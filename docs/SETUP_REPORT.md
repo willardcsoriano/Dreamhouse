@@ -7,7 +7,9 @@
 ---
 
 ## Executive Summary
-This report documents the initial setup phase of the Dreamhouse Realty application development environment. It details the local tooling installation, Salesforce org authorization, version control baseline, and the integration of the Salesforce Model Context Protocol (MCP) server for AI-assisted development.
+This report documents the initial setup phase of the Dreamhouse Realty application development environment. It details the local tooling installation, Salesforce org authorization, version control baseline, and the integration of the Salesforce Model Context Protocol (MCP) server for AI-assisted development. 
+
+The developer's workflow is strictly CLI-first and keyboard-centric; consequently, navigating browser-based configuration tools (such as Salesforce Setup navigation and the Object Creator spreadsheet import wizard) was a notable source of friction during this phase.
 
 ---
 
@@ -58,8 +60,11 @@ To enable advanced AI pair-programming, the official Salesforce Model Context Pr
 ---
 
 ## 5. Roadblocks & Resolutions Encountered
-During the setup phase, several environmental and licensing roadblocks were encountered and resolved:
+During the setup phase, several environmental, licensing, and workflow roadblocks were encountered and resolved:
 
+*   **GUI Configuration Overhead & Friction (CLI-First Preference):**
+    *   **Roadblock:** Significant workflow friction and navigation difficulties encountered during browser-based point-and-click tasks (specifically navigating Salesforce Setup menus and utilizing the web-based Object Creator spreadsheet wizard), due to the developer's strong preference for terminal-based, keyboard-centric environments.
+    *   **Resolution:** Tabled browser-based configuration tasks as quickly as possible, immediately syncing the resulting metadata changes back to the terminal using the `sf project retrieve` command to return to a pure CLI and local text editor workflow.
 *   **Wrong Org Authorized (Trailhead Verification Failure):**
     *   **Roadblock:** The CLI was initially connected using a personal Salesforce Developer org (`hello@willardcsoriano.dev`), which caused the Trailhead page challenge validator to fail.
     *   **Resolution:** Logged into the playground in the browser, accessed the `Playground Starter` credentials tab, reset the playground password, and re-authenticated the CLI using `sf org login web -a myDevOrg -s` with the playground's specific username.
