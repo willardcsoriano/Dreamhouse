@@ -57,7 +57,25 @@ To enable advanced AI pair-programming, the official Salesforce Model Context Pr
 
 ---
 
-## 5. Next Milestones
+## 5. Roadblocks & Resolutions Encountered
+During the setup phase, several environmental and licensing roadblocks were encountered and resolved:
+
+*   **Wrong Org Authorized (Trailhead Verification Failure):**
+    *   **Roadblock:** The CLI was initially connected using a personal Salesforce Developer org (`hello@willardcsoriano.dev`), which caused the Trailhead page challenge validator to fail.
+    *   **Resolution:** Logged into the playground in the browser, accessed the `Playground Starter` credentials tab, reset the playground password, and re-authenticated the CLI using `sf org login web -a myDevOrg -s` with the playground's specific username.
+*   **Missing Java Compiler (JDK):**
+    *   **Roadblock:** VS Code's Salesforce Apex Extension failed to compile or support class structures because Java was missing on the local Debian 13 environment (`javac: command not found`).
+    *   **Resolution:** Installed the default JDK using Debian's package manager (`sudo apt install default-jdk -y`), configuring `javac 21.0.11`.
+*   **NVM PATH Conflict (VS Code CLI Recognition Gap):**
+    *   **Roadblock:** NVM loaded Node and npm binaries dynamically in active terminal shell sessions. VS Code's background processes and non-interactive shell hosts (`/bin/sh`) could not read NVM variables, failing with `sf: not found` errors.
+    *   **Resolution:** Created symbolic links from NVM's binary directory shortcuts directly into `/usr/local/bin/node` and `/usr/local/bin/sf` to expose them system-wide.
+*   **Agentforce Vibes Licensing:**
+    *   **Roadblock:** The LWC coding agent pane in VS Code returned a block screen saying "Agentforce Vibes is not enabled in your org."
+    *   **Resolution:** Opened Setup in the browser, accepted the native `Agentforce Vibes IDE` terms and conditions under the Development menu, and re-authenticated the CLI credentials to refresh the workspace licenses.
+
+---
+
+## 6. Next Milestones
 1.  **Apex Service Implementation:** Write the `HouseService` Apex controller in `force-app/main/default/classes/` to execute security-enforced SOQL queries.
 2.  **Lightning Web Component (LWC) Creation:** Build the `housingMap` component using Salesforce base elements (`lightning-card` and `lightning-map`) to plot properties.
 3.  **UI Deployment & Page Layout Placement:** Deploy the LWC bundle and place it on the Dreamhouse App Home Page layout using Lightning App Builder.
