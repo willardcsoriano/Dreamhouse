@@ -10,4 +10,9 @@
         <field>Offer__c.Target_Close_Date__c</field>
         <readable>true</readable>
     </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Offer__c.Contact__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
 </Profile>
