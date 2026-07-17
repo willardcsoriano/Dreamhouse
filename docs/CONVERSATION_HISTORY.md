@@ -1,8 +1,22 @@
 # Dreamhouse Developer Reference Guide
 
-A concise technical reference for Salesforce development, architecture, and environmental troubleshooting.
+## Overview
+
+This is a concise technical reference for Salesforce development on the Dreamhouse Realty project, covering platform architecture, Lightning Web Components, and environmental troubleshooting. It exists so recurring setup pain points don't have to be re-diagnosed from scratch each time they resurface. Section 1 explains how Salesforce's metadata-driven, multi-tenant architecture differs from a traditional app-plus-database stack. Section 2 maps LWC concepts to their React equivalents for developers coming from a JS framework background. Section 3 catalogs environment and CLI/deployment issues hit during setup, each with cause and fix. Trailhead challenge-check failures specifically have their own dedicated reference — see `TRAILHEAD_TROUBLESHOOTING.md`.
 
 ---
+
+## Table of Contents
+
+- [Overview](#overview)
+- [1. Salesforce Platform Architecture](#1-salesforce-platform-architecture)
+  - [Metadata-Driven Architecture](#metadata-driven-architecture)
+  - [Data Virtualization & Multi-Tenancy](#data-virtualization-multi-tenancy)
+- [2. Lightning Web Components (LWC)](#2-lightning-web-components-lwc)
+  - [React Developer Concept Mapping](#react-developer-concept-mapping)
+- [3. Environment & Tooling Troubleshooting](#3-environment-tooling-troubleshooting)
+  - [VS Code & Extension Host Diagnostics](#vs-code-extension-host-diagnostics)
+  - [Salesforce CLI & Deployment Issues](#salesforce-cli-deployment-issues)
 
 ## 1. Salesforce Platform Architecture
 
@@ -72,3 +86,6 @@ LWC is a modern standards-based UI framework built natively on browser web compo
     ```bash
     rm -rf ~/.config/Code/GPUCache && mv ~/.config/Code ~/.config/Code.bak && mv ~/.vscode ~/.vscode.bak
     ```
+- **Trailhead Challenge Check Failures:**
+  - **Cause:** Varies — see the dedicated reference.
+  - **Fix:** See [`TRAILHEAD_TROUBLESHOOTING.md`](TRAILHEAD_TROUBLESHOOTING.md) for diagnostic steps and fixes, including the "field does not exist / wrong type" error caused by missing field-level security on Metadata API-deployed fields.

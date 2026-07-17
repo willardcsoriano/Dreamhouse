@@ -6,6 +6,17 @@
 
 ---
 
+## Table of Contents
+
+- [Executive Summary](#executive-summary)
+  - [Development Environment Architecture](#development-environment-architecture)
+- [1. Local Tooling & Project Dependencies](#1-local-tooling-project-dependencies)
+- [2. Salesforce Org Authorization](#2-salesforce-org-authorization)
+- [3. Version Control (Git)](#3-version-control-git)
+- [4. Salesforce MCP Server Integration](#4-salesforce-mcp-server-integration)
+- [5. Roadblocks & Resolutions Encountered](#5-roadblocks-resolutions-encountered)
+- [6. Next Milestones](#6-next-milestones)
+
 ## Executive Summary
 
 This report documents the initial setup phase of the Dreamhouse Realty application development environment. It details the local tooling installation, Salesforce org authorization, version control baseline, and the integration of the Salesforce Model Context Protocol (MCP) server for AI-assisted development.
@@ -102,6 +113,9 @@ During the setup phase, several environmental, licensing, and workflow roadblock
 - **VS Code Apex Extension Missing Java Path (`Java runtime could not be located`):**
   - **Roadblock:** Local VS Code Apex Extension failed to detect the Java runtime even after installing the default JDK, displaying a `Java runtime could not be located` warning.
   - **Resolution:** Defined the Java home folder path explicitly in VS Code's `settings.json` under `salesforce.salesforcedx-vscode-apex.java.home` (pointing to `/usr/lib/jvm/default-java` or the active OpenJDK home directory `/usr/lib/jvm/java-21-openjdk-amd64`).
+- **Trailhead Challenge Falsely Reporting Missing/Wrong-Type Field (`Offer_Amount__c`):**
+  - **Roadblock:** After deploying the custom `Offer__c` object and its `Offer_Amount__c` (Currency) and `Target_Close_Date__c` (Date) fields via `sf project deploy start`, the Trailhead challenge repeatedly failed with "The field 'Offer_Amount__c' either does not exist on the Offer__c object or it is not of type currency" — despite the field being verifiably present and correctly typed via Tooling API queries. A parallel debugging attempt (a second, concurrently run agent session) first suspected the field's currency precision/scale (`18,0` vs. the Setup UI's default `16,2`) and redeployed with the adjusted scale; this did not resolve the error, ruling out precision/scale as the cause.
+  - **Resolution:** Identified via direct `FieldPermissions` SOQL queries that the Metadata API deploy had created the field correctly in the schema but granted **no field-level security to any profile**, including System Administrator — unlike the Setup UI wizard, a bare `CustomField` metadata deploy does not auto-grant FLS. Deployed a `force-app/main/default/profiles/Admin.profile-meta.xml` component with explicit `fieldPermissions` entries (readable/editable) for both fields, which resolved the check. Full diagnostic method and prevention rule documented in [`TRAILHEAD_TROUBLESHOOTING.md`](TRAILHEAD_TROUBLESHOOTING.md).
 
 ---
 
