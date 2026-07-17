@@ -1,126 +1,83 @@
-# Dreamhouse Development Setup & Environment Report
+# Dreamhouse Development Progress Report
 
-**Date:** July 16, 2026  
-**Developer:** Willard Soriano  
-**Project:** Salesforce Dreamhouse Realty App
-
----
-
-## Table of Contents
-
-- [Executive Summary](#executive-summary)
-  - [Development Environment Architecture](#development-environment-architecture)
-- [1. Local Tooling & Project Dependencies](#1-local-tooling-project-dependencies)
-- [2. Salesforce Org Authorization](#2-salesforce-org-authorization)
-- [3. Version Control (Git)](#3-version-control-git)
-- [4. Salesforce MCP Server Integration](#4-salesforce-mcp-server-integration)
-- [5. Roadblocks & Resolutions Encountered](#5-roadblocks-resolutions-encountered)
-- [6. Next Milestones](#6-next-milestones)
-
-## Executive Summary
-
-This report documents the initial setup phase of the Dreamhouse Realty application development environment. It details the local tooling installation, Salesforce org authorization, version control baseline, and the integration of the Salesforce Model Context Protocol (MCP) server for AI-assisted development.
-
-The developer's workflow is strictly CLI-first and keyboard-centric; consequently, navigating browser-based configuration tools (such as Salesforce Setup navigation and the Object Creator spreadsheet import wizard) was a notable source of friction during this phase.
-
-### Development Environment Architecture
-
-Due to local hardware constraints (the initial local developer machine only having **8 GB of RAM**, leading to out-of-memory/RAM exhaustion during heavy development workloads), a **dual-machine architecture** was established:
-
-- **Local Client:** 8 GB RAM Linux PC used for remote access interfaces and local SSH connection.
-- **Remote Development Host (VM):** A **Hetzner CX43 Cloud VM** (equipped with **4 vCPUs and 16 GB RAM**) hosting the primary project workspace, Salesforce CLI (`sf`), Node.js environment, Git repository, and the Salesforce Model Context Protocol (MCP) servers.
+**Date:** July 17, 2026  
+**To:** Supervisor, DreamHouse Realty  
+**From:** Willard Soriano, Lead Developer  
+**Subject:** Dreamhouse Realty Application Development Progress Update
 
 ---
 
-## 1. Local Tooling & Project Dependencies
+## 1. Executive Summary
 
-The development environment has been configured with the necessary compilers, formatters, and Salesforce Command Line Interface (CLI) components.
-
-| Tool / Dependency         | Version / Status          | Description                                                  |
-| :------------------------ | :------------------------ | :----------------------------------------------------------- |
-| **Node.js**               | `v24.14.1`                | Runtime environment for local JS tooling and build tasks.    |
-| **Salesforce CLI (`sf`)** | `@salesforce/cli/2.143.6` | The primary CLI tool for deploying and retrieving metadata.  |
-| **npm packages**          | 785 packages installed    | Dev dependencies including ESLint, Prettier, and LWC Jest.   |
-| **Husky & Lint-Staged**   | Configured                | Automatically formats and lints code changes before commits. |
+This report summarizes the current development status of the Dreamhouse Realty custom application implementation. The environment configuration, core data architecture modeling, and deployment pipelines have been successfully established. We are currently executing the feature implementation roadmap, starting with the property purchase workflow and target close date tracking features.
 
 ---
 
-## 2. Salesforce Org Authorization
+## 2. Key Accomplishments & Features Delivered
 
-To establish a connection between the local project files and the cloud, the Salesforce CLI was authorized to connect to the Trailhead Playground.
+### Core Custom Object Modeling (Offer Object)
 
-- **Default Target Org Alias:** `myDevOrg`
-- **Active Instance URL:** `https://willardcsoriano.my.salesforce.com`
-- **Authentication Flow:** OAuth 2.0 Web Server Flow (`sf org login web`)
-- **Connection Verification Status:** **Successful**
-- **Playground Setup Experience:** Resolved a common verification issue by resetting the auto-generated Playground password via the `Playground Starter` application and authenticating using the specific Playground credentials rather than personal developer credentials.
+We have designed and deployed the custom **Offer** schema to Salesforce. This object allows brokers to record and track buyer offers, pricing, and purchase timelines.
 
----
+- **Auto Numbering System:** Configured the record name as an auto-incrementing field formatted as `OF-{0000}`, starting at number `1` for clear record cataloging.
+- **Currency Tracking (`Offer_Amount__c`):** Created a custom Currency field with a precision of 18 digits and a scale of 2 decimal places to capture transactional offer amounts.
+- **Timeline Tracking (`Target_Close_Date__c`):** Created a custom Date field to track close dates for sales negotiations.
 
-## 3. Version Control (Git)
+### Version Control & CI/CD Staging
 
-A Git repository has been initialized to implement source-driven development. A branching strategy has been adopted to maintain clear code ownership:
+To maintain quality control and support peer review:
 
-- **Repository Init:** Running `git init` in the project root.
-- **Initial Commit (`cb922af`):** Baseline files and the retrieved `House__c` Custom Object metadata.
-- **Branching Strategy:**
-  - **`master` (Current):** A clean working branch kept at a baseline state. This branch will contain only the code written step-by-step by the developer.
-  - **`agent-solution`:** An isolated branch containing the AI assistant's generated solutions (Apex classes and LWC maps) to serve as a reference.
+- Initialized source-controlled metadata repository tracking.
+- Created isolated feature branch `feature/offer-object`.
+- Opened Pull Request #1 on GitHub to stage changes for main branch review.
 
 ---
 
-## 4. Salesforce MCP Server Integration
+## 3. Engineering Key Learnings & Operational Roadblocks
 
-To enable advanced AI pair-programming, the official Salesforce Model Context Protocol (MCP) server (`@salesforce/mcp`) was configured.
+To ensure project resilience and optimal development speed, several engineering roadblocks were analyzed, bypassed, and documented during this sprint:
 
-- **Configuration File:** [mcp_config.json](file:///home/willard/.gemini/config/mcp_config.json)
-- **Launch Syntax:** `npx @salesforce/mcp@latest -o myDevOrg --toolsets all`
-- **Verification Tests Run:**
-  1.  **`list_all_orgs`:** Confirmed the MCP server is communicating with the CLI.
-  2.  **`run_soql_query`:** Confirmed database connectivity by querying the active user's name and email.
-  3.  **`run_apex_test`:** Verified Apex test-running capability by executing existing cloud unit tests (4/4 tests passed).
+### A. Local Hardware Optimization & Scaling
 
----
+- **Challenge:** The initial local developer machine (8 GB RAM) experienced memory exhaustion (OOM) under concurrent execution of the Salesforce model context servers and Node dependencies.
+- **Resolution:** Provisioned and scaled the development environment to a **Hetzner CX43 VM** (4 vCPUs, 16 GB RAM). This resolved all performance bottlenecks and ensured clean multitasking.
 
-## 5. Roadblocks & Resolutions Encountered
+### B. Workspace Tooling & CLI Resilience
 
-During the setup phase, several environmental, licensing, and workflow roadblocks were encountered and resolved:
+- **Challenge:** Local VS Code Electron runtime crashed on startup due to corrupted GPU caches.
+- **Resolution:** Transitioned seamlessly to a **CLI-first, keyboard-centric workflow** via remote SSH. Bypassed graphics overhead by utilizing terminal-based code readers (`less`), lightweight editors (`gedit`/`nano`), and manual command-line deployments.
+- **GPU Cache Fix:** Documented a local terminal routine (`rm -rf ~/.config/Code/GPUCache`) to fix the underlying local Electron issue.
 
-- **GUI Configuration Overhead & Friction (CLI-First Preference):**
-  - **Roadblock:** Significant workflow friction and navigation difficulties encountered during browser-based point-and-click tasks (specifically navigating Salesforce Setup menus and utilizing the web-based Object Creator spreadsheet wizard), due to the developer's strong preference for terminal-based, keyboard-centric environments.
-  - **Resolution:** Tabled browser-based configuration tasks as quickly as possible, immediately syncing the resulting metadata changes back to the terminal using the `sf project retrieve` command to return to a pure CLI and local text editor workflow.
-- **Wrong Org Authorized (Trailhead Verification Failure):**
-  - **Roadblock:** The CLI was initially connected using a personal Salesforce Developer org (`hello@willardcsoriano.dev`), which caused the Trailhead page challenge validator to fail.
-  - **Resolution:** Logged into the playground in the browser, accessed the `Playground Starter` credentials tab, reset the playground password, and re-authenticated the CLI using `sf org login web -a myDevOrg -s` with the playground's specific username.
-- **Missing Java Compiler (JDK):**
-  - **Roadblock:** VS Code's Salesforce Apex Extension failed to compile or support class structures because Java was missing on the local Debian 13 environment (`javac: command not found`).
-  - **Resolution:** Installed the default JDK using Debian's package manager (`sudo apt install default-jdk -y`), configuring `javac 21.0.11`.
-- **NVM PATH Conflict (VS Code CLI Recognition Gap):**
-  - **Roadblock:** NVM loaded Node and npm binaries dynamically in active terminal shell sessions. VS Code's background processes and non-interactive shell hosts (`/bin/sh`) could not read NVM variables, failing with `sf: not found` errors.
-  - **Resolution:** Created symbolic links from NVM's binary directory shortcuts directly into `/usr/local/bin/node` and `/usr/local/bin/sf` to expose them system-wide.
-- **Agentforce Vibes Licensing:**
-  - **Roadblock:** The LWC coding agent pane in VS Code returned a block screen saying "Agentforce Vibes is not enabled in your org."
-  - **Resolution:** Opened Setup in the browser, accepted the native `Agentforce Vibes IDE` terms and conditions under the Development menu, and re-authenticated the CLI credentials to refresh the workspace licenses.
-- **Local VS Code Crash & CLI Transition (Loss of Remote SSH Window):**
-  - **Roadblock:** The local VS Code application crashed and failed to open (prompted to close immediately on launch) due to local GPU/cache corruption, preventing remote SSH access through the IDE interface.
-  - **Resolution:** Transitioned completely to the Agentic CLI command-line workflow over remote SSH. Handled code viewing (using `less` and syntax highlighting tips), project navigation, and executing Python (`uv run`) and Go (`go run`) CLI files directly via terminal commands.
-- **Salesforce CLI Default Target Org Missing (`NoDefaultEnvError`):**
-  - **Roadblock:** Authenticated with `sf org login web -d -a trailhead-playground` successfully, but subsequent metadata deployment failed with `NoDefaultEnvError: No default environment found` because the login command configured the alias as the default DevHub (`target-dev-hub` 🌳) but not the default active target org (`target-org` 🍁).
-  - **Resolution:** Configured the target-org default value explicitly via `sf config set target-org trailhead-playground` (or passing the `-o` flag), allowing the metadata deploy to succeed.
-- **Netdata Repository Package Mismatch (`Hash Sum mismatch`):**
-  - **Roadblock:** Run-time system updates via `sudo apt full-upgrade` failed due to ongoing Netdata repository CDN/mirror synchronization conflicts, causing package downloads to abort due to checksum size and hash mismatches.
-  - **Resolution:** Placed temporary holds on Netdata packages (`sudo apt-mark hold ...`) to bypass the mismatch errors, allowing the rest of the system upgrades to proceed smoothly.
-- **VS Code Apex Extension Missing Java Path (`Java runtime could not be located`):**
-  - **Roadblock:** Local VS Code Apex Extension failed to detect the Java runtime even after installing the default JDK, displaying a `Java runtime could not be located` warning.
-  - **Resolution:** Defined the Java home folder path explicitly in VS Code's `settings.json` under `salesforce.salesforcedx-vscode-apex.java.home` (pointing to `/usr/lib/jvm/default-java` or the active OpenJDK home directory `/usr/lib/jvm/java-21-openjdk-amd64`).
-- **Trailhead Challenge Falsely Reporting Missing/Wrong-Type Field (`Offer_Amount__c`):**
-  - **Roadblock:** After deploying the custom `Offer__c` object and its `Offer_Amount__c` (Currency) and `Target_Close_Date__c` (Date) fields via `sf project deploy start`, the Trailhead challenge repeatedly failed with "The field 'Offer_Amount__c' either does not exist on the Offer__c object or it is not of type currency" — despite the field being verifiably present and correctly typed via Tooling API queries. A parallel debugging attempt (a second, concurrently run agent session) first suspected the field's currency precision/scale (`18,0` vs. the Setup UI's default `16,2`) and redeployed with the adjusted scale; this did not resolve the error, ruling out precision/scale as the cause.
-  - **Resolution:** Identified via direct `FieldPermissions` SOQL queries that the Metadata API deploy had created the field correctly in the schema but granted **no field-level security to any profile**, including System Administrator — unlike the Setup UI wizard, a bare `CustomField` metadata deploy does not auto-grant FLS. Deployed a `force-app/main/default/profiles/Admin.profile-meta.xml` component with explicit `fieldPermissions` entries (readable/editable) for both fields, which resolved the check. Full diagnostic method and prevention rule documented in [`TRAILHEAD_TROUBLESHOOTING.md`](TRAILHEAD_TROUBLESHOOTING.md).
+### C. Salesforce Org Target Environment Routing
+
+- **Challenge:** Encountered `NoDefaultEnvError` during metadata deployment because the initial login flow set the playground as a default DevHub (`target-dev-hub`), but left the active target org (`target-org`) unassigned.
+- **Resolution:** Configured the CLI target-org default value explicitly (`sf config set target-org trailhead-playground`), securing persistent, direct deployments to the playground.
+
+### D. Package Manager Mirror Mismatches
+
+- **Challenge:** Intermittent checksum/hash sum failures during `sudo apt full-upgrade` caused by upstream Netdata repository synchronization delays.
+- **Resolution:** Placed temporary holds on Netdata packages (`sudo apt-mark hold ...`) to decouple them from core OS and security package upgrades, allowing system updates to finish.
 
 ---
 
-## 6. Next Milestones
+## 4. Project Milestones & Next Steps
 
-1.  **Apex Service Implementation:** Write the `HouseService` Apex controller in `force-app/main/default/classes/` to execute security-enforced SOQL queries.
-2.  **Lightning Web Component (LWC) Creation:** Build the `housingMap` component using Salesforce base elements (`lightning-card` and `lightning-map`) to plot properties.
-3.  **UI Deployment & Page Layout Placement:** Deploy the LWC bundle and place it on the Dreamhouse App Home Page layout using Lightning App Builder.
+```mermaid
+gantt
+    title Dreamhouse Project Roadmap
+    dateFormat  YYYY-MM-DD
+    section Phase 1
+    Custom Object Modeling & Schema Deployment :done, 2026-07-16, 2026-07-17
+    section Phase 2
+    Apex Service Implementation (SOQL Queries)  :active, 2026-07-17, 2026-07-19
+    Lightning Web Component (housingMap) Build : 2026-07-19, 2026-07-22
+    section Phase 3
+    LWC Integration & App Layout Placement      : 2026-07-22, 2026-07-24
+```
+
+1.  **Apex Service Implementation (Next Task):**
+    Write the `HouseService` Apex controller in the `force-app/main/default/classes/` directory to run security-enforced SOQL queries for filtering properties.
+2.  **Lightning Web Component (LWC) Creation:**
+    Build the `housingMap` component using Salesforce Lightning Base Components (`lightning-card` and `lightning-map`) to plot active listings on a map.
+3.  **UI Integration:**
+    Deploy the LWC bundle and place it on the Dreamhouse App Home Page layout using Lightning App Builder.
