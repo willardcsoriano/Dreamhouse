@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a copy-paste-ready command log of the exact `sf` CLI sequence that diagnosed and resolved the Trailhead field-level-security (FLS) failure described in `TRAILHEAD_TROUBLESHOOTING.md`. Where that file explains _why_ the error happened, this one is a terse runbook of _what was actually typed_, in order, so the same sequence can be replayed quickly the next time a Trailhead challenge falsely reports a field as missing or wrong-typed. Replace `Offer__c`/field names/`<org>` with the object, fields, and org alias relevant at the time. Commands are grouped into three phases: confirm the org connection, diagnose schema vs. access, then fix and reverify.
+This is a copy-paste-ready command log of the exact `sf` CLI sequence that diagnosed and resolved the Trailhead field-level-security (FLS) failure described in `TROUBLESHOOTING.md`. Where that file explains _why_ the error happened, this one is a terse runbook of _what was actually typed_, in order, so the same sequence can be replayed quickly the next time a Trailhead challenge falsely reports a field as missing or wrong-typed. Replace `Offer__c`/field names/`<org>` with the object, fields, and org alias relevant at the time. Commands are grouped into three phases: confirm the org connection, diagnose schema vs. access, then fix and reverify.
 
 ---
 

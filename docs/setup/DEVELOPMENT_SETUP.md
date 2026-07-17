@@ -1,12 +1,24 @@
 # Dreamhouse Development Setup & Environment Guide
 
-This guide documents the local tooling installation, Salesforce org authorization, version control configuration, and the integration of the Salesforce Model Context Protocol (MCP) server for the Dreamhouse Realty project.
+## Overview
+
+This guide documents the local tooling installation, Salesforce org authorization, version control configuration, and the integration of the Salesforce Model Context Protocol (MCP) server for the Dreamhouse Realty project. It's the practical setup reference: what's installed, how the CLI authenticates to the org, and the specific fixes applied when environment or deployment tooling misbehaved. Trailhead challenge-check failures have their own dedicated reference in `../trailhead/TROUBLESHOOTING.md` rather than being duplicated here, and the architecture/LWC reference material lives in `DEVELOPER_REFERENCE.md`.
 
 ---
 
+## Table of Contents
+
+- [Overview](#overview)
+- [1. Local Tooling & Project Dependencies](#1-local-tooling-project-dependencies)
+- [2. Salesforce Org Authorization](#2-salesforce-org-authorization)
+- [3. Salesforce MCP Server Integration](#3-salesforce-mcp-server-integration)
+- [4. Setup Troubleshooting & Configuration Fixes](#4-setup-troubleshooting-configuration-fixes)
+  - [VS Code & Extension Host Settings](#vs-code-extension-host-settings)
+  - [CLI Environment & OS-Level Fixes](#cli-environment-os-level-fixes)
+
 ## 1. Local Tooling & Project Dependencies
 
-The development environment has been configured with the necessary compilers, compilers, formatters, and Salesforce Command Line Interface (CLI) components:
+The development environment has been configured with the necessary compilers, formatters, and Salesforce Command Line Interface (CLI) components:
 
 - **Node.js:** `v24.14.1` (using NVM for node version management).
 - **Salesforce CLI (`sf`):** `@salesforce/cli/2.143.6`.

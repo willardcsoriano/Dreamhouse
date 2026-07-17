@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a concise technical reference for Salesforce development on the Dreamhouse Realty project, covering platform architecture, Lightning Web Components, and environmental troubleshooting. It exists so recurring setup pain points don't have to be re-diagnosed from scratch each time they resurface. Section 1 explains how Salesforce's metadata-driven, multi-tenant architecture differs from a traditional app-plus-database stack. Section 2 maps LWC concepts to their React equivalents for developers coming from a JS framework background. Section 3 catalogs environment and CLI/deployment issues hit during setup, each with cause and fix. Trailhead challenge-check failures specifically have their own dedicated reference — see `TRAILHEAD_TROUBLESHOOTING.md`.
+This is a concise technical reference for Salesforce development on the Dreamhouse Realty project, covering platform architecture and Lightning Web Components. Section 1 explains how Salesforce's metadata-driven, multi-tenant architecture differs from a traditional app-plus-database stack. Section 2 maps LWC concepts to their React equivalents for developers coming from a JS framework background. Environment and CLI/deployment troubleshooting now lives in its own dedicated guide (`DEVELOPMENT_SETUP.md`) rather than being duplicated here, and Trailhead challenge-check failures have their own reference in `../trailhead/TROUBLESHOOTING.md`.
 
 ---
 
@@ -14,9 +14,7 @@ This is a concise technical reference for Salesforce development on the Dreamhou
   - [Data Virtualization & Multi-Tenancy](#data-virtualization-multi-tenancy)
 - [2. Lightning Web Components (LWC)](#2-lightning-web-components-lwc)
   - [React Developer Concept Mapping](#react-developer-concept-mapping)
-- [3. Environment & Tooling Troubleshooting](#3-environment-tooling-troubleshooting)
-  - [VS Code & Extension Host Diagnostics](#vs-code-extension-host-diagnostics)
-  - [Salesforce CLI & Deployment Issues](#salesforce-cli-deployment-issues)
+- [3. Where Setup & Troubleshooting Content Lives](#3-where-setup-troubleshooting-content-lives)
 
 ## 1. Salesforce Platform Architecture
 
@@ -54,38 +52,6 @@ LWC is a modern standards-based UI framework built natively on browser web compo
 
 ---
 
-## 3. Environment & Tooling Troubleshooting
+## 3. Where Setup & Troubleshooting Content Lives
 
-### VS Code & Extension Host Diagnostics
-
-- **Java Runtime Missing (`Java runtime could not be located`):**
-  - **Cause:** VS Code Apex Extension failed to auto-locate the local JDK path.
-  - **Fix:** Define the JVM directory path explicitly in VS Code's `settings.json`:
-    ```json
-    "salesforce.salesforcedx-vscode-apex.java.home": "/usr/lib/jvm/default-java"
-    ```
-- **System-wide Node/CLI Path Conflicts:**
-  - **Cause:** Dynamic NVM loading prevents non-interactive shell hosts or background extensions from recognizing binary paths.
-  - **Fix:** Create global symbolic links:
-    ```bash
-    sudo ln -sf $(which node) /usr/local/bin/node
-    sudo ln -sf $(npm config get prefix)/bin/sf /usr/local/bin/sf
-    ```
-
-### Salesforce CLI & Deployment Issues
-
-- **Default Target Org Missing (`NoDefaultEnvError`):**
-  - **Cause:** Authorizing with `-d` sets the org as the default DevHub but not the default Target Org for source deployments.
-  - **Fix:** Set the default target org config key:
-    ```bash
-    sf config set target-org trailhead-playground
-    ```
-- **Local VS Code GPU Crash (Linux):**
-  - **Cause:** Hardware acceleration or shader cache corruption on Wayland/Nvidia setups.
-  - **Fix:** Perform a non-destructive GPU cache delete and configuration soft reset:
-    ```bash
-    rm -rf ~/.config/Code/GPUCache && mv ~/.config/Code ~/.config/Code.bak && mv ~/.vscode ~/.vscode.bak
-    ```
-- **Trailhead Challenge Check Failures:**
-  - **Cause:** Varies — see the dedicated reference.
-  - **Fix:** See [`TRAILHEAD_TROUBLESHOOTING.md`](TRAILHEAD_TROUBLESHOOTING.md) for diagnostic steps and fixes, including the "field does not exist / wrong type" error caused by missing field-level security on Metadata API-deployed fields.
+This guide stays focused on architecture and LWC concepts. Environment setup, CLI/deployment issues (JDK path, NVM PATH conflicts, `NoDefaultEnvError`, VS Code GPU crashes, and more) are documented in [`DEVELOPMENT_SETUP.md`](DEVELOPMENT_SETUP.md). Trailhead challenge-check failures — including the "field does not exist / wrong type" error caused by missing field-level security on Metadata API-deployed fields — are documented in [`../trailhead/TROUBLESHOOTING.md`](../trailhead/TROUBLESHOOTING.md).

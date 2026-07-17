@@ -7,6 +7,19 @@
 
 ---
 
+## Table of Contents
+
+- [1. Executive Summary](#1-executive-summary)
+- [2. Key Accomplishments & Trailhead Modules Covered](#2-key-accomplishments-trailhead-modules-covered)
+  - [A. Salesforce Platform Basics & Data Modeling](#a-salesforce-platform-basics-data-modeling)
+  - [B. Platform Development Workflows](#b-platform-development-workflows)
+- [3. Roadblocks & Beginner Developer Learnings](#3-roadblocks-beginner-developer-learnings)
+  - [Local Hardware Limitations & Cloud Offloading](#local-hardware-limitations-cloud-offloading)
+  - [VS Code Extension & Compilation Diagnostics](#vs-code-extension-compilation-diagnostics)
+  - [Salesforce CLI Connection & Default Org Setup](#salesforce-cli-connection-default-org-setup)
+  - [Field-Level Security Is a Separate Layer From Schema](#field-level-security-is-a-separate-layer-from-schema)
+- [4. Next Milestones & Training Roadmap](#4-next-milestones-training-roadmap)
+
 ## 1. Executive Summary
 
 This report summarizes the progress and key outcomes of my training on the Salesforce **Developer Beginner** learning path. Using the Dreamhouse Realty app codebase, I have successfully configured the developer environment, learned the core Salesforce schema architectures, and deployed a custom database model using Salesforce DX metadata pipelines.
@@ -22,6 +35,7 @@ I implemented custom schema updates to support the broker workflow. This aligned
 - **Custom Object (`Offer__c`):** Built a custom object schema to model property offers, utilizing an Auto Number naming format (`OF-{0000}`) starting at index `1`.
 - **Currency Custom Field (`Offer_Amount__c`):** Created a currency database field with standard precision (18, 2) to capture numeric monetary figures.
 - **Date Custom Field (`Target_Close_Date__c`):** Implemented a date field to log the purchase negotiation deadline.
+- **Object Relationships:** Added a required Master-Detail field (`Property__c`) linking each offer to the property it's on — deleting a property now cascades to its offers — and an optional Lookup field (`Contact__c`) tracking which buyer made the offer.
 
 ### B. Platform Development Workflows
 
@@ -48,6 +62,11 @@ During environment provisioning and metadata verification, several technical roa
 
 - _Learning:_ Authorizing an environment using `sf org login web` does not automatically make it the default deployment target.
 - _Resolution:_ Learned to set the default target org config key (`sf config set target-org trailhead-playground`) to resolve `NoDefaultEnvError` during metadata deployment.
+
+### Field-Level Security Is a Separate Layer From Schema
+
+- _Learning:_ A Metadata API field deploy can succeed, with the field correctly typed and fully queryable via Tooling API, while still failing every Trailhead check with a misleading "field does not exist" error — because unlike the Setup UI wizard, a bare CLI field deploy grants no profile any field-level security by default.
+- _Resolution:_ Diagnosed via direct `FieldPermissions` SOQL queries, then deployed an `Admin.profile-meta.xml` component granting explicit read/edit access. Applied proactively on every field added afterward. Full writeup in [`../trailhead/TROUBLESHOOTING.md`](../trailhead/TROUBLESHOOTING.md).
 
 ---
 

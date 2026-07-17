@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a standalone, quick-lookup reference for Trailhead challenge check failures on this project — kept separate from the broader `CONVERSATION_HISTORY.md` and `SETUP_REPORT.md` docs so it's fast to find the next time a challenge check fails for a non-obvious reason (e.g., after Trailhead re-links the Playground to VS Code/the CLI, or after any future org re-authentication). Each entry below documents a specific misleading Trailhead error message, its real root cause, the exact diagnostic commands used to confirm it, the fix, and any dead-end hypotheses that were tried and ruled out along the way so they aren't retried. Currently covers one incident: a "field does not exist / wrong type" error on the `Offer__c.Offer_Amount__c` field that was actually a missing field-level security grant, not a schema problem. See also the "Wrong Org Authorized" entry in `SETUP_REPORT.md` for Trailhead check failures caused by the CLI being connected to the wrong org.
+This is a standalone, quick-lookup reference for Trailhead challenge check failures on this project — kept separate from the broader `DEVELOPER_REFERENCE.md` and `DEVELOPMENT_SETUP.md` docs so it's fast to find the next time a challenge check fails for a non-obvious reason (e.g., after Trailhead re-links the Playground to VS Code/the CLI, or after any future org re-authentication). Each entry below documents a specific misleading Trailhead error message, its real root cause, the exact diagnostic commands used to confirm it, the fix, and any dead-end hypotheses that were tried and ruled out along the way so they aren't retried. Covers two incidents so far: a "field does not exist / wrong type" error that was actually a missing field-level security grant, and a wrong-org authentication mismatch that made every challenge check fail regardless of what was deployed.
 
 ---
 
@@ -16,6 +16,10 @@ This is a standalone, quick-lookup reference for Trailhead challenge check failu
   - [Fix](#fix)
   - [Ruled-Out Hypothesis: Currency Precision/Scale](#ruled-out-hypothesis-currency-precisionscale)
   - [Prevention Rule](#prevention-rule)
+- [Wrong Org Authorized](#wrong-org-authorized)
+  - [Symptom](#symptom-1)
+  - [Root Cause](#root-cause-1)
+  - [Fix](#fix-1)
 
 ## Field-Level Security Not Granted by Metadata API Deploys
 
@@ -101,3 +105,29 @@ While this was being diagnosed, a second, concurrent debugging session (a separa
 1. Create the `.field-meta.xml` under `objects/<Object>/fields/` as usual.
 2. In the same change, add or update `fieldPermissions` entries for that field in `force-app/main/default/profiles/Admin.profile-meta.xml` (or the relevant permission set, if this project moves to permission-set-based access later).
 3. Deploy both together. Don't treat the profile/permission-set grant as an optional follow-up — a field with no FLS grant is, for practical purposes, a field that doesn't exist to anyone using it through normal UI, Apex-with-sharing, or API access checks.
+
+---
+
+## Wrong Org Authorized
+
+### Symptom
+
+Every Trailhead challenge check fails, regardless of what's actually been built or deployed — including challenges that were previously passing, or metadata that's demonstrably correct in whatever org the CLI is talking to.
+
+### Root Cause
+
+The Salesforce CLI was authenticated to a personal Salesforce Developer org rather than the specific Trailhead Playground the challenge page is checking. Trailhead validates whatever org/username its challenge page shows as your connected Hands-on Org — a browser-side connection that has no relationship to which org `sf` happens to have as its default locally. A deploy can succeed perfectly and still never be seen by the checker if it landed in the wrong org.
+
+### Fix
+
+1. Confirm which org Trailhead expects: open the challenge page and check the username/org shown near **Check Challenge** (or `trailhead.salesforce.com/myplayground`).
+2. Compare against the CLI's connected org: `sf org list --json` / `sf org display -o <alias> --json`.
+3. If they don't match, authenticate to the correct Playground. If the Playground's auto-generated password is unknown, reset it via the **Playground Starter** app's credentials tab, then re-authenticate:
+   ```bash
+   sf org login web -a <alias> -s -d
+   ```
+4. Set it as the default target org so subsequent deploys go to the right place without needing `-o` every time:
+   ```bash
+   sf config set target-org <alias>
+   ```
+5. Re-deploy (or simply re-check, if the metadata was already correct) once the CLI and the challenge page agree on the org.
