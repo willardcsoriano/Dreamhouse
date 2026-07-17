@@ -12,6 +12,13 @@ This report documents the initial setup phase of the Dreamhouse Realty applicati
 
 The developer's workflow is strictly CLI-first and keyboard-centric; consequently, navigating browser-based configuration tools (such as Salesforce Setup navigation and the Object Creator spreadsheet import wizard) was a notable source of friction during this phase.
 
+### Development Environment Architecture
+
+Due to local hardware constraints (the initial local developer machine only having **8 GB of RAM**, leading to out-of-memory/RAM exhaustion during heavy development workloads), a **dual-machine architecture** was established:
+
+- **Local Client:** 8 GB RAM Linux PC used for remote access interfaces and local SSH connection.
+- **Remote Development Host (VM):** A **Hetzner CX43 Cloud VM** (equipped with **4 vCPUs and 16 GB RAM**) hosting the primary project workspace, Salesforce CLI (`sf`), Node.js environment, Git repository, and the Salesforce Model Context Protocol (MCP) servers.
+
 ---
 
 ## 1. Local Tooling & Project Dependencies
@@ -89,6 +96,12 @@ During the setup phase, several environmental, licensing, and workflow roadblock
 - **Salesforce CLI Default Target Org Missing (`NoDefaultEnvError`):**
   - **Roadblock:** Authenticated with `sf org login web -d -a trailhead-playground` successfully, but subsequent metadata deployment failed with `NoDefaultEnvError: No default environment found` because the login command configured the alias as the default DevHub (`target-dev-hub` 🌳) but not the default active target org (`target-org` 🍁).
   - **Resolution:** Configured the target-org default value explicitly via `sf config set target-org trailhead-playground` (or passing the `-o` flag), allowing the metadata deploy to succeed.
+- **Netdata Repository Package Mismatch (`Hash Sum mismatch`):**
+  - **Roadblock:** Run-time system updates via `sudo apt full-upgrade` failed due to ongoing Netdata repository CDN/mirror synchronization conflicts, causing package downloads to abort due to checksum size and hash mismatches.
+  - **Resolution:** Placed temporary holds on Netdata packages (`sudo apt-mark hold ...`) to bypass the mismatch errors, allowing the rest of the system upgrades to proceed smoothly.
+- **VS Code Apex Extension Missing Java Path (`Java runtime could not be located`):**
+  - **Roadblock:** Local VS Code Apex Extension failed to detect the Java runtime even after installing the default JDK, displaying a `Java runtime could not be located` warning.
+  - **Resolution:** Defined the Java home folder path explicitly in VS Code's `settings.json` under `salesforce.salesforcedx-vscode-apex.java.home` (pointing to `/usr/lib/jvm/default-java` or the active OpenJDK home directory `/usr/lib/jvm/java-21-openjdk-amd64`).
 
 ---
 
