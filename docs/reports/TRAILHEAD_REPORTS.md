@@ -16,6 +16,20 @@
    - **Deploy (`sf project deploy start`):** Pushes local metadata files (Apex, XML, LWC) from VS Code to the Salesforce cloud org so the platform registers the changes.
    - **Retrieve (`sf project retrieve start`):** The Salesforce term for "pulling" GUI changes; downloads metadata created or modified in the web Setup UI back into local VS Code files for Git version control.
 
+   ```text
+          [ VS CODE / GIT REPO ]
+            (Local Source Files)
+             │              ▲
+             │              │
+       sf project      sf project
+      deploy start    retrieve start
+      (Push Code)     (Pull Metadata)
+             │              │
+             ▼              │
+          [ SALESFORCE CLOUD ORG ]
+            (Web GUI / Sandbox)
+   ```
+
 ---
 
 ## Supplemental Learnings
