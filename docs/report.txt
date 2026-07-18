@@ -1,0 +1,17 @@
+report
+
+learnings 
+
+1. salesforce is used by businesses to track all operations seamlessly
+2. 
+
+supplemental learnings
+
+1. salesforce patented their db approach in the 2000s, but technology quickly caught up and by the time the patent expired, nobody cared. today, postgress easily handles the concerns sf patented such as [refer to developer reference md]
+2. salesforce is very expensive and all users invest heavily. entry level sf prices right now range [fetch this data]
+3. 
+
+roadblocks
+
+1. did badges not in order. i first finished the first badge, then unkowingly finished the 3rd batch next, where i did all activities via playground without vscode. by the time i found out i skipped badge 2, which was connected to vscode, i got so confused and spent a lot of time connecting trailhead to org to vscode. and even after i connected it, i found navigating the sf gui very hard, which again cost me time. if it wasnt for the video included in the tutorial, i wouldnt have followed through. 
+2. i had to switch machines because my local machine only had 8gb ram. i had to remote ssh vscode into my hetzner vm so i had to do the setup from scratch, costing me time. 
