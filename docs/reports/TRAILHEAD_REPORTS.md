@@ -30,13 +30,9 @@
 
 ```bash
 # 1. Confirm field exists in the schema via Tooling API
-sf data query -o trailhead-playground --use-tooling-api -q \
-  "SELECT QualifiedApiName, DataType FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = 'Offer__c'"
-```
+$ sf data query -o trailhead-playground --use-tooling-api -q \
+    "SELECT QualifiedApiName, DataType FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = 'Offer__c'"
 
-**Output:**
-
-```text
 ┌──────────────────────┬────────────────────────────┐
 │ QUALIFIEDAPINAME     │ DATATYPE                   │
 ├──────────────────────┼────────────────────────────┤
@@ -46,23 +42,22 @@ sf data query -o trailhead-playground --use-tooling-api -q \
 │ Contact__c           │ Lookup(Contact)            │
 │ Property__c          │ Master-Detail(Property)    │
 └──────────────────────┴────────────────────────────┘
-```
 
-```bash
-# 2. Confirm field-level security permissions
-sf data query -o trailhead-playground -q \
-  "SELECT Field, PermissionsRead, PermissionsEdit, Parent.Profile.Name FROM FieldPermissions WHERE SobjectType='Offer__c'"
-```
+# 2. Confirm field-level security permissions (Pre-fix: 0 records returned)
+$ sf data query -o trailhead-playground -q \
+    "SELECT Field, PermissionsRead, PermissionsEdit, Parent.Profile.Name FROM FieldPermissions WHERE SobjectType='Offer__c'"
 
-**Pre-Fix Output (FLS missing):**
-
-```text
 Total number of records retrieved: 0.
-```
 
-**Post-Fix Output (After deploying Admin.profile-meta.xml):**
+# 3. Deploy profile metadata granting explicit read/edit Field-Level Security
+$ sf project deploy start -d force-app/main/default/profiles -o trailhead-playground
 
-```text
+Status: Succeeded | 1/1 Components Deployed
+
+# 4. Re-verify permissions (Post-fix: Read/Edit granted to System Administrator)
+$ sf data query -o trailhead-playground -q \
+    "SELECT Field, PermissionsRead, PermissionsEdit, Parent.Profile.Name FROM FieldPermissions WHERE SobjectType='Offer__c'"
+
 ┌─────────────────────────────┬─────────────────┬─────────────────┬──────────────────────┐
 │ FIELD                       │ PERMISSIONSREAD │ PERMISSIONSEDIT │ PARENT.PROFILE.NAME  │
 ├─────────────────────────────┼─────────────────┼─────────────────┼──────────────────────┤
@@ -70,15 +65,4 @@ Total number of records retrieved: 0.
 │ Offer__c.Target_Close_Date  │ true            │ true            │ System Administrator │
 │ Offer__c.Contact__c         │ true            │ true            │ System Administrator │
 └─────────────────────────────┴─────────────────┴─────────────────┴──────────────────────┘
-```
-
-```bash
-# 3. Deploy profile metadata granting explicit read/edit Field-Level Security
-sf project deploy start -d force-app/main/default/profiles -o trailhead-playground
-```
-
-**Deploy Output:**
-
-```text
-Status: Succeeded | 1/1 Components Deployed
 ```
