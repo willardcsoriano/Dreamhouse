@@ -26,4 +26,17 @@
 
 1. **Out-of-Order Badge Completion & Setup Friction:** Completed the first badge, then unknowingly jumped directly to Badge 3 inside the web Playground without VS Code. Discovering that Badge 2 was skipped (which covered the initial VS Code connection) caused significant confusion and consumed extra time connecting the Trailhead Playground org to VS Code. Additionally, navigating the Salesforce GUI initially presented a steep learning curve, though following the included tutorial videos helped clarify the navigation.
 2. **Hardware Limitations & Remote VM Migration:** Local hardware constraints (8 GB RAM) were insufficient to run VS Code alongside developer tooling without performance degradation. To resolve this, development was migrated to a 16 GB Hetzner VM via Remote SSH, which required setting up the development stack from scratch and cost setup time.
-3. **CLI Deployment vs. GUI Challenge Verification (Field-Level Security):** Completing activities via the Salesforce CLI (`sf project deploy start`) instead of the point-and-click Setup GUI caused Trailhead challenge checks to fail with misleading "field does not exist" errors. Unlike the Setup UI wizard, CLI metadata deployments do not automatically grant Field-Level Security (FLS) access permissions to user profiles. This was resolved by diagnosing the missing access via Tooling API SOQL queries and deploying an explicit `Admin.profile-meta.xml` profile component with `fieldPermissions` (read/edit) for the new fields.
+3. **CLI Deployment vs. GUI Challenge Verification (Field-Level Security):** Completing activities via the Salesforce CLI (`sf project deploy start`) instead of the point-and-click Setup GUI caused Trailhead challenge checks to fail with misleading "field does not exist" errors. Unlike the Setup UI wizard, CLI metadata deployments do not automatically grant Field-Level Security (FLS) access permissions to user profiles. This was resolved by diagnosing the missing access via Tooling API SOQL queries and deploying an explicit `Admin.profile-meta.xml` profile component with `fieldPermissions` (read/edit) for the new fields:
+
+```bash
+# 1. Confirm field exists in the schema via Tooling API
+sf data query -o trailhead-playground --use-tooling-api -q \
+  "SELECT QualifiedApiName, DataType FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = 'Offer__c'"
+
+# 2. Confirm field-level security permissions (returned empty prior to fix)
+sf data query -o trailhead-playground -q \
+  "SELECT Field, PermissionsRead, PermissionsEdit, Parent.Profile.Name FROM FieldPermissions WHERE SobjectType='Offer__c'"
+
+# 3. Deploy profile metadata granting explicit read/edit Field-Level Security
+sf project deploy start -d force-app/main/default/profiles -o trailhead-playground
+```
