@@ -3,7 +3,7 @@ report
 learnings 
 
 1. salesforce is used by businesses to track all operations seamlessly
-2. 
+2. deploy is pushing local code to org; retrieve is the sf term for pulling gui changes to local files
 
 supplemental learnings
 
