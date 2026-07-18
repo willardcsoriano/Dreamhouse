@@ -12,6 +12,9 @@
    - **Objects & Fields:** Objects represent database tables, Fields represent columns, and Records represent rows.
    - **Primary Keys (`Id`):** Every record is automatically assigned a unique 18-character alphanumeric string (`Id`).
    - **Foreign Keys (Lookup vs. Master-Detail):** Both are Foreign Key columns storing the parent's `Id` under the hood. **Lookup** acts as an optional FK with independent record ownership, while **Master-Detail** acts as a strict `NOT NULL` FK with cascading deletes, parent-inherited security (`ControlledByParent`), and support for real-time **Roll-Up Summary fields** (`SUM`, `COUNT`, `MIN`, `MAX`).
+3. **Two-Way Metadata Synchronization (Deploy vs. Retrieve):**
+   - **Deploy (`sf project deploy start`):** Pushes local metadata files (Apex, XML, LWC) from VS Code to the Salesforce cloud org so the platform registers the changes.
+   - **Retrieve (`sf project retrieve start`):** The Salesforce term for "pulling" GUI changes; downloads metadata created or modified in the web Setup UI back into local VS Code files for Git version control.
 
 ---
 
