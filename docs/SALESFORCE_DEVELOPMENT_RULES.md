@@ -75,6 +75,11 @@ The Salesforce Lightning Platform is a heavily stateful, cloud-hosted multi-tena
 - **Directive:** Always pass `--use-tooling-api` (`sf data query --use-tooling-api`) or MCP `"use_tooling_api": true` when querying `FieldDefinition` metadata.
 - **Rationale:** Standard SOQL queries fail when inspecting metadata definitions. Tooling API queries expose internal data types (`Currency(16, 2)`, `Master-Detail(Property)`, `Lookup(Contact)`).
 
+### Rule 3.4: The Hybrid SFDX CLI + `--json` Protocol (Mandatory Badge 05 Onwards)
+
+- **Directive:** From Badge 05 onwards, all developer activities MUST be executed using **hands-on SFDX CLI commands appended with the `--json` flag** (`sf project deploy start ... --json` and `sf data query ... --json`).
+- **Rationale:** Standard terminal text logs can be noisy ASCII tables, whereas `--json` CLI output guarantees **100% hands-on developer learning retention** combined with **100% deterministic JSON payload traceability** matching MCP protocol auditability standards.
+
 ---
 
 ## Section 4: Version Control & Shipping Hygiene Rules

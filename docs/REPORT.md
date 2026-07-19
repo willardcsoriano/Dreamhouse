@@ -1,6 +1,6 @@
 # Trailhead Progress Report
 
-**Date:** July 18, 2026  
+**Date:** July 19, 2026  
 **Subject:** Developer Beginner Trailhead Progress & Learnings
 
 ---
@@ -30,6 +30,15 @@
             (Web GUI / Sandbox)
    ```
 
+4. **Atomic Schema & FLS Provisioning (The "Ghost Field" Anti-Pattern):**
+   - **Database Schema vs. Visibility Layer:** Creating a `CustomField` XML file physically instantiates the column in Salesforce, BUT Salesforce sets Field-Level Security (FLS) to `invisible/non-editable` by default for all user profiles.
+   - **The "Ghost Field" Phenomenon:** Deploying schema without profile `fieldPermissions` produces "ghost fields"—fields that exist in the database but are completely hidden from the GUI, throw `No such column` errors in SOQL queries, and cause Trailhead verification checks to fail.
+   - **GUI Parity & CLI Automation:** In the Salesforce Setup GUI, Step 3 of the field creation wizard displays a page of checkboxes that automatically grants FLS visibility to profiles. When working via CLI/source XML, non-interactive Stream Editing (`sed -i '/<\/Profile>/i ...'`) acts as the exact CLI equivalent of checking those GUI visibility boxes.
+   - **Mandatory Pattern:** Schema creation (`CustomField`) and Security provisioning (`fieldPermissions`) MUST always be executed as a single atomic unit.
+
+5. **The Hybrid SFDX CLI + `--json` Execution Protocol:**
+   - **The Sweet Spot:** Combining hands-on SFDX CLI execution with the `--json` output flag provides the ultimate developer hybrid: **100% hands-on CLI learning retention** (mastering flags like `-d`, `-o`, `-q`) paired with **100% deterministic JSON payload traceability** matching MCP protocol auditability standards.
+
 ---
 
 ## Supplemental Learnings
@@ -43,7 +52,7 @@
 
 1. **Out-of-Order Badge Completion & Setup Friction:** Completed the first badge, then unknowingly jumped directly to Badge 3 inside the web Playground without VS Code. Discovering that Badge 2 was skipped (which covered the initial VS Code connection) caused significant confusion and consumed extra time connecting the Trailhead Playground org to VS Code. Additionally, navigating the Salesforce GUI initially presented a steep learning curve, though following the included tutorial videos helped clarify the navigation.
 2. **Hardware Limitations & Remote VM Migration:** Local hardware constraints (8 GB RAM) were insufficient to run VS Code alongside developer tooling without performance degradation. To resolve this, development was migrated to a 16 GB Hetzner VM via Remote SSH, which required setting up the development stack from scratch and cost setup time.
-3. **CLI Deployment vs. GUI Challenge Verification (Field-Level Security):** Completing activities via the Salesforce CLI (`sf project deploy start`) instead of the point-and-click Setup GUI caused Trailhead challenge checks to fail with misleading "field does not exist" errors. Unlike the Setup UI wizard, CLI metadata deployments do not automatically grant Field-Level Security (FLS) access permissions to user profiles. This was resolved by diagnosing the missing access via Tooling API SOQL queries and deploying an explicit `Admin.profile-meta.xml` profile component with `fieldPermissions` (read/edit) for the new fields:
+3. **CLI Deployment vs. GUI Challenge Verification ("Ghost Fields"):** Completing activities via the Salesforce CLI (`sf project deploy start`) instead of the point-and-click Setup GUI caused Trailhead challenge checks to fail with misleading "field does not exist" errors. Unlike the Setup UI wizard, CLI metadata deployments do not automatically grant Field-Level Security (FLS) access permissions to user profiles. This created "ghost fields" that existed in the database schema but remained completely invisible to SOQL and Trailhead. This was resolved by diagnosing the missing access via Tooling API SOQL queries and appending explicit `fieldPermissions` into `Admin.profile-meta.xml` before deploying:
 
 ```bash
 # 1. Confirm field exists in the schema via Tooling API
@@ -66,12 +75,18 @@ $ sf data query -o trailhead-playground -q \
 
 Total number of records retrieved: 0.
 
-# 3. Deploy profile metadata granting explicit read/edit Field-Level Security
-$ sf project deploy start -d force-app/main/default/profiles -o trailhead-playground
+# 3. Stream-edit Admin profile XML to append FLS visibility right before </Profile>
+$ sed -i '/<\/Profile>/i \    <fieldPermissions>\n        <editable>true</editable>\n        <field>Offer__c.Offer_Amount__c</field>\n        <readable>true</readable>\n    </fieldPermissions>' force-app/main/default/profiles/Admin.profile-meta.xml
 
-Status: Succeeded | 1/1 Components Deployed
+# 4. Deploy object schema and profile metadata atomically
+$ sf project deploy start \
+    -d force-app/main/default/objects/Offer__c \
+    -d force-app/main/default/profiles \
+    -o trailhead-playground
 
-# 4. Re-verify permissions (Post-fix: Read/Edit granted to System Administrator)
+Status: Succeeded | 2/2 Components Deployed
+
+# 5. Re-verify permissions (Post-fix: Read/Edit granted to System Administrator)
 $ sf data query -o trailhead-playground -q \
     "SELECT Field, PermissionsRead, PermissionsEdit, Parent.Profile.Name FROM FieldPermissions WHERE SobjectType='Offer__c'"
 
