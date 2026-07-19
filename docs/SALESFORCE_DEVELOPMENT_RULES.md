@@ -30,6 +30,11 @@ The Salesforce Lightning Platform is a heavily stateful, cloud-hosted multi-tena
     -o trailhead-playground
   ```
 
+### Rule 1.3: The Roll-Forward Rule (No Destructive Rollbacks Allowed)
+
+- **Directive:** **Destructive rollbacks are strictly prohibited.** When deployment errors, missing FLS permissions, or schema flaws occur, engineers MUST NOT attempt to delete or roll back org metadata state. Always fix the issue locally in source code and **roll forward** with a new patch deployment.
+- **Rationale:** Attempting destructive metadata rollbacks in multi-tenant environments risks wiping production record data, corrupting database foreign keys, and breaking dependent Apex/LWC components. Roll-forward patch deployments preserve database integrity and maintain clean version history.
+
 ---
 
 ## Section 2: Security & Field-Level Security (FLS) Rules
