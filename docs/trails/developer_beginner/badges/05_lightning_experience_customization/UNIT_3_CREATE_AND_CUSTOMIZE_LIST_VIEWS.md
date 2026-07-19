@@ -104,7 +104,7 @@ UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customiz
 mkdir -p "$UNIT_DIR"
 
 sf data query \
-  -o Rimes \
+  -o trailhead-playground \
   -q "SELECT Id, Name, DeveloperName, SobjectType FROM ListView WHERE SobjectType = 'Account' AND DeveloperName = 'Channel_Customers'" \
   --json | tee "$UNIT_DIR/UNIT_3_GUIDED_LISTVIEW_AUDIT.json"
 ```
@@ -204,7 +204,7 @@ EOF
 # 2. Deploy the ListView Metadata directly to target org 'Rimes'
 sf project deploy start \
   -d force-app/main/default/objects/Opportunity/listViews/High_Probability_Opportunities.listView-meta.xml \
-  -o Rimes
+  -o trailhead-playground
 ```
 
 ---
@@ -220,7 +220,7 @@ UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customiz
 mkdir -p "$UNIT_DIR"
 
 sf data query \
-  -o Rimes \
+  -o trailhead-playground \
   -q "SELECT Id, Name, DeveloperName, SobjectType FROM ListView WHERE SobjectType = 'Opportunity' AND DeveloperName = 'High_Probability_Opportunities'" \
   --json | tee "$UNIT_DIR/UNIT_3_CHALLENGE_VERIFICATION_AUDIT.json"
 ```
