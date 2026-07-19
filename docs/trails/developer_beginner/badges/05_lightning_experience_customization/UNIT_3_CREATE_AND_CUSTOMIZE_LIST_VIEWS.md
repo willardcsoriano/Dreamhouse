@@ -97,6 +97,8 @@ In Salesforce Lightning Experience, list views present data in tabular format fo
 
 - **Problem Solved:** Validates that requirement `[REQ-5.3.G1.1]` was satisfied by querying the custom `ListView` metadata record `Channel_Customers` on object `Account`, verifying `FilterScope = 'Everything'`.
 
+**Solves Requirement:** `[REQ-5.3.G1.1]`
+
 ```bash
 UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
 mkdir -p "$UNIT_DIR"
@@ -107,7 +109,9 @@ sf data query \
   --json | tee "$UNIT_DIR/UNIT_3_GUIDED_LISTVIEW_AUDIT.json"
 ```
 
-##### Expected Tooling JSON Output (`UNIT_3_GUIDED_LISTVIEW_AUDIT.json`):
+##### Expected Tooling JSON Output (`UNIT_3_GUIDED_LISTVIEW_AUDIT.json`)
+
+**Audit Payload Target:** `[REQ-5.3.G1.1]`
 
 ```json
 {
@@ -138,6 +142,8 @@ sf data query \
 
 - **Problem Solved:** Validates that requirement `[REQ-5.3.G3.1]` was satisfied by querying Tooling API `ListViewChart` for `Pipeline_Total_Value` on `Opportunity`, verifying parameters `ChartType: Donut`, `AggregateType: Sum`, and `GroupingType: Account`.
 
+**Solves Requirement:** `[REQ-5.3.G3.1]`
+
 ```bash
 sf data query \
   -o trailhead-playground \
@@ -146,7 +152,9 @@ sf data query \
   --json | tee "$UNIT_DIR/UNIT_3_GUIDED_CHART_AUDIT.json"
 ```
 
-##### Expected Tooling JSON Output (`UNIT_3_GUIDED_CHART_AUDIT.json`):
+##### Expected Tooling JSON Output (`UNIT_3_GUIDED_CHART_AUDIT.json`)
+
+**Audit Payload Target:** `[REQ-5.3.G3.1]`
 
 ```json
 {
@@ -213,6 +221,8 @@ Create a custom Opportunity list view for sales rep Lance Park to isolate opport
 
 - **Problem Solved:** Solves verification for requirements `[REQ-5.3.C1.1]` – `[REQ-5.3.C1.4]`, confirming that `High_Probability_Opportunities` exists on object `Opportunity` with `FilterScope: Everything`.
 
+**Solves Requirements:** `[REQ-5.3.C1.1]`, `[REQ-5.3.C1.2]`, `[REQ-5.3.C1.3]`, `[REQ-5.3.C1.4]`
+
 ```bash
 UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
 mkdir -p "$UNIT_DIR"
@@ -223,7 +233,9 @@ sf data query \
   --json | tee "$UNIT_DIR/UNIT_3_CHALLENGE_VERIFICATION_AUDIT.json"
 ```
 
-#### Expected Tooling JSON Output (`UNIT_3_CHALLENGE_VERIFICATION_AUDIT.json`):
+#### Expected Tooling JSON Output (`UNIT_3_CHALLENGE_VERIFICATION_AUDIT.json`)
+
+**Audit Payload Target:** `[REQ-5.3.C1.1]` – `[REQ-5.3.C1.4]`
 
 ```json
 {
