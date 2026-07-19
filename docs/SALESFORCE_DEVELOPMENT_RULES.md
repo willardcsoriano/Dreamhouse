@@ -107,7 +107,8 @@ The Salesforce Lightning Platform is a heavily stateful, cloud-hosted multi-tena
 
 - **Directive:** Leave experimental visual formatting, documentation updates, and schema refactoring uncommitted in the local working tree until the user reviews and explicitly approves the rendering.
 
-### Rule 4.4: File Editing vs. Command Execution Boundaries
+### Rule 4.4: Local CLI Execution vs. GitHub CLI Approval Boundaries
 
 - **Directive:** The AI agent is **100% permitted** to create, edit, and refine workspace files (`write_to_file`, `replace_file_content`) and inspect the codebase (`view_file`, `grep_search`).
-- **Prohibition:** The AI agent **MUST NOT** execute terminal commands (`run_command`) or perform Git operations (`git commit`, `git push`, `gh pr create`) unless explicitly commanded by the user in that exact turn. All CLI commands belong to the developer's hands-on terminal workflow.
+- **Local CLI Prohibition:** The AI agent **MUST NOT** execute local terminal commands (`run_command`), Salesforce CLI commands (`sf`), or local Git commands (`git commit`, `git checkout`). All local CLI execution belongs 100% to the developer's hands-on workflow.
+- **GitHub CLI (`gh`) Approval Exception:** The AI agent MAY execute GitHub CLI commands (`gh pr create`, `gh pr merge`) ONLY upon direct explicit instruction/approval from the user in that exact turn.
