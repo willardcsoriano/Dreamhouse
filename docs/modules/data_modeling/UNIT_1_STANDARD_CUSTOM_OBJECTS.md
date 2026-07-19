@@ -40,6 +40,14 @@ The challenge requires creating the `Offer__c` custom object along with two cust
 
 ---
 
+## Directive Traceability & Execution Prompt
+
+```text
+Create custom object Offer__c (Auto Number OF-{0000}), Currency field Offer_Amount__c, and Date field Target_Close_Date__c, provision profile FLS security in Admin.profile-meta.xml, deploy metadata to trailhead-playground via SFDX CLI, and verify schema via Tooling API SOQL.
+```
+
+---
+
 ## Solution Blueprint: Mandatory Atomic Field & FLS Creation Workflow
 
 ### Step 1: Custom Object Metadata Creation (`[REQ-1.1]`)
