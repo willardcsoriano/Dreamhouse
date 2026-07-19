@@ -106,3 +106,8 @@ The Salesforce Lightning Platform is a heavily stateful, cloud-hosted multi-tena
 ### Rule 4.3: Uncommitted Working Tree Review
 
 - **Directive:** Leave experimental visual formatting, documentation updates, and schema refactoring uncommitted in the local working tree until the user reviews and explicitly approves the rendering.
+
+### Rule 4.4: File Editing vs. Command Execution Boundaries
+
+- **Directive:** The AI agent is **100% permitted** to create, edit, and refine workspace files (`write_to_file`, `replace_file_content`) and inspect the codebase (`view_file`, `grep_search`).
+- **Prohibition:** The AI agent **MUST NOT** execute terminal commands (`run_command`) or perform Git operations (`git commit`, `git push`, `gh pr create`) unless explicitly commanded by the user in that exact turn. All CLI commands belong to the developer's hands-on terminal workflow.

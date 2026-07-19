@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Energy Audit</label>
+    <pluralLabel>Energy Audits</pluralLabel>
+    <nameField>
+        <label>Energy Audit Name</label>
+        <type>Text</type>
+        <trackFeedHistory>true</trackFeedHistory>
+    </nameField>
+    <sharingModel>ReadWrite</sharingModel>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <enableSearch>true</enableSearch>
+    <enableFeeds>true</enableFeeds>
+</CustomObject>
