@@ -104,7 +104,7 @@ UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customiz
 mkdir -p "$UNIT_DIR"
 
 sf data query \
-  -o trailhead-playground \
+  -o Rimes \
   -q "SELECT Id, Name, DeveloperName, SobjectType FROM ListView WHERE SobjectType = 'Account' AND DeveloperName = 'Channel_Customers'" \
   --json | tee "$UNIT_DIR/UNIT_3_GUIDED_LISTVIEW_AUDIT.json"
 ```
