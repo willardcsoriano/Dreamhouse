@@ -101,3 +101,38 @@ $ sf data query -o trailhead-playground -q \
 │ Offer__c.Contact__c         │ true            │ true            │ System Administrator │
 └─────────────────────────────┴─────────────────┴─────────────────┴──────────────────────┘
 ```
+
+---
+
+## Unit-Level Engineering Hiccups & Resolutions
+
+### Trail: Developer Beginner
+
+#### Badge 05: Lightning Experience Customization
+
+##### Unit 1: Set Up Your Org
+
+1. **Picklist Value Case Sensitivity (`Duplicate picklist value ground mounted`):**
+   - **Context:** `Developer Beginner > Badge 05: Lightning Experience Customization > Unit 1: Set Up Your Org`
+   - **Hiccup:** Guided activity specified `Ground mounted` (lowercase `m`), whereas the Challenge specified `Ground Mounted` (capital `M`). Including both in `Type_of_Installation__c.field-meta.xml` caused deployment to fail with `Duplicate picklist value ground mounted`.
+   - **Resolution:** Salesforce picklist Metadata API definitions are case-insensitive. Standardized value sets to eliminate case-insensitive collisions.
+
+2. **Standard Field Feed Tracking Metadata Schema (`<nameField>`):**
+   - **Context:** `Developer Beginner > Badge 05: Lightning Experience Customization > Unit 1: Set Up Your Org`
+   - **Hiccup:** Feed tracking was enabled on custom fields (`<trackFeedHistory>true</trackFeedHistory>`) and object level (`<enableFeeds>true</enableFeeds>`), but Trailhead challenge check failed on field `Energy Audit Name`.
+   - **Resolution:** Standard object name fields are defined inside `<nameField>` in `object-meta.xml`. Placed `<trackFeedHistory>true</trackFeedHistory>` explicitly inside the `<nameField>` block to enable Chatter Feed Tracking on `Name`.
+
+3. **Lookup Foreign Key Binds & CLI Data Command Placeholders (`MALFORMED_ID`):**
+   - **Context:** `Developer Beginner > Badge 05: Lightning Experience Customization > Unit 1: Set Up Your Org`
+   - **Hiccup:** Running `sf data create record -v "Account__c='<Burlington-Account-Id>'"` failed with `MALFORMED_ID` because text placeholders are invalid Salesforce IDs.
+   - **Resolution:** Automated CLI scripts by binding Live Account IDs dynamically into bash variables via SOQL + `jq` (`BURLINGTON_ID=$(sf data query ... --json | jq -r '.result.records[0].Id')`).
+
+4. **Terminal Input Buffer Overflows (Paste Truncation):**
+   - **Context:** `Developer Beginner > Badge 05: Lightning Experience Customization > Unit 1: Set Up Your Org`
+   - **Hiccup:** Copy-pasting a 105-line monolithic bash code block into terminal caused line truncation (`ERROR_HTTP_404`), cutting off `cat << 'EOF'` mid-line.
+   - **Resolution:** Modularized long CLI code blocks in documentation into paste-safe steps (`Challenge 3.1` and `Challenge 3.2`).
+
+5. **Developer vs. AI Agent Responsibility Boundaries (Rule 4.4):**
+   - **Context:** `Developer Beginner > Badge 05: Lightning Experience Customization > Unit 1: Set Up Your Org`
+   - **Hiccup:** Auto-committing and auto-executing CLI fixes created friction with hands-on learning retention.
+   - **Resolution:** Established **Rule 4.4** in `docs/SALESFORCE_DEVELOPMENT_RULES.md`, strictly separating file authoring (AI assistant permitted) from terminal execution and Git shipping (reserved exclusively for developer).
