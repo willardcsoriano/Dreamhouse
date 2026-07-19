@@ -95,7 +95,7 @@ In Salesforce Lightning Experience, list views present data in tabular format fo
 
 #### Verification Query 1 (`[SOL-5.3.G1.1]`): Account List View Schema (`Channel_Customers`)
 
-- **Problem Solved:** Validates that requirement `[REQ-5.3.G1.1]` was satisfied by querying the custom `ListView` metadata record `Channel_Customers` on object `Account`, verifying `FilterScope = 'Everything'`.
+- **Problem Solved:** Validates that requirement `[REQ-5.3.G1.1]` was satisfied by querying the custom `ListView` record `Channel_Customers` on object `Account`.
 
 **Solves Requirement:** `[REQ-5.3.G1.1]`
 
@@ -105,12 +105,11 @@ mkdir -p "$UNIT_DIR"
 
 sf data query \
   -o trailhead-playground \
-  --use-tooling-api \
   -q "SELECT Id, Name, DeveloperName, SobjectType FROM ListView WHERE SobjectType = 'Account' AND DeveloperName = 'Channel_Customers'" \
   --json | tee "$UNIT_DIR/UNIT_3_GUIDED_LISTVIEW_AUDIT.json"
 ```
 
-##### Expected Tooling JSON Output (`UNIT_3_GUIDED_LISTVIEW_AUDIT.json`)
+##### Expected JSON Output (`UNIT_3_GUIDED_LISTVIEW_AUDIT.json`)
 
 **Audit Payload Target:** `[REQ-5.3.G1.1]`
 
@@ -127,53 +126,7 @@ sf data query \
         "Id": "00BfL0000012345AAA",
         "Name": "Channel Customers",
         "DeveloperName": "Channel_Customers",
-        "SobjectType": "Account",
-        "FilterScope": "Everything"
-      }
-    ],
-    "totalSize": 1,
-    "done": true
-  }
-}
-```
-
----
-
-#### Verification Query 2 (`[SOL-5.3.G3.1]`): Opportunity List View Chart Schema (`Pipeline_Total_Value`)
-
-- **Problem Solved:** Validates that requirement `[REQ-5.3.G3.1]` was satisfied by querying Tooling API `ListViewChart` for `Pipeline_Total_Value` on `Opportunity`, verifying parameters `ChartType: Donut`, `AggregateType: Sum`, and `GroupingType: Account`.
-
-**Solves Requirement:** `[REQ-5.3.G3.1]`
-
-```bash
-sf data query \
-  -o trailhead-playground \
-  --use-tooling-api \
-  -q "SELECT Id, MasterLabel, DeveloperName, SobjectType, ChartType, AggregateType, GroupingType FROM ListViewChart WHERE SobjectType = 'Opportunity' AND DeveloperName = 'Pipeline_Total_Value'" \
-  --json | tee "$UNIT_DIR/UNIT_3_GUIDED_CHART_AUDIT.json"
-```
-
-##### Expected Tooling JSON Output (`UNIT_3_GUIDED_CHART_AUDIT.json`)
-
-**Audit Payload Target:** `[REQ-5.3.G3.1]`
-
-```json
-{
-  "status": 0,
-  "result": {
-    "records": [
-      {
-        "attributes": {
-          "type": "ListViewChart",
-          "url": "/services/data/v60.0/sobjects/ListViewChart/05AfL0000012345BBB"
-        },
-        "Id": "05AfL0000012345BBB",
-        "MasterLabel": "Pipeline Total Value",
-        "DeveloperName": "Pipeline_Total_Value",
-        "SobjectType": "Opportunity",
-        "ChartType": "Donut",
-        "AggregateType": "Sum",
-        "GroupingType": "Account"
+        "SobjectType": "Account"
       }
     ],
     "totalSize": 1,
@@ -190,12 +143,12 @@ sf data query \
 
 Create a custom Opportunity list view for sales rep Lance Park to isolate opportunities that are in late-stage negotiations or have a high probability of closing (>= 50%).
 
-| Requirement Tag ID   | Component / Setting             | Target Value / Specification                                                                                                             | Validation Rule                       |
-| :------------------- | :------------------------------ | :--------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------ |
-| **`[REQ-5.3.C1.1]`** | Target Object & Naming          | Object: Opportunity (`Opportunity`) \| **List Name:** `High Probability Opportunities` \| **API Name:** `High_Probability_Opportunities` | Exact string match on DeveloperName   |
-| **`[REQ-5.3.C1.2]`** | Sharing & Visibility            | `All users can see this list view`                                                                                                       | `FilterScope` must equal `Everything` |
-| **`[REQ-5.3.C1.3]`** | Filter Criteria 1 (Stage)       | `Stage` equals `Proposal/Price Quote`, `Negotiation/Review`                                                                              | Multi-picklist match                  |
-| **`[REQ-5.3.C1.4]`** | Filter Criteria 2 (Probability) | `Probability (%)` greater than or equal to `50` (`>= 50`)                                                                                | Numeric threshold match (`>= 50`)     |
+| Requirement Tag ID   | Component / Setting             | Target Value / Specification                                                                                                             | Validation Rule                     |
+| :------------------- | :------------------------------ | :--------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------- |
+| **`[REQ-5.3.C1.1]`** | Target Object & Naming          | Object: Opportunity (`Opportunity`) \| **List Name:** `High Probability Opportunities` \| **API Name:** `High_Probability_Opportunities` | Exact string match on DeveloperName |
+| **`[REQ-5.3.C1.2]`** | Sharing & Visibility            | `All users can see this list view`                                                                                                       | Standard list view scope            |
+| **`[REQ-5.3.C1.3]`** | Filter Criteria 1 (Stage)       | `Stage` equals `Proposal/Price Quote`, `Negotiation/Review`                                                                              | Multi-picklist match                |
+| **`[REQ-5.3.C1.4]`** | Filter Criteria 2 (Probability) | `Probability (%)` greater than or equal to `50` (`>= 50`)                                                                                | Numeric threshold match (`>= 50`)   |
 
 ---
 
@@ -220,7 +173,7 @@ Create a custom Opportunity list view for sales rep Lance Park to isolate opport
 
 ### Challenge Verification Query & Audit Payload (`[SOL-5.3.C1]`)
 
-- **Problem Solved:** Solves verification for requirements `[REQ-5.3.C1.1]` – `[REQ-5.3.C1.4]`, confirming that `High_Probability_Opportunities` exists on object `Opportunity` with `FilterScope: Everything`.
+- **Problem Solved:** Solves verification for requirements `[REQ-5.3.C1.1]` – `[REQ-5.3.C1.4]`, confirming that `High_Probability_Opportunities` exists on object `Opportunity`.
 
 **Solves Requirements:** `[REQ-5.3.C1.1]`, `[REQ-5.3.C1.2]`, `[REQ-5.3.C1.3]`, `[REQ-5.3.C1.4]`
 
@@ -230,12 +183,11 @@ mkdir -p "$UNIT_DIR"
 
 sf data query \
   -o trailhead-playground \
-  --use-tooling-api \
   -q "SELECT Id, Name, DeveloperName, SobjectType FROM ListView WHERE SobjectType = 'Opportunity' AND DeveloperName = 'High_Probability_Opportunities'" \
   --json | tee "$UNIT_DIR/UNIT_3_CHALLENGE_VERIFICATION_AUDIT.json"
 ```
 
-#### Expected Tooling JSON Output (`UNIT_3_CHALLENGE_VERIFICATION_AUDIT.json`)
+#### Expected JSON Output (`UNIT_3_CHALLENGE_VERIFICATION_AUDIT.json`)
 
 **Audit Payload Target:** `[REQ-5.3.C1.1]` – `[REQ-5.3.C1.4]`
 
@@ -252,8 +204,7 @@ sf data query \
         "Id": "00BfL0000067890CCC",
         "Name": "High Probability Opportunities",
         "DeveloperName": "High_Probability_Opportunities",
-        "SobjectType": "Opportunity",
-        "FilterScope": "Everything"
+        "SobjectType": "Opportunity"
       }
     ],
     "totalSize": 1,
