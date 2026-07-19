@@ -252,28 +252,6 @@ Once verified, click **Check Challenge to Earn 500 Points** on your Trailhead Pl
 
 ---
 
-## Technical Post-Mortem & Hiccups Resolution
-
-- **Trail:** Developer Beginner
-- **Badge 05:** Lightning Experience Customization
-- **Unit 3:** Create and Customize List Views
-
-### Key Engineering Hiccups & Solutions Encountered
-
-1. **Multi-Value Picklist Filter Syntax & Delimiters (`[REQ-5.3.C1.3]`):**
-   - **Hiccup:** When filtering by multiple picklist values (e.g. `Stage` equals `Proposal/Price Quote`, `Negotiation/Review`), entering raw quotes (`'Proposal/Price Quote', 'Negotiation/Review'`) into the text filter input causes Salesforce to evaluate the string literally, resulting in zero records returned.
-   - **Resolution:** In Lightning Experience List View UI, picklist filter values must be selected via the picklist modal checkboxes or separated by raw commas without quotes.
-
-2. **Percentage Field Input Values (`[REQ-5.3.C1.4]`):**
-   - **Hiccup:** Entering `50%` with the percent symbol in the `Probability (%)` numeric filter field causes an inline validation error `Invalid Number`.
-   - **Resolution:** Salesforce stores percentage field values internally as numbers/decimals. Enter integer `50` without the `%` symbol.
-
-3. **Chart Availability Scope on System List Views (`[REQ-5.3.G3.1]`):**
-   - **Hiccup:** Attempting to create a list view chart on the default `Recently Viewed` list view shows the Charts icon grayed out or unavailable.
-   - **Resolution:** Salesforce Metadata architecture restricts `ListViewChart` objects to standard and custom list views that possess explicit filter criteria; `Recently Viewed` is dynamically computed per session and does not support persistent charts.
-
----
-
 ## Resources & Reference Documentation
 
 - [Salesforce Help: Create or Clone a List View in Lightning Experience](https://help.salesforce.com/s/articleView?id=sf.custom_views.htm&type=5)
