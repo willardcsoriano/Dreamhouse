@@ -39,6 +39,7 @@ Create mandatory Text Area custom field Street_Address__c on Property__c with <r
 ### Step 1: Text Area Field Creation with Required Validation (`[REQ-3.1]` - `[REQ-3.5]`)
 
 #### Step 1.1: Create Field Metadata XML (`Property__c/fields/Street_Address__c.field-meta.xml`)
+
 ```bash
 # 1. Ensure target fields directory exists under Property__c object
 mkdir -p force-app/main/default/objects/Property__c/fields
@@ -63,6 +64,7 @@ EOF
 ### Step 2: Atomic Source Deployment Execution
 
 #### Step 2.1: Terminal CLI Execution
+
 ```bash
 # Deploy Property__c schema (-d objects/Property__c) to target org (-o trailhead-playground)
 sf project deploy start \
@@ -71,6 +73,7 @@ sf project deploy start \
 ```
 
 #### Step 2.2: AI Agent MCP Protocol Tool Call (`salesforce.deploy_metadata`)
+
 ```json
 // Invoke official Salesforce Model Context Protocol RPC tool to execute cloud deployment
 salesforce.deploy_metadata({
@@ -86,12 +89,14 @@ salesforce.deploy_metadata({
 ### Step 3: Schema & Security Verification
 
 #### Step 3.1: Terminal CLI SOQL Query
+
 ```bash
 # Run Tooling API query via CLI to verify QualifiedApiName and DataType schema properties for Property__c
 sf data query -o trailhead-playground --use-tooling-api -q "SELECT QualifiedApiName, DataType FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = 'Property__c'"
 ```
 
 #### Step 3.2: AI Agent MCP Protocol Query Tool Calls (`salesforce.query_data`)
+
 ```json
 // Query Tooling API schema definitions via MCP Protocol
 salesforce.query_data({
@@ -107,6 +112,7 @@ salesforce.query_data({
 ### Step 1: Deployment Execution
 
 #### Step 1.1: Vanilla CLI Input Command
+
 ```bash
 # Terminal SFDX deployment command
 sf project deploy start \
@@ -115,12 +121,14 @@ sf project deploy start \
 ```
 
 #### Step 1.2: Vanilla CLI Output Log
+
 ```text
 Status: Succeeded | 4/4 Components Deployed
 Created: Property__c.Street_Address__c (CustomField)
 ```
 
 #### Step 1.3: MCP Protocol Tool Call Input (`salesforce.deploy_metadata`)
+
 ```json
 // MCP tool call payload
 salesforce.deploy_metadata({
@@ -130,6 +138,7 @@ salesforce.deploy_metadata({
 ```
 
 #### Step 1.4: MCP Protocol Response Payload Output
+
 ```json
 {
   "status": "Succeeded",
@@ -144,12 +153,14 @@ salesforce.deploy_metadata({
 ### Step 2: Tooling API Schema Verification
 
 #### Step 2.1: Vanilla CLI Input Command
+
 ```bash
 # Terminal Tooling API query
 sf data query -o trailhead-playground --use-tooling-api -q "SELECT QualifiedApiName, DataType FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = 'Property__c'"
 ```
 
 #### Step 2.2: Vanilla CLI Output Table
+
 ```text
 ┌────────────────────┬────────────────────────────┐
 │ QUALIFIEDAPINAME   │ DATATYPE                   │
@@ -160,6 +171,7 @@ sf data query -o trailhead-playground --use-tooling-api -q "SELECT QualifiedApiN
 ```
 
 #### Step 2.3: MCP Protocol Query Tool Call Input (`salesforce.query_data`)
+
 ```json
 // MCP Tooling API query tool call
 salesforce.query_data({
@@ -169,6 +181,7 @@ salesforce.query_data({
 ```
 
 #### Step 2.4: MCP Protocol Response Payload Output
+
 ```json
 {
   "totalSize": 14,
