@@ -1,97 +1,65 @@
-# Trailhead Module: Data Modeling
+# Trailhead Module Index: Data Modeling
 
 **Trail:** Developer Beginner  
 **Module:** Data Modeling  
-**Date:** July 18, 2026
+**Date:** July 19, 2026
 
 ---
 
-## Unit 1: Optimize Customer Data with Standard and Custom Objects
+## Overview
 
-### Challenge Requirements
+This module covers custom objects, field types, relationships, and deployment paradigms for DreamHouse Realty in Salesforce.
 
-When a homebuyer makes an offer to buy a property, the brokers at DreamHouse Realty need to track the details in Salesforce. Create a custom object they can use to record the offer amount and target close date for the sale. Use auto numbering to generate the name of each offer record.
-
-1. **Create a Custom Object:**
-   - **Label:** Offer
-   - **Object Name:** `Offer` (`Offer__c`)
-   - **Record Name:** Offer Name
-   - **Data Type:** Auto Number
-   - **Display Format:** `OF-{0000}`
-   - **Starting Number:** 1
-
-2. **Create a Custom Currency Field:**
-   - **Data Type:** Currency
-   - **Field Label:** Offer Amount
-   - **Field Name:** `Offer_Amount` (`Offer_Amount__c`)
-
-3. **Create a Custom Date Field:**
-   - **Data Type:** Date
-   - **Field Label:** Target Close Date
-   - **Field Name:** `Target_Close_Date` (`Target_Close_Date__c`)
+Each unit is documented in its own dedicated file:
 
 ---
 
-### Solution Source Metadata & Commands
+## Module Units Index
 
-#### 1. Custom Object (`force-app/main/default/objects/Offer__c/Offer__c.object-meta.xml`)
+### 1. [Unit 1: Optimize Customer Data with Standard and Custom Objects](UNIT_1_STANDARD_CUSTOM_OBJECTS.md)
 
-```xml
-<?xml version="1.0" encoding="UTF-8" ?>
-<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
-    <label>Offer</label>
-    <pluralLabel>Offers</pluralLabel>
-    <nameField>
-        <displayFormat>OF-{0000}</displayFormat>
-        <label>Offer Name</label>
-        <type>AutoNumber</type>
-    </nameField>
-    <sharingModel>ReadWrite</sharingModel>
-    <deploymentStatus>Deployed</deploymentStatus>
-</CustomObject>
-```
+- **File Link (Absolute):** [UNIT_1_STANDARD_CUSTOM_OBJECTS.md](file:///home/willard/repos/Dreamhouse/docs/modules/data_modeling/UNIT_1_STANDARD_CUSTOM_OBJECTS.md)
+- **Focus:** Custom Object `Offer__c` (Auto Number `OF-{0000}`), Currency field (`Offer_Amount__c`), and Date field (`Target_Close_Date__c`).
+- **Tooling Paradigm:** 100% Vanilla Salesforce CLI (`sf project deploy start` and `sf data query`).
+- **Status:** **PASSED & VERIFIED**
 
-#### 2. Currency Field (`force-app/main/default/objects/Offer__c/fields/Offer_Amount__c.field-meta.xml`)
+---
 
-```xml
-<?xml version="1.0" encoding="UTF-8" ?>
-<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Offer_Amount__c</fullName>
-    <label>Offer Amount</label>
-    <type>Currency</type>
-    <precision>16</precision>
-    <scale>2</scale>
-</CustomField>
-```
+### 2. [Unit 2: Create Object Relationships](UNIT_2_OBJECT_RELATIONSHIPS.md)
 
-#### 3. Date Field (`force-app/main/default/objects/Offer__c/fields/Target_Close_Date__c.field-meta.xml`)
+- **File Link (Absolute):** [UNIT_2_OBJECT_RELATIONSHIPS.md](file:///home/willard/repos/Dreamhouse/docs/modules/data_modeling/UNIT_2_OBJECT_RELATIONSHIPS.md)
+- **Focus:** Linking `Offer__c` to `Property__c` (Master-Detail) and `Contact` (Lookup).
+- **Tooling Paradigm:** Salesforce Model Context Protocol (`@salesforce/mcp`) Server.
+- **Status:** **PASSED & VERIFIED**
 
-```xml
-<?xml version="1.0" encoding="UTF-8" ?>
-<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Target_Close_Date__c</fullName>
-    <label>Target Close Date</label>
-    <type>Date</type>
-</CustomField>
-```
+---
 
-#### 4. Field-Level Security Profile Grant (`force-app/main/default/profiles/Admin.profile-meta.xml`)
+### 3. [Unit 3: Work with Schema Builder](UNIT_3_WORK_WITH_SCHEMA_BUILDER.md)
 
-```xml
-<fieldPermissions>
-    <editable>true</editable>
-    <field>Offer__c.Offer_Amount__c</field>
-    <readable>true</readable>
-</fieldPermissions>
-<fieldPermissions>
-    <editable>true</editable>
-    <field>Offer__c.Target_Close_Date__c</field>
-    <readable>true</readable>
-</fieldPermissions>
-```
+- **File Link (Absolute):** [UNIT_3_WORK_WITH_SCHEMA_BUILDER.md](file:///home/willard/repos/Dreamhouse/docs/modules/data_modeling/UNIT_3_WORK_WITH_SCHEMA_BUILDER.md)
+- **Focus:** Custom Text Area field `Street_Address__c` on `Property__c` with mandatory `<required>true</required>` validation.
+- **Tooling Paradigm:** Salesforce Model Context Protocol (`@salesforce/mcp`) Server & SFDX CLI.
+- **Status:** **PASSED & VERIFIED**
 
-#### 5. Deployment Command
+---
 
-```bash
-sf project deploy start -d force-app/main/default/objects/Offer__c -d force-app/main/default/profiles -o trailhead-playground
-```
+### Challenge Satisfying Commands Matrix
+
+| Requirement Tag | Challenge Requirement Description                    | Unit Blueprint Document                                                                                                                                                                    | Status     |
+| :-------------- | :--------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------- |
+| **`[REQ-1.1]`** | Custom Object `Offer__c` (Auto Number `OF-{0000}`)   | [UNIT_1_STANDARD_CUSTOM_OBJECTS.md](UNIT_1_STANDARD_CUSTOM_OBJECTS.md) ([Absolute](file:///home/willard/repos/Dreamhouse/docs/modules/data_modeling/UNIT_1_STANDARD_CUSTOM_OBJECTS.md))    | **PASSED** |
+| **`[REQ-1.2]`** | Custom Currency Field `Offer_Amount__c`              | [UNIT_1_STANDARD_CUSTOM_OBJECTS.md](UNIT_1_STANDARD_CUSTOM_OBJECTS.md) ([Absolute](file:///home/willard/repos/Dreamhouse/docs/modules/data_modeling/UNIT_1_STANDARD_CUSTOM_OBJECTS.md))    | **PASSED** |
+| **`[REQ-1.3]`** | Custom Date Field `Target_Close_Date__c`             | [UNIT_1_STANDARD_CUSTOM_OBJECTS.md](UNIT_1_STANDARD_CUSTOM_OBJECTS.md) ([Absolute](file:///home/willard/repos/Dreamhouse/docs/modules/data_modeling/UNIT_1_STANDARD_CUSTOM_OBJECTS.md))    | **PASSED** |
+| **`[REQ-2.1]`** | Master-Detail Field `Property__c` (to `Property__c`) | [UNIT_2_OBJECT_RELATIONSHIPS.md](UNIT_2_OBJECT_RELATIONSHIPS.md) ([Absolute](file:///home/willard/repos/Dreamhouse/docs/modules/data_modeling/UNIT_2_OBJECT_RELATIONSHIPS.md))             | **PASSED** |
+| **`[REQ-2.2]`** | Lookup Field `Contact__c` (to `Contact`)             | [UNIT_2_OBJECT_RELATIONSHIPS.md](UNIT_2_OBJECT_RELATIONSHIPS.md) ([Absolute](file:///home/willard/repos/Dreamhouse/docs/modules/data_modeling/UNIT_2_OBJECT_RELATIONSHIPS.md))             | **PASSED** |
+| **`[REQ-3.1]`** | Text Area Field `Street_Address__c` (`<required>`)   | [UNIT_3_WORK_WITH_SCHEMA_BUILDER.md](UNIT_3_WORK_WITH_SCHEMA_BUILDER.md) ([Absolute](file:///home/willard/repos/Dreamhouse/docs/modules/data_modeling/UNIT_3_WORK_WITH_SCHEMA_BUILDER.md)) | **PASSED** |
+
+---
+
+### Developer Insight: Target Org Flags vs. VS Code "No Default Org Set"
+
+> **Key Takeaway:**
+>
+> - **VS Code "No Default Org Set":** VS Code's status bar displays "No Default Org Set" when no workspace-level fallback key (`target-org`) is configured in `.sf/config.json`.
+> - **Why Deploys & Checks Succeed:** Passing explicit org alias flags (`-o trailhead-playground`) in CLI/MCP commands bypasses workspace defaults entirely. The CLI looks up the saved OAuth refresh tokens stored locally on your machine for `trailhead-playground` and authenticates silently without requiring re-login.
+> - **Fixing the VS Code Status Bar:** Running `sf config set target-org trailhead-playground` sets the workspace default so VS Code's status bar displays `trailhead-playground`.
