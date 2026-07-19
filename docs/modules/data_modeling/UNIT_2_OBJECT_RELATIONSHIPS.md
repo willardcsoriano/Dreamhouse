@@ -3,14 +3,14 @@
 **Author:** Business Applications Engineering  
 **Module:** Data Modeling (Developer Beginner Trail)  
 **Unit 2:** Create Object Relationships  
-**Execution Paradigm:** Model Context Protocol Server (`@salesforce/mcp`) vs. Vanilla Salesforce CLI (`sf`)  
+**Execution Paradigm:** 100% Salesforce Model Context Protocol Server (`@salesforce/mcp`)  
 **Date:** July 19, 2026
 
 ---
 
 ## Executive Abstract
 
-This technical report documents the architectural design, security configuration, and metadata deployment execution for linking the custom `Offer__c` object to parent standard and custom entities (`Property__c` and `Contact`) within the Salesforce Lightning Platform. The report contrasts traditional developer terminal workflows against autonomous AI agent execution via the official Salesforce Model Context Protocol (`@salesforce/mcp`) server, proving complete functional and data state parity across both deployment paradigms.
+This technical report documents the architectural design, security configuration, and metadata deployment execution for linking the custom `Offer__c` object to parent standard and custom entities (`Property__c` and `Contact`) within the Salesforce Lightning Platform. The report details autonomous AI agent execution via the official Salesforce Model Context Protocol (`@salesforce/mcp`) server tools (`salesforce.deploy_metadata` and `salesforce.query_data`).
 
 ---
 
@@ -42,11 +42,11 @@ Create Master-Detail relationship field Property__c and Lookup relationship fiel
 
 ---
 
-## Solution Blueprint: Mandatory Atomic Field & FLS Creation Workflow
+## Solution Blueprint: Step-by-Step AI Agent MCP Execution Protocol
 
-### Step 1: Master-Detail Field Creation (`Property__c.field-meta.xml`) `[Satisfies REQ-2.1]`
+### Step 1: Create Master-Detail Relationship Field (`Property__c`) `[Satisfies REQ-2.1]`
 
-#### Step 1.1: Create Field Metadata XML
+#### Step 1.1: Generate Field Metadata XML
 
 ```bash
 # Generate Master-Detail relationship field metadata referencing Property__c
@@ -70,9 +70,9 @@ EOF
 
 ---
 
-### Step 2: Lookup Field Creation & Immediate FLS Provisioning (`Contact__c.field-meta.xml`) `[Satisfies REQ-2.2]`
+### Step 2: Create Lookup Relationship Field & Provision FLS (`Contact__c`) `[Satisfies REQ-2.2]`
 
-#### Step 2.1: Create Field Metadata XML
+#### Step 2.1: Generate Field Metadata XML
 
 ```bash
 # Generate Lookup relationship field metadata referencing Contact with SetNull deletion constraint
@@ -90,7 +90,7 @@ cat << 'EOF' > force-app/main/default/objects/Offer__c/fields/Contact__c.field-m
 EOF
 ```
 
-#### Step 2.2: Provision Immediate Field-Level Security (FLS) in Admin Profile
+#### Step 2.2: Provision Field-Level Security (FLS) in Admin Profile
 
 ```bash
 # Append fieldPermissions for Contact__c directly into Admin.profile-meta.xml before </Profile>
@@ -99,22 +99,12 @@ sed -i '/<\/Profile>/i \    <fieldPermissions>\n        <editable>true</editable
 
 ---
 
-### Step 3: Atomic Source Deployment Execution
+### Step 3: Deploy Metadata to Salesforce Cloud via MCP Protocol (`salesforce.deploy_metadata`)
 
-#### Step 3.1: Terminal CLI Execution
-
-```bash
-# Deploy metadata directories (-d) to target org (-o trailhead-playground) via standard CLI
-sf project deploy start \
-  -d force-app/main/default/objects/Offer__c \
-  -d force-app/main/default/profiles \
-  -o trailhead-playground
-```
-
-#### Step 3.2: AI Agent MCP Protocol Tool Call (`salesforce.deploy_metadata`)
+#### Step 3.1: MCP Protocol Invocation Input Payload
 
 ```json
-// Invoke official Salesforce Model Context Protocol RPC tool to execute cloud deployment
+// Invoke official Salesforce Model Context Protocol RPC tool to deploy metadata directories
 salesforce.deploy_metadata({
   "metadata_dirs": [
     "force-app/main/default/objects/Offer__c",
@@ -124,67 +114,7 @@ salesforce.deploy_metadata({
 })
 ```
 
----
-
-### Step 4: Schema & Security Verification
-
-#### Step 4.1: Terminal CLI SOQL Query
-
-```bash
-# Run Tooling API query via CLI to verify QualifiedApiName and DataType schema properties
-sf data query -o trailhead-playground --use-tooling-api -q "SELECT QualifiedApiName, DataType FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = 'Offer__c'"
-```
-
-#### Step 4.2: AI Agent MCP Protocol Query Tool Calls (`salesforce.query_data`)
-
-```json
-// Query Tooling API schema definitions via MCP Protocol
-salesforce.query_data({
-  "query": "SELECT QualifiedApiName, DataType FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = 'Offer__c'",
-  "use_tooling_api": true
-})
-```
-
-```json
-// Query FieldPermissions security grants via MCP Protocol
-salesforce.query_data({
-  "query": "SELECT Field, PermissionsRead, PermissionsEdit FROM FieldPermissions WHERE SobjectType='Offer__c'"
-})
-```
-
----
-
-## Empirical Inputs & Outputs Execution Comparison
-
-### Step 1: Deployment Execution
-
-#### Step 1.1: Vanilla CLI Input Command
-
-```bash
-# Terminal SFDX deployment command
-sf project deploy start \
-  -d force-app/main/default/objects/Offer__c \
-  -d force-app/main/default/profiles \
-  -o trailhead-playground
-```
-
-#### Step 1.2: Vanilla CLI Output Log
-
-```text
-Status: Succeeded | 6/6 Components Deployed
-```
-
-#### Step 1.3: MCP Protocol Tool Call Input (`salesforce.deploy_metadata`)
-
-```json
-// MCP tool call payload
-salesforce.deploy_metadata({
-  "metadata_dirs": ["force-app/main/default/objects/Offer__c", "force-app/main/default/profiles"],
-  "target_org": "trailhead-playground"
-})
-```
-
-#### Step 1.4: MCP Protocol Response Payload Output
+#### Step 3.2: MCP Protocol Response Output Payload
 
 ```json
 {
@@ -197,39 +127,19 @@ salesforce.deploy_metadata({
 
 ---
 
-### Step 2: Tooling API Schema Verification
+### Step 4: Verify Schema & Security State via MCP Protocol (`salesforce.query_data`)
 
-#### Step 2.1: Vanilla CLI Input Command
-
-```bash
-# Terminal Tooling API query
-sf data query -o trailhead-playground --use-tooling-api -q "SELECT QualifiedApiName, DataType FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = 'Offer__c'"
-```
-
-#### Step 2.2: Vanilla CLI Output Table
-
-```text
-┌──────────────────────┬────────────────────────────┐
-│ QUALIFIEDAPINAME     │ DATATYPE                   │
-├──────────────────────┼────────────────────────────┤
-│ Offer_Amount__c      │ Currency(16, 2)            │
-│ Target_Close_Date__c │ Date                       │
-│ Contact__c           │ Lookup(Contact)            │
-│ Property__c          │ Master-Detail(Property)    │
-└──────────────────────┴────────────────────────────┘
-```
-
-#### Step 2.3: MCP Protocol Query Tool Call Input (`salesforce.query_data`)
+#### Step 4.1: Query Schema Definitions Input Payload
 
 ```json
-// MCP Tooling API query tool call
+// Query Tooling API schema definitions to verify field data types on Offer__c
 salesforce.query_data({
   "query": "SELECT QualifiedApiName, DataType FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = 'Offer__c'",
   "use_tooling_api": true
 })
 ```
 
-#### Step 2.4: MCP Protocol Response Payload Output
+#### Step 4.2: Query Schema Definitions Response Output Payload
 
 ```json
 {
@@ -244,39 +154,16 @@ salesforce.query_data({
 }
 ```
 
----
-
-### Step 3: FieldPermissions Security Verification
-
-#### Step 3.1: Vanilla CLI Input Command
-
-```bash
-# Terminal FieldPermissions SOQL query
-sf data query -o trailhead-playground -q "SELECT Field, PermissionsRead, PermissionsEdit FROM FieldPermissions WHERE SobjectType='Offer__c'"
-```
-
-#### Step 3.2: Vanilla CLI Output Table
-
-```text
-┌──────────────────────────────┬─────────────────┬─────────────────┐
-│ FIELD                        │ PERMISSIONSREAD │ PERMISSIONSEDIT │
-├──────────────────────────────┼─────────────────┼─────────────────┤
-│ Offer__c.Offer_Amount__c     │ true            │ true            │
-│ Offer__c.Target_Close_Date__c│ true            │ true            │
-│ Offer__c.Contact__c          │ true            │ true            │
-└──────────────────────────────┴─────────────────┴─────────────────┘
-```
-
-#### Step 3.3: MCP Protocol Query Tool Call Input (`salesforce.query_data`)
+#### Step 4.3: Query FieldPermissions Security Input Payload
 
 ```json
-// MCP FieldPermissions query tool call
+// Query FieldPermissions security grants to confirm read/edit access
 salesforce.query_data({
   "query": "SELECT Field, PermissionsRead, PermissionsEdit FROM FieldPermissions WHERE SobjectType='Offer__c'"
 })
 ```
 
-#### Step 3.4: MCP Protocol Response Payload Output
+#### Step 4.4: Query FieldPermissions Security Response Output Payload
 
 ```json
 {
@@ -307,7 +194,6 @@ salesforce.query_data({
 ## Architectural Findings & Key Engineering Insights
 
 - **Atomic Schema & FLS Provisioning (The "Ghost Field" Anti-Pattern):** Creating a `CustomField` XML file physically instantiates the column in Salesforce, BUT Salesforce sets Field-Level Security (FLS) to `invisible/non-editable` by default for all user profiles. Deploying schema without profile `fieldPermissions` produces "ghost fields"—fields that exist in the database but are completely hidden from the GUI, throw `No such column` errors in SOQL queries, and fail Trailhead verification checks. Schema creation (`CustomField`) and Security provisioning (`fieldPermissions`) MUST always be executed as a single atomic unit.
-- **GUI Wizard vs. CLI Automation Parity:** In the Salesforce Setup GUI, Step 3 of the field creation wizard displays a page of checkboxes that automatically grants FLS visibility to profiles. When working via CLI/source XML, non-interactive Stream Editing (`sed -i '/<\/Profile>/i ...'`) acts as the exact CLI equivalent of checking those GUI visibility boxes.
 - **Master-Detail Security Encapsulation:** Salesforce Metadata API strictly rejects explicit `fieldPermissions` entries for Master-Detail relationship fields (`Property__c`). Because Master-Detail relationships inherit security controls from the parent object, attempting to deploy profile permissions for `Offer__c.Property__c` results in a Metadata API deployment failure (`FieldPermissions cannot be specified for Master-Detail field`).
 - **OAuth Target Org Overrides vs. Local VS Code State:** VS Code displays `"No Default Org Set"` when `.sf/config.json` lacks a global fallback key. However, passing explicit org alias flags (`-o trailhead-playground`) in CLI commands or `"target_org": "trailhead-playground"` in MCP tool calls references local OAuth 2.0 refresh tokens stored in `~/.sf/tokens.json`, allowing deployments and queries to succeed flawlessly without interactive login.
 - **Protocol Interoperability:** Autonomous AI execution via `@salesforce/mcp` provides complete functional parity with standard CLI tools, returning machine-readable JSON structures that enable automated verification and real-time schema validation.

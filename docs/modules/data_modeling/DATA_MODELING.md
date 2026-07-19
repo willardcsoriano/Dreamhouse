@@ -8,7 +8,7 @@
 
 ## Overview
 
-This module covers custom objects, field types, relationships, and deployment paradigms for DreamHouse Realty in Salesforce.
+This module covers custom objects, field types, relationships, and deployment paradigms for DreamHouse Realty in Salesforce. All tasks in this module adhere to the **[Global Module Git Branching Protocol](../README.md#mandatory-git-version-control--feature-branching-protocol)**.
 
 Each unit is documented in its own dedicated file:
 
@@ -29,7 +29,7 @@ Each unit is documented in its own dedicated file:
 
 - **File Link (Absolute):** [UNIT_2_OBJECT_RELATIONSHIPS.md](file:///home/willard/repos/Dreamhouse/docs/modules/data_modeling/UNIT_2_OBJECT_RELATIONSHIPS.md)
 - **Focus:** Linking `Offer__c` to `Property__c` (Master-Detail) and `Contact` (Lookup).
-- **Tooling Paradigm:** Salesforce Model Context Protocol (`@salesforce/mcp`) Server.
+- **Tooling Paradigm:** 100% Salesforce Model Context Protocol (`@salesforce/mcp`) Server (`salesforce.deploy_metadata` and `salesforce.query_data`).
 - **Status:** **PASSED & VERIFIED**
 
 ---
@@ -38,7 +38,7 @@ Each unit is documented in its own dedicated file:
 
 - **File Link (Absolute):** [UNIT_3_WORK_WITH_SCHEMA_BUILDER.md](file:///home/willard/repos/Dreamhouse/docs/modules/data_modeling/UNIT_3_WORK_WITH_SCHEMA_BUILDER.md)
 - **Focus:** Custom Text Area field `Street_Address__c` on `Property__c` with mandatory `<required>true</required>` validation.
-- **Tooling Paradigm:** Salesforce Model Context Protocol (`@salesforce/mcp`) Server & SFDX CLI.
+- **Tooling Paradigm:** 100% Vanilla Salesforce CLI (`sf project deploy start` and `sf data query`).
 - **Status:** **PASSED & VERIFIED**
 
 ---
