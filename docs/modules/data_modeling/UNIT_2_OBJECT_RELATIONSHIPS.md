@@ -14,20 +14,6 @@ This technical report documents the architectural design, security configuration
 
 ---
 
-## Directive Traceability & Purpose Matrix
-
-| Directive   | Polished Technical Command                                                                 | Purpose                                                                                                                                        |
-| :---------- | :----------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------- |
-| **DIR-2.1** | _Establish feature-isolated version control branch for Object Relationships module._       | Establish a feature-isolated Git branch (`feature/object-relationships`) adhering to trunk-based development rules.                            |
-| **DIR-2.2** | _Provision and integrate Salesforce Model Context Protocol server for AI agent execution._ | Provision the `@salesforce/mcp` Model Context Protocol server, creating an RPC bridge for automated deployments and Tooling API queries.       |
-| **DIR-2.3** | _Synthesize implementation blueprints into a comparative dual-workflow matrix._            | Structure solution blueprints into a 50/50 dual-column grid contrasting manual developer CLI scripts against automated AI protocol tool calls. |
-| **DIR-2.4** | _Evaluate org state and data equivalence across CLI and MCP protocol executions._          | Evaluate semantic parity between terminal ASCII table outputs and JSON RPC response payloads to confirm identical org state mutations.         |
-| **DIR-2.5** | _Document complete input invocation commands alongside cloud org response payloads._       | Map exact input arguments (`salesforce.deploy_metadata`, `salesforce.query_data`) alongside corresponding cloud org JSON response payloads.    |
-| **DIR-2.6** | _Standardize CSS Flexbox layout architecture and dark-themed code container styling._      | Apply CSS Flexbox layout rules (`display: flex; flex: 1; width: 50%;`), isolating raw metadata and CLI code inside styled dark containers.     |
-| **DIR-2.7** | _Architect modular documentation hierarchy under dedicated sub-directories._               | Refactor documentation into dedicated sub-directories (`docs/modules/data_modeling/`) to optimize maintainability and Markdown rendering.      |
-
----
-
 ## Technical Requirements & Requirements Specification
 
 The challenge requires creating two distinct relationship types on the `Offer__c` custom object:
@@ -45,6 +31,14 @@ The challenge requires creating two distinct relationship types on the `Offer__c
   - **Related Object:** `Contact`
   - **Child Relationship Name:** `Offers`
   - **Deletion Constraint:** `SetNull` (clears the lookup value if the referenced Contact is deleted).
+
+---
+
+## Directive Traceability & Execution Prompt
+
+```text
+Create Master-Detail relationship field Property__c and Lookup relationship field Contact__c on Offer__c, provision profile FLS security for Contact__c, deploy metadata to trailhead-playground via MCP protocol server, and verify org schema state via Tooling API SOQL.
+```
 
 ---
 

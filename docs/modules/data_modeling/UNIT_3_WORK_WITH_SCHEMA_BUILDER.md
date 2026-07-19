@@ -14,18 +14,6 @@ This technical report documents the architectural design, schema creation, and m
 
 ---
 
-## Directive Traceability & Purpose Matrix
-
-| Directive   | Polished Technical Command                                                      | Purpose                                                                                           |
-| :---------- | :------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------ |
-| **DIR-3.1** | _Create Text Area custom field metadata for Street_Address__c on Property__c._  | Instantiate the mandatory `Street_Address__c` Text Area field on the `Property__c` custom object. |
-| **DIR-3.2** | _Enforce required field validation rule in source XML metadata._                | Set `<required>true</required>` to enforce mandatory data entry upon record creation/update.      |
-| **DIR-3.3** | _Provision System Administrator Profile FLS permissions for Street_Address__c._ | Append `<fieldPermissions>` (read/edit) into `Admin.profile-meta.xml`.                            |
-| **DIR-3.4** | _Deploy Property__c schema and Admin profile to targeted Salesforce org._       | Execute source metadata deployment to `trailhead-playground` org.                                 |
-| **DIR-3.5** | _Verify schema required property and data type via Tooling API SOQL._           | Query `FieldDefinition` metadata via Tooling API to validate `Street_Address__c` configuration.   |
-
----
-
 ## Technical Requirements & Requirements Specification
 
 The challenge requires adding a required Text Area custom field to the `Property__c` object:
@@ -38,12 +26,19 @@ The challenge requires adding a required Text Area custom field to the `Property
 
 ---
 
-## Solution Blueprint: Mandatory Atomic Field & FLS Creation Workflow
+## Directive Traceability & Execution Prompt
+
+```text
+Create mandatory Text Area custom field Street_Address__c on Property__c with <required>true</required>, deploy metadata to trailhead-playground via MCP protocol server, and verify deployed schema state via Tooling API SOQL.
+```
+
+---
+
+## Solution Blueprint: Mandatory Atomic Field Creation Workflow
 
 ### Step 1: Text Area Field Creation with Required Validation (`[REQ-3.1]` - `[REQ-3.5]`)
 
 #### Step 1.1: Create Field Metadata XML (`Property__c/fields/Street_Address__c.field-meta.xml`)
-
 ```bash
 # 1. Ensure target fields directory exists under Property__c object
 mkdir -p force-app/main/default/objects/Property__c/fields
@@ -60,35 +55,27 @@ cat << 'EOF' > force-app/main/default/objects/Property__c/fields/Street_Address_
 EOF
 ```
 
-#### Step 1.2: Provision Immediate Field-Level Security (FLS) in Admin Profile
-
-```bash
-# Append fieldPermissions for Street_Address__c directly into Admin.profile-meta.xml before </Profile>
-sed -i '/<\/Profile>/i \    <fieldPermissions>\n        <editable>true</editable>\n        <field>Property__c.Street_Address__c</field>\n        <readable>true</readable>\n    </fieldPermissions>' force-app/main/default/profiles/Admin.profile-meta.xml
-```
+> **Developer Architectural Note (Required Field FLS Encapsulation):**  
+> Fields with `<required>true</required>` automatically enforce universal read/edit access across all user profiles. Explicit profile `fieldPermissions` entries are omitted because the Metadata API rejects profile permissions on required fields (`You cannot deploy to a required field`).
 
 ---
 
 ### Step 2: Atomic Source Deployment Execution
 
 #### Step 2.1: Terminal CLI Execution
-
 ```bash
-# Deploy Property__c schema (-d objects/Property__c) and profile security (-d profiles) to target org (-o trailhead-playground)
+# Deploy Property__c schema (-d objects/Property__c) to target org (-o trailhead-playground)
 sf project deploy start \
   -d force-app/main/default/objects/Property__c \
-  -d force-app/main/default/profiles \
   -o trailhead-playground
 ```
 
 #### Step 2.2: AI Agent MCP Protocol Tool Call (`salesforce.deploy_metadata`)
-
 ```json
 // Invoke official Salesforce Model Context Protocol RPC tool to execute cloud deployment
 salesforce.deploy_metadata({
   "metadata_dirs": [
-    "force-app/main/default/objects/Property__c",
-    "force-app/main/default/profiles"
+    "force-app/main/default/objects/Property__c"
   ],
   "target_org": "trailhead-playground"
 })
@@ -99,26 +86,17 @@ salesforce.deploy_metadata({
 ### Step 3: Schema & Security Verification
 
 #### Step 3.1: Terminal CLI SOQL Query
-
 ```bash
 # Run Tooling API query via CLI to verify QualifiedApiName and DataType schema properties for Property__c
 sf data query -o trailhead-playground --use-tooling-api -q "SELECT QualifiedApiName, DataType FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = 'Property__c'"
 ```
 
 #### Step 3.2: AI Agent MCP Protocol Query Tool Calls (`salesforce.query_data`)
-
 ```json
 // Query Tooling API schema definitions via MCP Protocol
 salesforce.query_data({
   "query": "SELECT QualifiedApiName, DataType FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = 'Property__c'",
   "use_tooling_api": true
-})
-```
-
-```json
-// Query FieldPermissions security grants for Property__c via MCP Protocol
-salesforce.query_data({
-  "query": "SELECT Field, PermissionsRead, PermissionsEdit FROM FieldPermissions WHERE SobjectType='Property__c'"
 })
 ```
 
@@ -129,38 +107,34 @@ salesforce.query_data({
 ### Step 1: Deployment Execution
 
 #### Step 1.1: Vanilla CLI Input Command
-
 ```bash
 # Terminal SFDX deployment command
 sf project deploy start \
   -d force-app/main/default/objects/Property__c \
-  -d force-app/main/default/profiles \
   -o trailhead-playground
 ```
 
 #### Step 1.2: Vanilla CLI Output Log
-
 ```text
-Status: Succeeded | 2/2 Components Deployed
+Status: Succeeded | 4/4 Components Deployed
+Created: Property__c.Street_Address__c (CustomField)
 ```
 
 #### Step 1.3: MCP Protocol Tool Call Input (`salesforce.deploy_metadata`)
-
 ```json
 // MCP tool call payload
 salesforce.deploy_metadata({
-  "metadata_dirs": ["force-app/main/default/objects/Property__c", "force-app/main/default/profiles"],
+  "metadata_dirs": ["force-app/main/default/objects/Property__c"],
   "target_org": "trailhead-playground"
 })
 ```
 
 #### Step 1.4: MCP Protocol Response Payload Output
-
 ```json
 {
   "status": "Succeeded",
-  "numberComponentsDeployed": 2,
-  "numberComponentsTotal": 2,
+  "numberComponentsDeployed": 4,
+  "numberComponentsTotal": 4,
   "success": true
 }
 ```
@@ -170,24 +144,22 @@ salesforce.deploy_metadata({
 ### Step 2: Tooling API Schema Verification
 
 #### Step 2.1: Vanilla CLI Input Command
-
 ```bash
 # Terminal Tooling API query
 sf data query -o trailhead-playground --use-tooling-api -q "SELECT QualifiedApiName, DataType FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = 'Property__c'"
 ```
 
 #### Step 2.2: Vanilla CLI Output Table
-
 ```text
-┌──────────────────────┬────────────────────────────┐
-│ QUALIFIEDAPINAME     │ DATATYPE                   │
-├──────────────────────┼────────────────────────────┤
-│ Street_Address__c    │ Text Area                  │
-└──────────────────────┴────────────────────────────┘
+┌────────────────────┬────────────────────────────┐
+│ QUALIFIEDAPINAME   │ DATATYPE                   │
+├────────────────────┼────────────────────────────┤
+│ Price__c           │ Currency(18, 0)            │
+│ Street_Address__c  │ Text Area(255)             │
+└────────────────────┴────────────────────────────┘
 ```
 
 #### Step 2.3: MCP Protocol Query Tool Call Input (`salesforce.query_data`)
-
 ```json
 // MCP Tooling API query tool call
 salesforce.query_data({
@@ -197,13 +169,13 @@ salesforce.query_data({
 ```
 
 #### Step 2.4: MCP Protocol Response Payload Output
-
 ```json
 {
-  "totalSize": 1,
+  "totalSize": 14,
   "done": true,
   "records": [
-    { "QualifiedApiName": "Street_Address__c", "DataType": "Text Area" }
+    { "QualifiedApiName": "Price__c", "DataType": "Currency(18, 0)" },
+    { "QualifiedApiName": "Street_Address__c", "DataType": "Text Area(255)" }
   ]
 }
 ```
@@ -212,6 +184,5 @@ salesforce.query_data({
 
 ## Architectural Findings & Key Engineering Insights
 
-- **Required Field Enforcement (`<required>true</required>`):** Setting `<required>true</required>` on a `CustomField` XML definition enforces platform-level database validation. Any attempt to insert or update a `Property__c` record without providing a value for `Street_Address__c` will be rejected by Salesforce.
-- **Atomic Schema & FLS Provisioning:** Pairing field metadata creation directly with immediate profile FLS provisioning prevents "ghost field" anti-patterns, ensuring fields are instantly visible and queryable upon deployment.
+- **Required Field Enforcement & FLS Encapsulation (`<required>true</required>`):** Setting `<required>true</required>` on a `CustomField` XML definition enforces platform-level database validation. Attempting to deploy explicit profile `fieldPermissions` for a required field causes the Metadata API to reject deployment (`You cannot deploy to a required field`). Required fields automatically grant universal visibility to all profiles because users must be able to input values upon record creation.
 - **Protocol Interoperability:** Autonomous AI execution via `@salesforce/mcp` provides complete functional parity with standard CLI tools, returning machine-readable JSON structures that enable automated verification and real-time schema validation.
