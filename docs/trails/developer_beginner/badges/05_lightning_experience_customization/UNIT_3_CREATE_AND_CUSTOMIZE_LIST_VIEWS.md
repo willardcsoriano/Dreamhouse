@@ -32,7 +32,7 @@ In Salesforce Lightning Experience, list views present data in tabular format fo
 
 ---
 
-## Guided Activities (Step-by-Step Instructions)
+## Guided Activities (Step-by-Step Instructions & Payloads)
 
 ### Activity 1: Create and Filter a Custom List View (Accounts)
 
@@ -75,6 +75,82 @@ In Salesforce Lightning Experience, list views present data in tabular format fo
      - **Grouping Field:** `Account Name`
   6. Click **Save**.
 
+### Guided Activities Verification Query & Payload (`--json`)
+
+Verify the creation of guided activity components in your org via SOQL query:
+
+```bash
+UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
+mkdir -p "$UNIT_DIR"
+
+# 1. Verify Account Channel Customers List View
+sf data query \
+  -o trailhead-playground \
+  -q "SELECT Id, Name, DeveloperName, SobjectType, FilterScope FROM ListView WHERE SobjectType = 'Account' AND DeveloperName = 'Channel_Customers'" \
+  --json | tee "$UNIT_DIR/UNIT_3_GUIDED_LISTVIEW_AUDIT.json"
+```
+
+#### Expected JSON Output (`UNIT_3_GUIDED_LISTVIEW_AUDIT.json`):
+
+```json
+{
+  "status": 0,
+  "result": {
+    "records": [
+      {
+        "attributes": {
+          "type": "ListView",
+          "url": "/services/data/v60.0/sobjects/ListView/00BfL0000012345AAA"
+        },
+        "Id": "00BfL0000012345AAA",
+        "Name": "Channel Customers",
+        "DeveloperName": "Channel_Customers",
+        "SobjectType": "Account",
+        "FilterScope": "Everything"
+      }
+    ],
+    "totalSize": 1,
+    "done": true
+  }
+}
+```
+
+```bash
+# 2. Verify Pipeline Total Value List View Chart
+sf data query \
+  -o trailhead-playground \
+  --use-tooling-api \
+  -q "SELECT Id, MasterLabel, DeveloperName, SobjectType, ChartType, AggregateType, GroupingType FROM ListViewChart WHERE SobjectType = 'Opportunity' AND DeveloperName = 'Pipeline_Total_Value'" \
+  --json | tee "$UNIT_DIR/UNIT_3_GUIDED_CHART_AUDIT.json"
+```
+
+#### Expected JSON Output (`UNIT_3_GUIDED_CHART_AUDIT.json`):
+
+```json
+{
+  "status": 0,
+  "result": {
+    "records": [
+      {
+        "attributes": {
+          "type": "ListViewChart",
+          "url": "/services/data/v60.0/sobjects/ListViewChart/05AfL0000012345BBB"
+        },
+        "Id": "05AfL0000012345BBB",
+        "MasterLabel": "Pipeline Total Value",
+        "DeveloperName": "Pipeline_Total_Value",
+        "SobjectType": "Opportunity",
+        "ChartType": "Donut",
+        "AggregateType": "Sum",
+        "GroupingType": "Account"
+      }
+    ],
+    "totalSize": 1,
+    "done": true
+  }
+}
+```
+
 ---
 
 ## Hands-on Challenge Requirements & Solution Details
@@ -115,11 +191,9 @@ Create a custom Opportunity list view for sales rep Lance Park to isolate opport
 7. Verify both filters are active (`1 AND 2`).
 8. Click **Save** on the filter panel.
 
----
+### Challenge Verification Query & Payload (`--json`)
 
-## Verification Query & SFDX CLI Commands
-
-Verify the `ListView` record creation in your Trailhead Playground org via SOQL using `sf data query`:
+Verify the `High_Probability_Opportunities` list view in your Trailhead Playground org via SOQL query:
 
 ```bash
 UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
@@ -128,7 +202,32 @@ mkdir -p "$UNIT_DIR"
 sf data query \
   -o trailhead-playground \
   -q "SELECT Id, Name, DeveloperName, SobjectType, FilterScope FROM ListView WHERE SobjectType = 'Opportunity' AND DeveloperName = 'High_Probability_Opportunities'" \
-  --json | tee "$UNIT_DIR/UNIT_3_VERIFICATION_AUDIT.json"
+  --json | tee "$UNIT_DIR/UNIT_3_CHALLENGE_VERIFICATION_AUDIT.json"
+```
+
+#### Expected JSON Output (`UNIT_3_CHALLENGE_VERIFICATION_AUDIT.json`):
+
+```json
+{
+  "status": 0,
+  "result": {
+    "records": [
+      {
+        "attributes": {
+          "type": "ListView",
+          "url": "/services/data/v60.0/sobjects/ListView/00BfL0000067890CCC"
+        },
+        "Id": "00BfL0000067890CCC",
+        "Name": "High Probability Opportunities",
+        "DeveloperName": "High_Probability_Opportunities",
+        "SobjectType": "Opportunity",
+        "FilterScope": "Everything"
+      }
+    ],
+    "totalSize": 1,
+    "done": true
+  }
+}
 ```
 
 ---
