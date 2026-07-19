@@ -171,6 +171,22 @@ Create a custom Opportunity list view for sales rep Lance Park to isolate opport
 
 ---
 
+#### `[SOL-5.3.C1.CLI]` SFDX CLI Metadata Deployment (Automated Solution)
+
+- **Solving Requirements:** `[REQ-5.3.C1.1]` through `[REQ-5.3.C1.4]`
+- **Metadata File:** [High_Probability_Opportunities.listView-meta.xml](file:///home/willard/repos/Dreamhouse/force-app/main/default/objects/Opportunity/listViews/High_Probability_Opportunities.listView-meta.xml)
+
+**Solves Requirements:** `[REQ-5.3.C1.1]`, `[REQ-5.3.C1.2]`, `[REQ-5.3.C1.3]`, `[REQ-5.3.C1.4]`
+
+```bash
+# Deploy the ListView Metadata XML directly to target org 'Rimes'
+sf project deploy start \
+  -d force-app/main/default/objects/Opportunity/listViews/High_Probability_Opportunities.listView-meta.xml \
+  -o Rimes
+```
+
+---
+
 ### Challenge Verification Query & Audit Payload (`[SOL-5.3.C1]`)
 
 - **Problem Solved:** Solves verification for requirements `[REQ-5.3.C1.1]` – `[REQ-5.3.C1.4]`, confirming that `High_Probability_Opportunities` exists on object `Opportunity`.
