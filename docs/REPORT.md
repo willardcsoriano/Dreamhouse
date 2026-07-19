@@ -39,6 +39,9 @@
 5. **The Hybrid SFDX CLI + `--json` Execution Protocol:**
    - **The Sweet Spot:** Combining hands-on SFDX CLI execution with the `--json` output flag provides the ultimate developer hybrid: **100% hands-on CLI learning retention** (mastering flags like `-d`, `-o`, `-q`) paired with **100% deterministic JSON payload traceability** matching MCP protocol auditability standards.
 
+6. **The Roll-Forward Deployment Strategy (No Destructive Rollbacks):**
+   - **Enterprise Rule:** Destructive rollbacks in cloud org environments carry severe risks of data loss, foreign key corruption, and component breaking. When deployment errors or missing FLS permissions occur, engineers MUST NOT attempt destructive rollbacks. Always fix the issue in local source code and **roll forward** with a patch deployment.
+
 ---
 
 ## Supplemental Learnings
