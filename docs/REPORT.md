@@ -136,3 +136,10 @@ $ sf data query -o trailhead-playground -q \
    - **Context:** `Developer Beginner > Badge 05: Lightning Experience Customization > Unit 1: Set Up Your Org`
    - **Hiccup:** Auto-committing and auto-executing CLI fixes created friction with hands-on learning retention.
    - **Resolution:** Established **Rule 4.4** in `docs/SALESFORCE_DEVELOPMENT_RULES.md`, strictly separating file authoring (AI assistant permitted) from terminal execution and Git shipping (reserved exclusively for developer).
+
+##### Unit 2: Create and Customize Agentforce 360 Platform Apps (formerly Lightning Apps)
+
+1. **Lightning App Navigation Tab Identifier Discrepancy (`standard-Chatter` vs `standard-Feed`):**
+   - **Context:** `Developer Beginner > Badge 05: Lightning Experience Customization > Unit 2: Create and Customize Agentforce 360 Platform Apps`
+   - **Hiccup:** Trailhead unit instructions specified adding the `Chatter` tab to navigation items. Defining `<tabs>standard-Chatter</tabs>` in `CustomApplication` XML metadata caused deployment to fail with `Tab standard-Chatter can't be added to Lightning app Energy_Consultations because it's not supported in Lightning apps`.
+   - **Resolution:** In Salesforce Metadata API for `uiType: Lightning`, the standard Chatter feed tab identifier is `<tabs>standard-Feed</tabs>`, whereas `standard-Chatter` refers to the legacy Salesforce Classic Chatter tab. Updated metadata schema to `<tabs>standard-Feed</tabs>`, resolving deployment error `0AfdL00000durUbSAI`.

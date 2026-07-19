@@ -192,3 +192,17 @@ Once verified, open the App Launcher in your Trailhead Playground (`App Launcher
 - [Salesforce Help: Salesforce App Considerations](https://help.salesforce.com/s/articleView?id=sf.apps_lex_considerations.htm&type=5)
 - [Salesforce Help: Personalized Navigation Considerations](https://help.salesforce.com/s/articleView?id=sf.user_user_nav_considerations.htm&type=5)
 - [Metadata API Reference: CustomApplication](https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_customapplication.htm)
+
+---
+
+## Technical Post-Mortem & Hiccups Resolution
+
+- **Trail:** Developer Beginner
+- **Badge 05:** Lightning Experience Customization
+- **Unit 2:** Create and Customize Agentforce 360 Platform Apps (formerly Lightning Apps)
+
+### Key Engineering Hiccups & Solutions Encountered
+
+1. **Lightning App Navigation Tab Identifier Discrepancy (`standard-Chatter` vs `standard-Feed`):**
+   - **Hiccup:** Trailhead instructions specify adding `Chatter` to navigation tabs. Using `<tabs>standard-Chatter</tabs>` in `CustomApplication` XML metadata caused deployment to fail with `Tab standard-Chatter can't be added to Lightning app Energy_Consultations because it's not supported in Lightning apps`.
+   - **Resolution:** In Salesforce Metadata API for `uiType: Lightning`, the standard Chatter feed tab identifier is `<tabs>standard-Feed</tabs>`, whereas `standard-Chatter` refers to the legacy Salesforce Classic Chatter tab. Updated metadata schema to `<tabs>standard-Feed</tabs>`, resolving deployment error `0AfdL00000durUbSAI`.
