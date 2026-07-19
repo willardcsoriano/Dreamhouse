@@ -32,37 +32,51 @@ In Salesforce Lightning Experience, list views present data in tabular format fo
 
 ---
 
-## Guided Activities (Step-by-Step Instructions & Audit Payloads)
+## Guided Activities (Requirements, Instructions & Audit Payloads)
 
-### Activity 1: Create and Filter a Custom List View (Accounts)
+### Requirements Matrix: Guided Activities
+
+| Requirement Tag ID   | Activity Title             | Target Object               | Key Parameters & Specifications                                                                                                                                                                                              |
+| :------------------- | :------------------------- | :-------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`[REQ-5.3.G1.1]`** | Account List View Creation | Account (`Account`)         | **List Name:** `Channel Customers` \| **API Name:** `Channel_Customers` \| **Sharing:** `All users can see this list view` \| **Filter 1:** `Type = Customer - Channel` \| **Filter 2:** `Billing State/Province = WA,OR,CA` |
+| **`[REQ-5.3.G2.1]`** | Display Columns & Sorting  | Account (`Account`)         | **Visible Fields:** Remove `Account Site`, `Account Owner Alias`, `Phone`; Add `Industry`, `Customer Priority` \| **Sort:** Ascending/Descending on `Account Name`                                                           |
+| **`[REQ-5.3.G3.1]`** | Opportunity Chart Creation | Opportunity (`Opportunity`) | **Chart Name:** `Pipeline Total Value` \| **API Name:** `Pipeline_Total_Value` \| **Type:** `Donut Chart` \| **Aggregate:** `Sum(Amount)` \| **Grouping:** `Account Name`                                                    |
+
+---
+
+### Step-by-Step Instructions & Solutions: Guided Activities
+
+#### `[SOL-5.3.G1.1]` Activity 1 Solution: Create and Filter Account List View (`Channel Customers`)
 
 - **Scenario:** Erin Donaghue (Sales Rep at Ursa Major Solar) needs a dedicated list view to monitor US West Coast channel customers.
-- **Steps:**
+- **Declarative Steps:**
   1. Open the **App Launcher** (9-dot grid icon), search for and select **Sales**.
   2. Click the **Accounts** tab.
   3. Click **List View Controls** (gear icon in upper right) and select **New**.
   4. Enter **List Name:** `Channel Customers` (API Name auto-populates as `Channel_Customers`).
   5. Under **Who sees this list view**, select `All users can see this list view`. Click **Save**.
   6. In the **Filters** pane on the right side:
-     - Click **Add Filter**.
-     - Set **Field:** `Type`, **Operator:** `equals`, **Value:** `Customer - Channel`. Click **Done**.
-     - Click **Add Filter**.
-     - Set **Field:** `Billing State/Province`, **Operator:** `equals`, **Value:** `WA,OR,CA`. Click **Done**.
+     - Click **Add Filter**: Set **Field:** `Type`, **Operator:** `equals`, **Value:** `Customer - Channel`. Click **Done**.
+     - Click **Add Filter**: Set **Field:** `Billing State/Province`, **Operator:** `equals`, **Value:** `WA,OR,CA`. Click **Done**.
   7. Click **Save** in the filter panel to apply changes.
 
-### Activity 2: Customize Display Fields & Record Sorting
+---
 
-- **Steps:**
+#### `[SOL-5.3.G2.1]` Activity 2 Solution: Customize Display Fields & Record Sorting
+
+- **Declarative Steps:**
   1. Click **List View Controls** (gear icon) -> **Select Fields to Display**.
   2. Move `Account Site`, `Account Owner Alias`, and `Phone` out of the **Visible Fields** column.
   3. Move `Industry` and `Customer Priority` into the **Visible Fields** column.
   4. Click **Save**.
   5. Click the **Account Name** column header to toggle ascending/descending sorting.
 
-### Activity 3: Create a List View Chart (Opportunities)
+---
+
+#### `[SOL-5.3.G3.1]` Activity 3 Solution: Create Opportunity Donut Chart (`Pipeline Total Value`)
 
 - **Scenario:** Erin wants to visualize total pipeline value by Account for all opportunities.
-- **Steps:**
+- **Declarative Steps:**
   1. In the **Sales** app, click the **Opportunities** tab.
   2. Select the **All Opportunities** list view from the dropdown menu.
   3. Click the **Charts** icon (bar graph icon in the upper right toolbar).
@@ -79,9 +93,9 @@ In Salesforce Lightning Experience, list views present data in tabular format fo
 
 ### Guided Activities Audit Payloads & Problem Solutions
 
-#### Verification Query 1: Account List View Schema (`Channel_Customers`)
+#### Verification Query 1 (`[SOL-5.3.G1.1]`): Account List View Schema (`Channel_Customers`)
 
-- **Problem Solved:** Validates that the custom `ListView` metadata record named `Channel Customers` (`DeveloperName: Channel_Customers`) was correctly created on object `Account` (`SobjectType: Account`) and configured with scope `Everything` (All users can see this list view) rather than restricted scope `Mine`.
+- **Problem Solved:** Validates that requirement `[REQ-5.3.G1.1]` was satisfied by querying the custom `ListView` metadata record `Channel_Customers` on object `Account`, verifying `FilterScope = 'Everything'`.
 
 ```bash
 UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
@@ -120,9 +134,9 @@ sf data query \
 
 ---
 
-#### Verification Query 2: Opportunity List View Chart Schema (`Pipeline_Total_Value`)
+#### Verification Query 2 (`[SOL-5.3.G3.1]`): Opportunity List View Chart Schema (`Pipeline_Total_Value`)
 
-- **Problem Solved:** Validates that the list view chart `Pipeline Total Value` (`DeveloperName: Pipeline_Total_Value`) was successfully attached to `Opportunity` (`SobjectType: Opportunity`) with chart parameters `ChartType: Donut`, `AggregateType: Sum`, and `GroupingType: Account` via the Tooling API (`ListViewChart`).
+- **Problem Solved:** Validates that requirement `[REQ-5.3.G3.1]` was satisfied by querying Tooling API `ListViewChart` for `Pipeline_Total_Value` on `Opportunity`, verifying parameters `ChartType: Donut`, `AggregateType: Sum`, and `GroupingType: Account`.
 
 ```bash
 sf data query \
@@ -163,47 +177,41 @@ sf data query \
 
 ## Hands-on Challenge Requirements & Solution Details
 
-### Challenge Goal
+### Requirements Matrix: Hands-on Challenge
 
 Create a custom Opportunity list view for sales rep Lance Park to isolate opportunities that are in late-stage negotiations or have a high probability of closing (>= 50%).
 
-### Specifications & Requirements
-
-| Property                   | Value / Requirement                                         |
-| :------------------------- | :---------------------------------------------------------- |
-| **Target Object**          | Opportunity (`Opportunity`)                                 |
-| **List Name**              | `High Probability Opportunities`                            |
-| **List API Name**          | `High_Probability_Opportunities`                            |
-| **Sharing Setting**        | `All users can see this list view`                          |
-| **Filter 1 (Stage)**       | `Stage` equals `Proposal/Price Quote`, `Negotiation/Review` |
-| **Filter 2 (Probability)** | `Probability (%)` greater than or equal to `50`             |
-
-### Declarative Setup (Salesforce UI Step-by-Step)
-
-1. Open **App Launcher** -> select **Sales**.
-2. Click the **Opportunities** tab.
-3. Click **List View Controls** (gear icon) -> select **New**.
-4. Enter **List Name:** `High Probability Opportunities` and **List API Name:** `High_Probability_Opportunities`.
-5. Select **All users can see this list view** and click **Save**.
-6. Open the **Filters** pane:
-   - Click **Add Filter**:
-     - **Field:** `Stage`
-     - **Operator:** `equals`
-     - **Value:** `Proposal/Price Quote`, `Negotiation/Review`
-     - Click **Done**.
-   - Click **Add Filter**:
-     - **Field:** `Probability (%)`
-     - **Operator:** `greater or equal`
-     - **Value:** `50`
-     - Click **Done**.
-7. Verify both filters are active (`1 AND 2`).
-8. Click **Save** on the filter panel.
+| Requirement Tag ID   | Component / Setting             | Target Value / Specification                                                                                                             | Validation Rule                       |
+| :------------------- | :------------------------------ | :--------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------ |
+| **`[REQ-5.3.C1.1]`** | Target Object & Naming          | Object: Opportunity (`Opportunity`) \| **List Name:** `High Probability Opportunities` \| **API Name:** `High_Probability_Opportunities` | Exact string match on DeveloperName   |
+| **`[REQ-5.3.C1.2]`** | Sharing & Visibility            | `All users can see this list view`                                                                                                       | `FilterScope` must equal `Everything` |
+| **`[REQ-5.3.C1.3]`** | Filter Criteria 1 (Stage)       | `Stage` equals `Proposal/Price Quote`, `Negotiation/Review`                                                                              | Multi-picklist match                  |
+| **`[REQ-5.3.C1.4]`** | Filter Criteria 2 (Probability) | `Probability (%)` greater than or equal to `50` (`>= 50`)                                                                                | Numeric threshold match (`>= 50`)     |
 
 ---
 
-### Challenge Verification Query & Audit Payload (`--json`)
+### Step-by-Step Instructions & Solutions: Hands-on Challenge
 
-- **Problem Solved:** Validates that the challenge list view `High Probability Opportunities` (`DeveloperName: High_Probability_Opportunities`) exists on object `Opportunity` with `FilterScope: Everything`. It confirms that multi-stage filtering (`Stage IN ('Proposal/Price Quote', 'Negotiation/Review')`) and numeric threshold filtering (`Probability >= 50%`) satisfy Trailhead validation rules.
+#### `[SOL-5.3.C1]` Declarative Setup (Salesforce UI Step-by-Step)
+
+- **Solving Requirements:** `[REQ-5.3.C1.1]` through `[REQ-5.3.C1.4]`
+- **Declarative Steps:**
+  1. Open **App Launcher** -> select **Sales**.
+  2. Click the **Opportunities** tab.
+  3. Click **List View Controls** (gear icon) -> select **New** (`[REQ-5.3.C1.1]`).
+  4. Enter **List Name:** `High Probability Opportunities` and **List API Name:** `High_Probability_Opportunities` (`[REQ-5.3.C1.1]`).
+  5. Select **All users can see this list view** and click **Save** (`[REQ-5.3.C1.2]`).
+  6. Open the **Filters** pane:
+     - Click **Add Filter**: Set **Field:** `Stage`, **Operator:** `equals`, **Value:** `Proposal/Price Quote`, `Negotiation/Review`. Click **Done** (`[REQ-5.3.C1.3]`).
+     - Click **Add Filter**: Set **Field:** `Probability (%)`, **Operator:** `greater or equal`, **Value:** `50`. Click **Done** (`[REQ-5.3.C1.4]`).
+  7. Verify both filters are active (`1 AND 2`).
+  8. Click **Save** on the filter panel.
+
+---
+
+### Challenge Verification Query & Audit Payload (`[SOL-5.3.C1]`)
+
+- **Problem Solved:** Solves verification for requirements `[REQ-5.3.C1.1]` – `[REQ-5.3.C1.4]`, confirming that `High_Probability_Opportunities` exists on object `Opportunity` with `FilterScope: Everything`.
 
 ```bash
 UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
@@ -252,15 +260,15 @@ Once verified, click **Check Challenge to Earn 500 Points** on your Trailhead Pl
 
 ### Key Engineering Hiccups & Solutions Encountered
 
-1. **Multi-Value Picklist Filter Syntax & Delimiters:**
+1. **Multi-Value Picklist Filter Syntax & Delimiters (`[REQ-5.3.C1.3]`):**
    - **Hiccup:** When filtering by multiple picklist values (e.g. `Stage` equals `Proposal/Price Quote`, `Negotiation/Review`), entering raw quotes (`'Proposal/Price Quote', 'Negotiation/Review'`) into the text filter input causes Salesforce to evaluate the string literally, resulting in zero records returned.
    - **Resolution:** In Lightning Experience List View UI, picklist filter values must be selected via the picklist modal checkboxes or separated by raw commas without quotes.
 
-2. **Percentage Field Input Values (`Probability (%)`):**
+2. **Percentage Field Input Values (`[REQ-5.3.C1.4]`):**
    - **Hiccup:** Entering `50%` with the percent symbol in the `Probability (%)` numeric filter field causes an inline validation error `Invalid Number`.
    - **Resolution:** Salesforce stores percentage field values internally as numbers/decimals. Enter integer `50` without the `%` symbol.
 
-3. **Chart Availability Scope on System List Views (`Recently Viewed`):**
+3. **Chart Availability Scope on System List Views (`[REQ-5.3.G3.1]`):**
    - **Hiccup:** Attempting to create a list view chart on the default `Recently Viewed` list view shows the Charts icon grayed out or unavailable.
    - **Resolution:** Salesforce Metadata architecture restricts `ListViewChart` objects to standard and custom list views that possess explicit filter criteria; `Recently Viewed` is dynamically computed per session and does not support persistent charts.
 
