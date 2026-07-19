@@ -105,7 +105,7 @@ cat << 'EOF' > force-app/main/default/applications/Energy_Consultations.app-meta
     <label>Energy Consultations</label>
     <navType>Standard</navType>
     <tabs>standard-home</tabs>
-    <tabs>standard-Chatter</tabs>
+    <tabs>standard-Feed</tabs>
     <tabs>standard-CollaborationGroup</tabs>
     <tabs>Energy_Audit__c</tabs>
     <tabs>standard-Account</tabs>

@@ -55,4 +55,9 @@
         <field>Energy_Audit__c.Audit_Notes__c</field>
         <readable>true</readable>
     </fieldPermissions>
+    <applicationVisibilities>
+        <application>Energy_Consultations</application>
+        <default>false</default>
+        <visible>true</visible>
+    </applicationVisibilities>
 </Profile>
