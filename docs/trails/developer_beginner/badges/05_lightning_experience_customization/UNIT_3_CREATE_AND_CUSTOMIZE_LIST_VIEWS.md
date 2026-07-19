@@ -32,7 +32,7 @@ In Salesforce Lightning Experience, list views present data in tabular format fo
 
 ---
 
-## Guided Activities (Step-by-Step Instructions & Payloads)
+## Guided Activities (Step-by-Step Instructions & Audit Payloads)
 
 ### Activity 1: Create and Filter a Custom List View (Accounts)
 
@@ -75,22 +75,25 @@ In Salesforce Lightning Experience, list views present data in tabular format fo
      - **Grouping Field:** `Account Name`
   6. Click **Save**.
 
-### Guided Activities Verification Query & Payload (`--json`)
+---
 
-Verify the creation of guided activity components in your org via SOQL query:
+### Guided Activities Audit Payloads & Problem Solutions
+
+#### Verification Query 1: Account List View Schema (`Channel_Customers`)
+
+- **Problem Solved:** Validates that the custom `ListView` metadata record named `Channel Customers` (`DeveloperName: Channel_Customers`) was correctly created on object `Account` (`SobjectType: Account`) and configured with scope `Everything` (All users can see this list view) rather than restricted scope `Mine`.
 
 ```bash
 UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
 mkdir -p "$UNIT_DIR"
 
-# 1. Verify Account Channel Customers List View
 sf data query \
   -o trailhead-playground \
   -q "SELECT Id, Name, DeveloperName, SobjectType, FilterScope FROM ListView WHERE SobjectType = 'Account' AND DeveloperName = 'Channel_Customers'" \
   --json | tee "$UNIT_DIR/UNIT_3_GUIDED_LISTVIEW_AUDIT.json"
 ```
 
-#### Expected JSON Output (`UNIT_3_GUIDED_LISTVIEW_AUDIT.json`):
+##### Expected Tooling JSON Output (`UNIT_3_GUIDED_LISTVIEW_AUDIT.json`):
 
 ```json
 {
@@ -115,8 +118,13 @@ sf data query \
 }
 ```
 
+---
+
+#### Verification Query 2: Opportunity List View Chart Schema (`Pipeline_Total_Value`)
+
+- **Problem Solved:** Validates that the list view chart `Pipeline Total Value` (`DeveloperName: Pipeline_Total_Value`) was successfully attached to `Opportunity` (`SobjectType: Opportunity`) with chart parameters `ChartType: Donut`, `AggregateType: Sum`, and `GroupingType: Account` via the Tooling API (`ListViewChart`).
+
 ```bash
-# 2. Verify Pipeline Total Value List View Chart
 sf data query \
   -o trailhead-playground \
   --use-tooling-api \
@@ -124,7 +132,7 @@ sf data query \
   --json | tee "$UNIT_DIR/UNIT_3_GUIDED_CHART_AUDIT.json"
 ```
 
-#### Expected JSON Output (`UNIT_3_GUIDED_CHART_AUDIT.json`):
+##### Expected Tooling JSON Output (`UNIT_3_GUIDED_CHART_AUDIT.json`):
 
 ```json
 {
@@ -191,9 +199,11 @@ Create a custom Opportunity list view for sales rep Lance Park to isolate opport
 7. Verify both filters are active (`1 AND 2`).
 8. Click **Save** on the filter panel.
 
-### Challenge Verification Query & Payload (`--json`)
+---
 
-Verify the `High_Probability_Opportunities` list view in your Trailhead Playground org via SOQL query:
+### Challenge Verification Query & Audit Payload (`--json`)
+
+- **Problem Solved:** Validates that the challenge list view `High Probability Opportunities` (`DeveloperName: High_Probability_Opportunities`) exists on object `Opportunity` with `FilterScope: Everything`. It confirms that multi-stage filtering (`Stage IN ('Proposal/Price Quote', 'Negotiation/Review')`) and numeric threshold filtering (`Probability >= 50%`) satisfy Trailhead validation rules.
 
 ```bash
 UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
@@ -205,7 +215,7 @@ sf data query \
   --json | tee "$UNIT_DIR/UNIT_3_CHALLENGE_VERIFICATION_AUDIT.json"
 ```
 
-#### Expected JSON Output (`UNIT_3_CHALLENGE_VERIFICATION_AUDIT.json`):
+#### Expected Tooling JSON Output (`UNIT_3_CHALLENGE_VERIFICATION_AUDIT.json`):
 
 ```json
 {
@@ -229,6 +239,30 @@ sf data query \
   }
 }
 ```
+
+Once verified, click **Check Challenge to Earn 500 Points** on your Trailhead Playground badge page!
+
+---
+
+## Technical Post-Mortem & Hiccups Resolution
+
+- **Trail:** Developer Beginner
+- **Badge 05:** Lightning Experience Customization
+- **Unit 3:** Create and Customize List Views
+
+### Key Engineering Hiccups & Solutions Encountered
+
+1. **Multi-Value Picklist Filter Syntax & Delimiters:**
+   - **Hiccup:** When filtering by multiple picklist values (e.g. `Stage` equals `Proposal/Price Quote`, `Negotiation/Review`), entering raw quotes (`'Proposal/Price Quote', 'Negotiation/Review'`) into the text filter input causes Salesforce to evaluate the string literally, resulting in zero records returned.
+   - **Resolution:** In Lightning Experience List View UI, picklist filter values must be selected via the picklist modal checkboxes or separated by raw commas without quotes.
+
+2. **Percentage Field Input Values (`Probability (%)`):**
+   - **Hiccup:** Entering `50%` with the percent symbol in the `Probability (%)` numeric filter field causes an inline validation error `Invalid Number`.
+   - **Resolution:** Salesforce stores percentage field values internally as numbers/decimals. Enter integer `50` without the `%` symbol.
+
+3. **Chart Availability Scope on System List Views (`Recently Viewed`):**
+   - **Hiccup:** Attempting to create a list view chart on the default `Recently Viewed` list view shows the Charts icon grayed out or unavailable.
+   - **Resolution:** Salesforce Metadata architecture restricts `ListViewChart` objects to standard and custom list views that possess explicit filter criteria; `Recently Viewed` is dynamically computed per session and does not support persistent charts.
 
 ---
 
