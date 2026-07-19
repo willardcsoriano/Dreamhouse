@@ -1,0 +1,20 @@
+{
+  "status": 0,
+  "result": {
+    "records": [
+      {
+        "attributes": {
+          "type": "ListView",
+          "url": "/services/data/v67.0/sobjects/ListView/00BdL00001GDB5ZUAX"
+        },
+        "Id": "00BdL00001GDB5ZUAX",
+        "Name": "High Probability Opportunities",
+        "DeveloperName": "High_Probability_Opportunities",
+        "SobjectType": "Opportunity"
+      }
+    ],
+    "totalSize": 1,
+    "done": true
+  },
+  "warnings": []
+}
