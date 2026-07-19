@@ -5,10 +5,10 @@
     <nameField>
         <label>Energy Audit Name</label>
         <type>Text</type>
+        <trackFeedHistory>true</trackFeedHistory>
     </nameField>
     <sharingModel>ReadWrite</sharingModel>
     <deploymentStatus>Deployed</deploymentStatus>
     <enableSearch>true</enableSearch>
-    <enableFeeds>true</enableFeeds>
     <enableFeeds>true</enableFeeds>
 </CustomObject>

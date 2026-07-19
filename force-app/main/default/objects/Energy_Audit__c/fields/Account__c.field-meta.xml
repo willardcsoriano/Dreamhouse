@@ -9,5 +9,4 @@
     <type>Lookup</type>
     <required>true</required>
     <trackFeedHistory>true</trackFeedHistory>
-    <trackFeedHistory>true</trackFeedHistory>
 </CustomField>

@@ -18,12 +18,11 @@
                 <label>Carport</label>
             </value>
             <value>
-                <fullName>Ground mounted</fullName>
+                <fullName>Ground Mounted</fullName>
                 <default>false</default>
-                <label>Ground mounted</label>
+                <label>Ground Mounted</label>
             </value>
         </valueSetDefinition>
     </valueSet>
-    <trackFeedHistory>true</trackFeedHistory>
     <trackFeedHistory>true</trackFeedHistory>
 </CustomField>

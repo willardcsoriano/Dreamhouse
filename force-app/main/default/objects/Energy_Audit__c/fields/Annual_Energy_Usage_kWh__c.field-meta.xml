@@ -5,8 +5,7 @@
     <type>Number</type>
     <precision>18</precision>
     <scale>0</scale>
-    <inlineHelpText>Usage per square foot.</inlineHelpText>
+    <inlineHelpText>Usage per square foot</inlineHelpText>
     <required>true</required>
-    <trackFeedHistory>true</trackFeedHistory>
     <trackFeedHistory>true</trackFeedHistory>
 </CustomField>
