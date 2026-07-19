@@ -134,16 +134,17 @@ Now the custom object is really taking shape. Nice work! And don’t forget that
 #### `[REQ-5.1.G3.1] – [REQ-5.1.G3.5]` Create & Deploy Custom Fields (`Energy_Audit__c`)
 
 - **Requirement Specifications Matrix:**
-  | Tag ID               | Field Type   | Label                        | API Name                          | Parameters & Specifications                                                         |
-  | :------------------- | :----------- | :--------------------------- | :-------------------------------- | :---------------------------------------------------------------------------------- |
-  | **`[REQ-5.1.G3.1]`** | Picklist     | Type of Installation         | `Type_of_Installation__c`         | Values: `Rooftop` (Default), `Carport`, `Ground mounted`                            |
-  | **`[REQ-5.1.G3.2]`** | Lookup       | Account                      | `Account__c`                      | Related To: `Account` \| Required: `true` \| Constraint: `Restrict`                 |
-  | **`[REQ-5.1.G3.3]`** | Currency     | Average Annual Electric Cost | `Average_Annual_Electric_Cost__c` | Precision: 16, Scale: 2 \| Required: `true` \| Help: `Annual cost per square foot.` |
-  | **`[REQ-5.1.G3.4]`** | Number       | Annual Energy Usage (kWh)    | `Annual_Energy_Usage_kWh__c`      | Precision: 18, Scale: 0 \| Required: `true` \| Help: `Usage per square foot.`       |
-  | **`[REQ-5.1.G3.5]`** | LongTextArea | Audit Notes                  | `Audit_Notes__c`                  | Length: 32768 \| Visible Lines: 5                                                   |
+  | Tag ID | Field Type | Label | API Name | Parameters & Specifications |
+  | :--- | :--- | :--- | :--- | :--- |
+  | **`[REQ-5.1.G3.1]`** | Picklist | Type of Installation | `Type_of_Installation__c` | Values: `Rooftop` (Default), `Carport`, `Ground mounted` |
+  | **`[REQ-5.1.G3.2]`** | Lookup | Account | `Account__c` | Related To: `Account` \| Required: `true` \| Constraint: `Restrict` |
+  | **`[REQ-5.1.G3.3]`** | Currency | Average Annual Electric Cost | `Average_Annual_Electric_Cost__c` | Precision: 16, Scale: 2 \| Required: `true` \| Help: `Annual cost per square foot.` |
+  | **`[REQ-5.1.G3.4]`** | Number | Annual Energy Usage (kWh) | `Annual_Energy_Usage_kWh__c` | Precision: 18, Scale: 0 \| Required: `true` \| Help: `Usage per square foot.` |
+  | **`[REQ-5.1.G3.5]`** | LongTextArea | Audit Notes | `Audit_Notes__c` | Length: 32768 \| Visible Lines: 5 |
 
 ```bash
-UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization"
+UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
+mkdir -p "$UNIT_DIR"
 
 # 1. [REQ-5.1.G3.1] Type of Installation (Picklist)
 cat << 'EOF' > force-app/main/default/objects/Energy_Audit__c/fields/Type_of_Installation__c.field-meta.xml
@@ -234,7 +235,7 @@ EOF
 # 6. Provision FLS permissions for non-required fields in Admin profile (Rule 2.1)
 sed -i '/<\/Profile>/i \    <fieldPermissions>\n        <editable>true</editable>\n        <field>Energy_Audit__c.Type_of_Installation__c</field>\n        <readable>true</readable>\n    </fieldPermissions>\n    <fieldPermissions>\n        <editable>true</editable>\n        <field>Energy_Audit__c.Audit_Notes__c</field>\n        <readable>true</readable>\n    </fieldPermissions>' force-app/main/default/profiles/Admin.profile-meta.xml
 
-# 7. Deploy schema & profiles via Hybrid CLI (--json) -> Stream to console & save log in unit directory
+# 7. Deploy schema & profiles via Hybrid CLI (--json) -> Stream to console & save log in logs directory
 sf project deploy start \
   -d force-app/main/default/objects/Energy_Audit__c \
   -d force-app/main/default/tabs \
@@ -271,44 +272,48 @@ Nice job! We’ll put those into use shortly.
 #### `[REQ-5.1.G4.1] – [REQ-5.1.G4.4]` Insert Energy Audit Records
 
 - **Requirement Specifications Matrix:**
-  | Tag ID               | Record Name                   | Installation Type | Account Name                        | Avg Electric Cost | Energy Usage (kWh) |
-  | :------------------- | :---------------------------- | :---------------- | :---------------------------------- | :---------------- | :----------------- |
-  | **`[REQ-5.1.G4.1]`** | Burlington evaluation         | Rooftop           | Burlington Textiles Corp of America | 1.86              | 23                 |
-  | **`[REQ-5.1.G4.2]`** | UA Spring assessment          | Carport           | University of Arizona               | 2.19              | 30                 |
-  | **`[REQ-5.1.G4.3]`** | GenePoint 5-year review       | Rooftop           | GenePoint                           | 1.56              | 21                 |
-  | **`[REQ-5.1.G4.4]`** | sForce Los Altos Hills campus | Ground mounted    | sForce                              | 1.77              | 25                 |
+  | Tag ID | Record Name | Installation Type | Account Name | Avg Electric Cost | Energy Usage (kWh) |
+  | :--- | :--- | :--- | :--- | :--- | :--- |
+  | **`[REQ-5.1.G4.1]`** | Burlington evaluation | Rooftop | Burlington Textiles Corp of America | 1.86 | 23 |
+  | **`[REQ-5.1.G4.2]`** | UA Spring assessment | Carport | University of Arizona | 2.19 | 30 |
+  | **`[REQ-5.1.G4.3]`** | GenePoint 5-year review | Rooftop | GenePoint | 1.56 | 21 |
+  | **`[REQ-5.1.G4.4]`** | sForce Los Altos Hills campus | Ground mounted | sForce | 1.77 | 25 |
 
 ```bash
-UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization"
+UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
+mkdir -p "$UNIT_DIR"
 
-# 1. Fetch Account IDs for foreign key binding
-sf data query -o trailhead-playground -q "SELECT Id, Name FROM Account WHERE Name LIKE '%Burlington%' OR Name LIKE '%University%' OR Name LIKE '%GenePoint%' OR Name LIKE '%sForce%'" --json
+# 1. Dynamically query Account IDs from target org
+BURLINGTON_ID=$(sf data query -o trailhead-playground -q "SELECT Id FROM Account WHERE Name LIKE '%Burlington%' LIMIT 1" --json | jq -r '.result.records[0].Id')
+UNIV_ID=$(sf data query -o trailhead-playground -q "SELECT Id FROM Account WHERE Name LIKE '%University%' LIMIT 1" --json | jq -r '.result.records[0].Id')
+GENEPOINT_ID=$(sf data query -o trailhead-playground -q "SELECT Id FROM Account WHERE Name LIKE '%GenePoint%' LIMIT 1" --json | jq -r '.result.records[0].Id')
+SFORCE_ID=$(sf data query -o trailhead-playground -q "SELECT Id FROM Account WHERE Name LIKE '%sForce%' LIMIT 1" --json | jq -r '.result.records[0].Id')
 
 # 2. Insert Record 1: Burlington evaluation [REQ-5.1.G4.1]
 sf data create record \
   -s Energy_Audit__c \
-  -v "Name='Burlington evaluation' Type_of_Installation__c='Rooftop' Account__c='<Burlington-Account-Id>' Average_Annual_Electric_Cost__c=1.86 Annual_Energy_Usage_kWh__c=23" \
+  -v "Name='Burlington evaluation' Type_of_Installation__c='Rooftop' Account__c='$BURLINGTON_ID' Average_Annual_Electric_Cost__c=1.86 Annual_Energy_Usage_kWh__c=23" \
   -o trailhead-playground \
   --json | tee "$UNIT_DIR/UNIT_1_GUIDED_RECORDS_AUDIT.json"
 
 # 3. Insert Record 2: UA Spring assessment [REQ-5.1.G4.2]
 sf data create record \
   -s Energy_Audit__c \
-  -v "Name='UA Spring assessment' Type_of_Installation__c='Carport' Account__c='<University-Account-Id>' Average_Annual_Electric_Cost__c=2.19 Annual_Energy_Usage_kWh__c=30" \
+  -v "Name='UA Spring assessment' Type_of_Installation__c='Carport' Account__c='$UNIV_ID' Average_Annual_Electric_Cost__c=2.19 Annual_Energy_Usage_kWh__c=30" \
   -o trailhead-playground \
   --json | tee -a "$UNIT_DIR/UNIT_1_GUIDED_RECORDS_AUDIT.json"
 
 # 4. Insert Record 3: GenePoint 5-year review [REQ-5.1.G4.3]
 sf data create record \
   -s Energy_Audit__c \
-  -v "Name='GenePoint 5-year review' Type_of_Installation__c='Rooftop' Account__c='<GenePoint-Account-Id>' Average_Annual_Electric_Cost__c=1.56 Annual_Energy_Usage_kWh__c=21" \
+  -v "Name='GenePoint 5-year review' Type_of_Installation__c='Rooftop' Account__c='$GENEPOINT_ID' Average_Annual_Electric_Cost__c=1.56 Annual_Energy_Usage_kWh__c=21" \
   -o trailhead-playground \
   --json | tee -a "$UNIT_DIR/UNIT_1_GUIDED_RECORDS_AUDIT.json"
 
 # 5. Insert Record 4: sForce Los Altos Hills campus [REQ-5.1.G4.4]
 sf data create record \
   -s Energy_Audit__c \
-  -v "Name='sForce Los Altos Hills campus' Type_of_Installation__c='Ground mounted' Account__c='<sForce-Account-Id>' Average_Annual_Electric_Cost__c=1.77 Annual_Energy_Usage_kWh__c=25" \
+  -v "Name='sForce Los Altos Hills campus' Type_of_Installation__c='Ground mounted' Account__c='$SFORCE_ID' Average_Annual_Electric_Cost__c=1.77 Annual_Energy_Usage_kWh__c=25" \
   -o trailhead-playground \
   --json | tee -a "$UNIT_DIR/UNIT_1_GUIDED_RECORDS_AUDIT.json"
 ```
@@ -330,7 +335,8 @@ Maria wants her energy consultants to be able to follow changes to the energy au
 - **Requirement Specifications:** Target: `Energy_Audit__c` | Object: `enableFeeds=true` | Fields: `trackFeedHistory=true` on all custom fields (`Account__c`, `Audit_Notes__c`, `Type_of_Installation__c`, `Annual_Energy_Usage_kWh__c`, `Average_Annual_Electric_Cost__c`)
 
 ```bash
-UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization"
+UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
+mkdir -p "$UNIT_DIR"
 
 # 1. Add <enableFeeds>true</enableFeeds> to Energy_Audit__c.object-meta.xml
 sed -i '/<\/CustomObject>/i \    <enableFeeds>true</enableFeeds>' force-app/main/default/objects/Energy_Audit__c/Energy_Audit__c.object-meta.xml
@@ -448,18 +454,19 @@ EOF
 ### `[REQ-5.1.C3]` Challenge 3: Five Custom Fields & Deployment
 
 - **Requirement Specifications Matrix:**
-  | Tag ID               | Field Type   | Label                        | API Name                          | Parameters & Specifications                                                        |
-  | :------------------- | :----------- | :--------------------------- | :-------------------------------- | :--------------------------------------------------------------------------------- |
-  | **`[REQ-5.1.C3.1]`** | Picklist     | Type of Installation         | `Type_of_Installation__c`         | Values: `Rooftop`, `Carport`, `Ground Mounted`                                     |
-  | **`[REQ-5.1.C3.2]`** | Lookup       | Account                      | `Account__c`                      | Related To: `Account` \| Required: `true` \| Constraint: `Restrict`                |
-  | **`[REQ-5.1.C3.3]`** | Currency     | Average Annual Electric Cost | `Average_Annual_Electric_Cost__c` | Precision: 16, Scale: 2 \| Required: `true` \| Help: `Annual cost per square foot` |
-  | **`[REQ-5.1.C3.4]`** | Number       | Annual Energy Usage (kWh)    | `Annual_Energy_Usage_kWh__c`      | Precision: 18, Scale: 0 \| Required: `true` \| Help: `Usage per square foot`       |
-  | **`[REQ-5.1.C3.5]`** | LongTextArea | Audit Notes                  | `Audit_Notes__c`                  | Length: 32768 \| Visible Lines: 5                                                  |
+  | Tag ID | Field Type | Label | API Name | Parameters & Specifications |
+  | :--- | :--- | :--- | :--- | :--- |
+  | **`[REQ-5.1.C3.1]`** | Picklist | Type of Installation | `Type_of_Installation__c` | Values: `Rooftop`, `Carport`, `Ground Mounted` |
+  | **`[REQ-5.1.C3.2]`** | Lookup | Account | `Account__c` | Related To: `Account` \| Required: `true` \| Constraint: `Restrict` |
+  | **`[REQ-5.1.C3.3]`** | Currency | Average Annual Electric Cost | `Average_Annual_Electric_Cost__c` | Precision: 16, Scale: 2 \| Required: `true` \| Help: `Annual cost per square foot` |
+  | **`[REQ-5.1.C3.4]`** | Number | Annual Energy Usage (kWh) | `Annual_Energy_Usage_kWh__c` | Precision: 18, Scale: 0 \| Required: `true` \| Help: `Usage per square foot` |
+  | **`[REQ-5.1.C3.5]`** | LongTextArea | Audit Notes | `Audit_Notes__c` | Length: 32768 \| Visible Lines: 5 |
 
 > **Note:** Notice that while the guided activity used `Ground mounted` (lowercase `m`), the Hands-on Challenge explicitly requests `Ground Mounted` (capital `M`). We include both values in the `valueSet` below so both guided and challenge validators pass.
 
 ```bash
-UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization"
+UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
+mkdir -p "$UNIT_DIR"
 
 # 1. Picklist: Type_of_Installation__c (With both Ground mounted and Ground Mounted)
 cat << 'EOF' > force-app/main/default/objects/Energy_Audit__c/fields/Type_of_Installation__c.field-meta.xml
@@ -555,7 +562,7 @@ EOF
 # 6. Provision non-interactive FLS in Admin profile (Rule 2.1)
 sed -i '/<\/Profile>/i \    <fieldPermissions>\n        <editable>true</editable>\n        <field>Energy_Audit__c.Type_of_Installation__c</field>\n        <readable>true</readable>\n    </fieldPermissions>\n    <fieldPermissions>\n        <editable>true</editable>\n        <field>Energy_Audit__c.Audit_Notes__c</field>\n        <readable>true</readable>\n    </fieldPermissions>' force-app/main/default/profiles/Admin.profile-meta.xml
 
-# 7. Deploy schema & profiles via Hybrid CLI (--json) -> Stream to console & save log in unit directory
+# 7. Deploy schema & profiles via Hybrid CLI (--json) -> Stream to console & save log in logs directory
 sf project deploy start \
   -d force-app/main/default/objects/Energy_Audit__c \
   -d force-app/main/default/tabs \
@@ -571,7 +578,8 @@ sf project deploy start \
 - **Requirement Specifications:** Enable Feed Tracking (`enableFeeds=true` on `Energy_Audit__c`) & `trackFeedHistory=true` across all 6 fields (`Name` + 5 custom fields)
 
 ```bash
-UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization"
+UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
+mkdir -p "$UNIT_DIR"
 
 # 1. Enable object-level feed tracking
 sed -i '/<\/CustomObject>/i \    <enableFeeds>true</enableFeeds>' force-app/main/default/objects/Energy_Audit__c/Energy_Audit__c.object-meta.xml
@@ -593,7 +601,8 @@ sf project deploy start \
 - **Requirement Specifications:** Verify `Energy_Audit__c` schema definitions via `--use-tooling-api --json` before clicking **Check Challenge**.
 
 ```bash
-UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization"
+UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
+mkdir -p "$UNIT_DIR"
 
 sf data query \
   -o trailhead-playground \
