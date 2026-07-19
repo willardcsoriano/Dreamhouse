@@ -1,0 +1,21 @@
+{
+  "status": 0,
+  "result": {
+    "records": [
+      {
+        "attributes": {
+          "type": "CustomApplication",
+          "url": "/services/data/v67.0/tooling/sobjects/CustomApplication/02udL00000ZGVYLQA5"
+        },
+        "DeveloperName": "Energy_Consultations",
+        "Label": "Energy Consultations",
+        "Description": "Track energy audits and product recommendations.",
+        "UiType": "Lightning",
+        "NavType": "Standard"
+      }
+    ],
+    "totalSize": 1,
+    "done": true
+  },
+  "warnings": []
+}

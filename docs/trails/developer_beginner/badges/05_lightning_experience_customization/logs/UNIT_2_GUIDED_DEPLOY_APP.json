@@ -1,0 +1,109 @@
+{
+  "status": 0,
+  "result": {
+    "checkOnly": false,
+    "completedDate": "2026-07-19T14:27:21.000Z",
+    "createdBy": "005dL00001otHpJ",
+    "createdByName": "Willard Soriano",
+    "createdDate": "2026-07-19T14:27:20.000Z",
+    "details": {
+      "componentSuccesses": [
+        {
+          "changed": false,
+          "componentType": "CustomTab",
+          "created": false,
+          "createdDate": "2026-07-19T14:27:21.000Z",
+          "deleted": false,
+          "fileName": "tabs/Energy_Audit__c.tab",
+          "fullName": "Energy_Audit__c",
+          "id": "01rdL00001clMecQAE",
+          "success": true
+        },
+        {
+          "changed": true,
+          "componentType": "CustomApplication",
+          "created": true,
+          "createdDate": "2026-07-19T14:27:21.000Z",
+          "deleted": false,
+          "fileName": "applications/Energy_Consultations.app",
+          "fullName": "Energy_Consultations",
+          "id": "02udL00000ZGVYLQA5",
+          "success": true
+        },
+        {
+          "changed": true,
+          "componentType": "Profile",
+          "created": false,
+          "createdDate": "2026-07-19T14:27:21.000Z",
+          "deleted": false,
+          "fileName": "profiles/Admin.profile",
+          "fullName": "Admin",
+          "id": "00edL00000UrhK5QAJ",
+          "success": true
+        },
+        {
+          "changed": true,
+          "componentType": "",
+          "created": false,
+          "createdDate": "2026-07-19T14:27:21.000Z",
+          "deleted": false,
+          "fileName": "package.xml",
+          "fullName": "package.xml",
+          "success": true
+        }
+      ],
+      "runTestResult": {
+        "numFailures": 0,
+        "numTestsRun": 0,
+        "totalTime": 0,
+        "codeCoverage": [],
+        "codeCoverageWarnings": [],
+        "failures": [],
+        "flowCoverage": [],
+        "flowCoverageWarnings": [],
+        "successes": []
+      },
+      "componentFailures": []
+    },
+    "done": true,
+    "id": "0AfdL00000durUbSAI",
+    "ignoreWarnings": false,
+    "lastModifiedDate": "2026-07-19T14:27:21.000Z",
+    "numberComponentErrors": 0,
+    "numberComponentsDeployed": 3,
+    "numberComponentsTotal": 3,
+    "numberFiles": "7",
+    "numberTestErrors": 0,
+    "numberTestsCompleted": 0,
+    "numberTestsTotal": 0,
+    "rollbackOnError": true,
+    "runTestsEnabled": false,
+    "startDate": "2026-07-19T14:27:20.000Z",
+    "status": "Succeeded",
+    "success": true,
+    "zipSize": 1894,
+    "files": [
+      {
+        "fullName": "Energy_Consultations",
+        "type": "CustomApplication",
+        "state": "Created",
+        "filePath": "/home/willard/repos/Dreamhouse/force-app/main/default/applications/Energy_Consultations.app-meta.xml"
+      },
+      {
+        "fullName": "Energy_Audit__c",
+        "type": "CustomTab",
+        "state": "Unchanged",
+        "filePath": "/home/willard/repos/Dreamhouse/force-app/main/default/tabs/Energy_Audit__c.tab-meta.xml"
+      },
+      {
+        "fullName": "Admin",
+        "type": "Profile",
+        "state": "Changed",
+        "filePath": "/home/willard/repos/Dreamhouse/force-app/main/default/profiles/Admin.profile-meta.xml"
+      }
+    ],
+    "zipFileCount": 4,
+    "deployUrl": "https://curious-impala-2bl463-dev-ed.trailblaze.my.salesforce.com/lightning/setup/DeployStatus/page?address=%2Fchangemgmt%2FmonitorDeploymentsDetails.apexp%3FasyncId%3D0AfdL00000durUbSAI%26retURL%3D%252Fchangemgmt%252FmonitorDeployment.apexp"
+  },
+  "warnings": []
+}

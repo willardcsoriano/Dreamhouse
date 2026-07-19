@@ -1,0 +1,356 @@
+[
+  {
+    "status": 0,
+    "result": {
+      "checkOnly": false,
+      "completedDate": "2026-07-19T13:51:22.000Z",
+      "createdBy": "005dL00001otHpJ",
+      "createdByName": "Willard Soriano",
+      "createdDate": "2026-07-19T13:51:17.000Z",
+      "details": {
+        "componentSuccesses": [
+          {
+            "changed": true,
+            "componentType": "CustomField",
+            "created": false,
+            "createdDate": "2026-07-19T13:51:20.000Z",
+            "deleted": false,
+            "fileName": "objects/Energy_Audit__c.object",
+            "fullName": "Energy_Audit__c.Account__c",
+            "id": "00NdL00002YiFbRUAV",
+            "success": true
+          },
+          {
+            "changed": true,
+            "componentType": "CustomField",
+            "created": false,
+            "createdDate": "2026-07-19T13:51:20.000Z",
+            "deleted": false,
+            "fileName": "objects/Energy_Audit__c.object",
+            "fullName": "Energy_Audit__c.Annual_Energy_Usage_kWh__c",
+            "id": "00NdL00002YiFbSUAV",
+            "success": true
+          },
+          {
+            "changed": true,
+            "componentType": "CustomField",
+            "created": false,
+            "createdDate": "2026-07-19T13:51:20.000Z",
+            "deleted": false,
+            "fileName": "objects/Energy_Audit__c.object",
+            "fullName": "Energy_Audit__c.Audit_Notes__c",
+            "id": "00NdL00002YiFbTUAV",
+            "success": true
+          },
+          {
+            "changed": true,
+            "componentType": "CustomField",
+            "created": false,
+            "createdDate": "2026-07-19T13:51:20.000Z",
+            "deleted": false,
+            "fileName": "objects/Energy_Audit__c.object",
+            "fullName": "Energy_Audit__c.Average_Annual_Electric_Cost__c",
+            "id": "00NdL00002YiFbUUAV",
+            "success": true
+          },
+          {
+            "changed": true,
+            "componentType": "CustomField",
+            "created": false,
+            "createdDate": "2026-07-19T13:51:20.000Z",
+            "deleted": false,
+            "fileName": "objects/Energy_Audit__c.object",
+            "fullName": "Energy_Audit__c.Type_of_Installation__c",
+            "id": "00NdL00002YiFbVUAV",
+            "success": true
+          },
+          {
+            "changed": true,
+            "componentType": "CustomObject",
+            "created": false,
+            "createdDate": "2026-07-19T13:51:22.000Z",
+            "deleted": false,
+            "fileName": "objects/Energy_Audit__c.object",
+            "fullName": "Energy_Audit__c",
+            "id": "01IdL00000G86WrUAJ",
+            "success": true
+          },
+          {
+            "changed": false,
+            "componentType": "CustomTab",
+            "created": false,
+            "createdDate": "2026-07-19T13:51:22.000Z",
+            "deleted": false,
+            "fileName": "tabs/Energy_Audit__c.tab",
+            "fullName": "Energy_Audit__c",
+            "id": "01rdL00001clMecQAE",
+            "success": true
+          },
+          {
+            "changed": true,
+            "componentType": "Profile",
+            "created": false,
+            "createdDate": "2026-07-19T13:51:22.000Z",
+            "deleted": false,
+            "fileName": "profiles/Admin.profile",
+            "fullName": "Admin",
+            "id": "00edL00000UrhK5QAJ",
+            "success": true
+          },
+          {
+            "changed": true,
+            "componentType": "",
+            "created": false,
+            "createdDate": "2026-07-19T13:51:22.000Z",
+            "deleted": false,
+            "fileName": "package.xml",
+            "fullName": "package.xml",
+            "success": true
+          }
+        ],
+        "runTestResult": {
+          "numFailures": 0,
+          "numTestsRun": 0,
+          "totalTime": 0,
+          "codeCoverage": [],
+          "codeCoverageWarnings": [],
+          "failures": [],
+          "flowCoverage": [],
+          "flowCoverageWarnings": [],
+          "successes": []
+        },
+        "componentFailures": []
+      },
+      "done": true,
+      "id": "0AfdL00000dunHJSAY",
+      "ignoreWarnings": false,
+      "lastModifiedDate": "2026-07-19T13:51:22.000Z",
+      "numberComponentErrors": 0,
+      "numberComponentsDeployed": 8,
+      "numberComponentsTotal": 8,
+      "numberFiles": "7",
+      "numberTestErrors": 0,
+      "numberTestsCompleted": 0,
+      "numberTestsTotal": 0,
+      "rollbackOnError": true,
+      "runTestsEnabled": false,
+      "startDate": "2026-07-19T13:51:17.000Z",
+      "status": "Succeeded",
+      "success": true,
+      "zipSize": 2222,
+      "files": [
+        {
+          "fullName": "Energy_Audit__c.Account__c",
+          "type": "CustomField",
+          "state": "Changed",
+          "filePath": "/home/willard/repos/Dreamhouse/force-app/main/default/objects/Energy_Audit__c/fields/Account__c.field-meta.xml"
+        },
+        {
+          "fullName": "Energy_Audit__c.Annual_Energy_Usage_kWh__c",
+          "type": "CustomField",
+          "state": "Changed",
+          "filePath": "/home/willard/repos/Dreamhouse/force-app/main/default/objects/Energy_Audit__c/fields/Annual_Energy_Usage_kWh__c.field-meta.xml"
+        },
+        {
+          "fullName": "Energy_Audit__c.Audit_Notes__c",
+          "type": "CustomField",
+          "state": "Changed",
+          "filePath": "/home/willard/repos/Dreamhouse/force-app/main/default/objects/Energy_Audit__c/fields/Audit_Notes__c.field-meta.xml"
+        },
+        {
+          "fullName": "Energy_Audit__c.Average_Annual_Electric_Cost__c",
+          "type": "CustomField",
+          "state": "Changed",
+          "filePath": "/home/willard/repos/Dreamhouse/force-app/main/default/objects/Energy_Audit__c/fields/Average_Annual_Electric_Cost__c.field-meta.xml"
+        },
+        {
+          "fullName": "Energy_Audit__c.Type_of_Installation__c",
+          "type": "CustomField",
+          "state": "Changed",
+          "filePath": "/home/willard/repos/Dreamhouse/force-app/main/default/objects/Energy_Audit__c/fields/Type_of_Installation__c.field-meta.xml"
+        },
+        {
+          "fullName": "Energy_Audit__c",
+          "type": "CustomObject",
+          "state": "Changed",
+          "filePath": "/home/willard/repos/Dreamhouse/force-app/main/default/objects/Energy_Audit__c/Energy_Audit__c.object-meta.xml"
+        },
+        {
+          "fullName": "Energy_Audit__c",
+          "type": "CustomTab",
+          "state": "Unchanged",
+          "filePath": "/home/willard/repos/Dreamhouse/force-app/main/default/tabs/Energy_Audit__c.tab-meta.xml"
+        },
+        {
+          "fullName": "Admin",
+          "type": "Profile",
+          "state": "Changed",
+          "filePath": "/home/willard/repos/Dreamhouse/force-app/main/default/profiles/Admin.profile-meta.xml"
+        }
+      ],
+      "zipFileCount": 4,
+      "deployUrl": "https://curious-impala-2bl463-dev-ed.trailblaze.my.salesforce.com/lightning/setup/DeployStatus/page?address=%2Fchangemgmt%2FmonitorDeploymentsDetails.apexp%3FasyncId%3D0AfdL00000dunHJSAY%26retURL%3D%252Fchangemgmt%252FmonitorDeployment.apexp"
+    },
+    "warnings": []
+  },
+  {
+    "status": 0,
+    "result": {
+      "checkOnly": false,
+      "completedDate": "2026-07-19T13:52:38.000Z",
+      "createdBy": "005dL00001otHpJ",
+      "createdByName": "Willard Soriano",
+      "createdDate": "2026-07-19T13:52:34.000Z",
+      "details": {
+        "componentSuccesses": [
+          {
+            "changed": false,
+            "componentType": "CustomField",
+            "created": false,
+            "createdDate": "2026-07-19T13:52:38.000Z",
+            "deleted": false,
+            "fileName": "objects/Energy_Audit__c.object",
+            "fullName": "Energy_Audit__c.Account__c",
+            "id": "00NdL00002YiFbRUAV",
+            "success": true
+          },
+          {
+            "changed": false,
+            "componentType": "CustomField",
+            "created": false,
+            "createdDate": "2026-07-19T13:52:38.000Z",
+            "deleted": false,
+            "fileName": "objects/Energy_Audit__c.object",
+            "fullName": "Energy_Audit__c.Annual_Energy_Usage_kWh__c",
+            "id": "00NdL00002YiFbSUAV",
+            "success": true
+          },
+          {
+            "changed": false,
+            "componentType": "CustomField",
+            "created": false,
+            "createdDate": "2026-07-19T13:52:38.000Z",
+            "deleted": false,
+            "fileName": "objects/Energy_Audit__c.object",
+            "fullName": "Energy_Audit__c.Audit_Notes__c",
+            "id": "00NdL00002YiFbTUAV",
+            "success": true
+          },
+          {
+            "changed": false,
+            "componentType": "CustomField",
+            "created": false,
+            "createdDate": "2026-07-19T13:52:38.000Z",
+            "deleted": false,
+            "fileName": "objects/Energy_Audit__c.object",
+            "fullName": "Energy_Audit__c.Average_Annual_Electric_Cost__c",
+            "id": "00NdL00002YiFbUUAV",
+            "success": true
+          },
+          {
+            "changed": false,
+            "componentType": "CustomField",
+            "created": false,
+            "createdDate": "2026-07-19T13:52:38.000Z",
+            "deleted": false,
+            "fileName": "objects/Energy_Audit__c.object",
+            "fullName": "Energy_Audit__c.Type_of_Installation__c",
+            "id": "00NdL00002YiFbVUAV",
+            "success": true
+          },
+          {
+            "changed": true,
+            "componentType": "CustomObject",
+            "created": false,
+            "createdDate": "2026-07-19T13:52:38.000Z",
+            "deleted": false,
+            "fileName": "objects/Energy_Audit__c.object",
+            "fullName": "Energy_Audit__c",
+            "id": "01IdL00000G86WrUAJ",
+            "success": true
+          },
+          {
+            "changed": true,
+            "componentType": "",
+            "created": false,
+            "createdDate": "2026-07-19T13:52:38.000Z",
+            "deleted": false,
+            "fileName": "package.xml",
+            "fullName": "package.xml",
+            "success": true
+          }
+        ],
+        "runTestResult": {
+          "numFailures": 0,
+          "numTestsRun": 0,
+          "totalTime": 0,
+          "codeCoverage": [],
+          "codeCoverageWarnings": [],
+          "failures": [],
+          "flowCoverage": [],
+          "flowCoverageWarnings": [],
+          "successes": []
+        },
+        "componentFailures": []
+      },
+      "done": true,
+      "id": "0AfdL00000duZW8SAM",
+      "ignoreWarnings": false,
+      "lastModifiedDate": "2026-07-19T13:52:38.000Z",
+      "numberComponentErrors": 0,
+      "numberComponentsDeployed": 6,
+      "numberComponentsTotal": 6,
+      "numberFiles": "3",
+      "numberTestErrors": 0,
+      "numberTestsCompleted": 0,
+      "numberTestsTotal": 0,
+      "rollbackOnError": true,
+      "runTestsEnabled": false,
+      "startDate": "2026-07-19T13:52:36.000Z",
+      "status": "Succeeded",
+      "success": true,
+      "zipSize": 1383,
+      "files": [
+        {
+          "fullName": "Energy_Audit__c.Account__c",
+          "type": "CustomField",
+          "state": "Unchanged",
+          "filePath": "/home/willard/repos/Dreamhouse/force-app/main/default/objects/Energy_Audit__c/fields/Account__c.field-meta.xml"
+        },
+        {
+          "fullName": "Energy_Audit__c.Annual_Energy_Usage_kWh__c",
+          "type": "CustomField",
+          "state": "Unchanged",
+          "filePath": "/home/willard/repos/Dreamhouse/force-app/main/default/objects/Energy_Audit__c/fields/Annual_Energy_Usage_kWh__c.field-meta.xml"
+        },
+        {
+          "fullName": "Energy_Audit__c.Audit_Notes__c",
+          "type": "CustomField",
+          "state": "Unchanged",
+          "filePath": "/home/willard/repos/Dreamhouse/force-app/main/default/objects/Energy_Audit__c/fields/Audit_Notes__c.field-meta.xml"
+        },
+        {
+          "fullName": "Energy_Audit__c.Average_Annual_Electric_Cost__c",
+          "type": "CustomField",
+          "state": "Unchanged",
+          "filePath": "/home/willard/repos/Dreamhouse/force-app/main/default/objects/Energy_Audit__c/fields/Average_Annual_Electric_Cost__c.field-meta.xml"
+        },
+        {
+          "fullName": "Energy_Audit__c.Type_of_Installation__c",
+          "type": "CustomField",
+          "state": "Unchanged",
+          "filePath": "/home/willard/repos/Dreamhouse/force-app/main/default/objects/Energy_Audit__c/fields/Type_of_Installation__c.field-meta.xml"
+        },
+        {
+          "fullName": "Energy_Audit__c",
+          "type": "CustomObject",
+          "state": "Changed",
+          "filePath": "/home/willard/repos/Dreamhouse/force-app/main/default/objects/Energy_Audit__c/Energy_Audit__c.object-meta.xml"
+        }
+      ],
+      "zipFileCount": 2,
+      "deployUrl": "https://curious-impala-2bl463-dev-ed.trailblaze.my.salesforce.com/lightning/setup/DeployStatus/page?address=%2Fchangemgmt%2FmonitorDeploymentsDetails.apexp%3FasyncId%3D0AfdL00000duZW8SAM%26retURL%3D%252Fchangemgmt%252FmonitorDeployment.apexp"
+    },
+    "warnings": []
+  }
+]
