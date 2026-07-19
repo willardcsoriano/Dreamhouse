@@ -179,7 +179,29 @@ Create a custom Opportunity list view for sales rep Lance Park to isolate opport
 **Solves Requirements:** `[REQ-5.3.C1.1]`, `[REQ-5.3.C1.2]`, `[REQ-5.3.C1.3]`, `[REQ-5.3.C1.4]`
 
 ```bash
-# Deploy the ListView Metadata XML directly to target org 'Rimes'
+# 1. Create the ListView Metadata XML locally
+mkdir -p force-app/main/default/objects/Opportunity/listViews
+
+cat << 'EOF' > force-app/main/default/objects/Opportunity/listViews/High_Probability_Opportunities.listView-meta.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>High_Probability_Opportunities</fullName>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>OPPORTUNITY.STAGE_NAME</field>
+        <operation>equals</operation>
+        <value>Proposal/Price Quote,Negotiation/Review</value>
+    </filters>
+    <filters>
+        <field>OPPORTUNITY.PROBABILITY</field>
+        <operation>greaterOrEqual</operation>
+        <value>50</value>
+    </filters>
+    <label>High Probability Opportunities</label>
+</ListView>
+EOF
+
+# 2. Deploy the ListView Metadata directly to target org 'Rimes'
 sf project deploy start \
   -d force-app/main/default/objects/Opportunity/listViews/High_Probability_Opportunities.listView-meta.xml \
   -o Rimes
@@ -198,7 +220,7 @@ UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customiz
 mkdir -p "$UNIT_DIR"
 
 sf data query \
-  -o trailhead-playground \
+  -o Rimes \
   -q "SELECT Id, Name, DeveloperName, SobjectType FROM ListView WHERE SobjectType = 'Opportunity' AND DeveloperName = 'High_Probability_Opportunities'" \
   --json | tee "$UNIT_DIR/UNIT_3_CHALLENGE_VERIFICATION_AUDIT.json"
 ```
