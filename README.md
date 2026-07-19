@@ -1,58 +1,89 @@
-# Salesforce DX Project
+# Salesforce DX Project & Developer Learning Repository
 
-Salesforce DX is a development approach that brings source-driven development, team collaboration, and continuous integration to the Salesforce Platform. Instead of working directly in an org through a web browser, you work with metadata as source files in a local DX project, track changes in version control, and deploy through automated processes.
+**Project:** Dreamhouse Realty & Developer Beginner Trailhead Portfolio  
+**Author:** Business Applications Engineering  
+**Date:** July 19, 2026
 
-This project template gets you started with the tools and structure you need to build Salesforce applications using source control, scratch orgs, and the Salesforce CLI.
+---
 
-## Prerequisites
+## Executive Overview
 
-Before you start, make sure you have:
+Salesforce DX (SFDX) brings source-driven development, continuous integration, and version control to the Salesforce Platform. Instead of working directly in an org through a web browser, metadata is tracked as local source files, versioned in Git, and deployed via automated terminal CLI processes and AI Model Context Protocol (`@salesforce/mcp`) tools.
 
-- **Salesforce CLI** - Download from [developer.salesforce.com/tools/salesforcecli](https://developer.salesforce.com/tools/salesforcecli). See [Install Salesforce CLI](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_install_cli.htm) for details.
-- **VS Code with Salesforce Extension Pack** - See [Installation Instructions](https://developer.salesforce.com/docs/platform/sfvscode-extensions/guide/install.html) for details. Includes the Agentforce Vibes extension.
-- **A development org** - Sign up for a free Developer Edition org [here](https://developer.salesforce.com/signup).
-- **Dev Hub enabled** (optional, required to create scratch orgs) - You can enable Dev Hub in your development org under Setup > Dev Hub.  See [Provide Developers Access to Salesforce DX Tools](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_setup_dx_tools.htm).
+This repository serves as both the **Dreamhouse Realty** project codebase and the complete **Salesforce Developer Beginner Trailhead Portfolio**.
 
-## Project Structure
+---
 
-Your DX project follows this structure:
+## Salesforce Platform Architecture
 
-- **`force-app/main/default/`** - Your metadata source files live in this default package directory. You can configure additional package directories in the `sfdx-project.json` file.
-- **`config/`** - Scratch org definitions and project settings
-- **`scripts/`** - Automation scripts for common tasks
-- **`sfdx-project.json`** - Project manifest that defines package directories, namespace, API version, and other project-level settings
+### Metadata-Driven Architecture
 
-See [Salesforce DX Project Configuration](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_ws_config.htm).
+Unlike traditional software stacks where changes must be manually propagated from database schemas to APIs, access controls, and frontend components, Salesforce verticalizes this via metadata:
 
-## Get Started
+- **Declarative Schema Updates:** Defining objects and fields automatically generates REST/GraphQL API endpoints.
+- **Vertical Security Integration:** Field-level security (FLS) and sharing rules are evaluated dynamically at runtime by the database routing engine.
 
-Ready to start developing? The [Get Started with Salesforce DX](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_get_started_dx.htm) guide walks you through your first project, from creating a scratch org to creating a simple Apex class or LWC to deploying your code to a sandbox.
+### Data Virtualization & Multi-Tenancy
 
-## Common Salesforce CLI Commands
+To route multi-tenant database requests through shared physical database tables, Salesforce uses a metadata-driven virtualization layer:
 
-Here are common CLI commands that you'll use the most:
+- **Dynamic Query Generator:** Translates virtual queries (e.g. querying custom fields) into references to shared physical columns (e.g. `Value42` in universal database tables).
+- **Universal Indexer:** Manages custom index records in a dedicated table to prevent query degradation on shared columns.
+- **Dynamic Sharing Filters:** Computes user sharing and row-level access permissions at execution runtime.
 
-- `sf org login web`: Authorize an org
-- `sf org open`: Open your org in a browser
-- `sf org create scratch`: Create a scratch org
-- `sf project deploy start`: Deploy metadata to your org
-- `sf project retrieve start`: Retrieve metadata from your org
-- `sf template generate <artifact>`: Scaffold new components, such as Apex classes and triggers, LWC components, Lightning apps, and more
-- `sf apex <command>`: Run Apex tests, run anonymous Apex blocks, and view logs
-- `sf data <command>`: Work with test data
-- `sf alias <command>`: Manage org aliases
-- `sf config <command>`: Configure CLI settings
+_(Note: In modern standalone systems like PostgreSQL, this virtualized multi-tenant structure can be handled natively using **JSONB schemas**, **GIN/Expression Indexes**, and native database-level **Row-Level Security (RLS)**)._
 
-## Use Agentforce Vibes to Build Lightning Apps
+---
 
-Transform your ideas into custom Lightning apps that extend CRM workflows directly in Lightning Experience. Through natural conversations with Agentforce Vibes, implement custom objects and fields, complex business logic, and dynamic UI components. See [Build a Lightning App Using Agentforce Vibes](https://developer.salesforce.com/docs/platform/einstein-for-devs/guide/lexapp-overview.html).
+## Lightning Web Components (LWC) Architecture
 
-## Additional Resources
+LWC is a modern standards-based UI framework built natively on browser web components (Custom Elements, Shadow DOM, and HTML templates), bypassing heavy client-side framework wrapper overhead.
 
-- [Agentforce Vibes Developer Guide](https://developer.salesforce.com/docs/platform/einstein-for-devs/guide/einstein-overview.html)
-- [Salesforce CLI Installation Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm)
-- [Salesforce DX Developer Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/)
-- [Salesforce CLI Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/)
-- [Salesforce CLI Plugin Development Guide](https://developer.salesforce.com/docs/platform/salesforce-cli-plugin/guide/conceptual-overview.html)
-- [Salesforce VS Code Extensions Documentation](https://developer.salesforce.com/tools/vscode/)
+### React Developer Concept Mapping
 
+| React Feature / Hook             | LWC Equivalent      | Description                                                                                       |
+| :------------------------------- | :------------------ | :------------------------------------------------------------------------------------------------ |
+| **Component Props**              | `@api propertyName` | Public reactive properties exposed to parent components.                                          |
+| **Component State / `useState`** | Class Fields        | LWC class fields are reactive by default; modifying them triggers a rerender.                     |
+| **Side Effects / `useEffect`**   | Lifecycle Hooks     | `connectedCallback()` (insert), `renderedCallback()` (render), `disconnectedCallback()` (remove). |
+| **Event Emission**               | `CustomEvent`       | Handled via standard DOM dispatch: `this.dispatchEvent(new CustomEvent('name'))`.                 |
+
+---
+
+## Project & Documentation Structure
+
+- **`force-app/main/default/`** - Package source directory containing custom objects (`Offer__c`, `Property__c`, `Energy_Audit__c`), Apex classes, LWCs, and profiles.
+- **`docs/REPORT.md`** - Global Trailhead progress report and roadblocks.
+- **`docs/SALESFORCE_DEVELOPMENT_RULES.md`** - Mandatory Salesforce CLI & MCP Server Development Rules.
+- **`docs/trails/developer_beginner/`** - Developer Beginner Trailhead Dashboard and 10 numbered badge directories (`01_` through `10_`).
+
+---
+
+## Hybrid SFDX CLI + `--json` Protocol
+
+All developer activities from **Badge 05 onwards** adhere to the **Hybrid SFDX CLI + `--json` Protocol**:
+
+```bash
+sf project deploy start -d force-app/main/default/objects/Energy_Audit__c -o trailhead-playground --json
+```
+
+- **100% Hands-On CLI Mastery:** Engineers execute terminal commands, mastering SFDX flags (`-d`, `-o`, `-q`, `--use-tooling-api`).
+- **100% Deterministic JSON Traceability:** Appending `--json` forces the CLI to output structured, unformatted JSON payloads matching MCP RPC standards for auditability.
+
+---
+
+## Prerequisites & Common CLI Commands
+
+### Prerequisites
+
+- **Salesforce CLI** (`sf`)
+- **VS Code with Salesforce Extension Pack**
+- **Salesforce Trailhead Playground Org** (`curious-impala-2bl463`)
+
+### Common Commands
+
+- `sf org login web --alias trailhead-playground`: Authorize target org
+- `sf org open -o trailhead-playground`: Open org in browser
+- `sf project deploy start -d <path> -o trailhead-playground --json`: Deploy metadata with JSON payload
+- `sf project retrieve start -m <metadata> -o trailhead-playground`: Retrieve metadata from org
+- `sf data query -o trailhead-playground --use-tooling-api -q "<SOQL>"`: Query Tooling API
