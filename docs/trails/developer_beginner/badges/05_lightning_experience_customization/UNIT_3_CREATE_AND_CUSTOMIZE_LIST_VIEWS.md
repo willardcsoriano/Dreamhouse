@@ -105,7 +105,8 @@ mkdir -p "$UNIT_DIR"
 
 sf data query \
   -o trailhead-playground \
-  -q "SELECT Id, Name, DeveloperName, SobjectType, FilterScope FROM ListView WHERE SobjectType = 'Account' AND DeveloperName = 'Channel_Customers'" \
+  --use-tooling-api \
+  -q "SELECT Id, Name, DeveloperName, SobjectType FROM ListView WHERE SobjectType = 'Account' AND DeveloperName = 'Channel_Customers'" \
   --json | tee "$UNIT_DIR/UNIT_3_GUIDED_LISTVIEW_AUDIT.json"
 ```
 
@@ -229,7 +230,8 @@ mkdir -p "$UNIT_DIR"
 
 sf data query \
   -o trailhead-playground \
-  -q "SELECT Id, Name, DeveloperName, SobjectType, FilterScope FROM ListView WHERE SobjectType = 'Opportunity' AND DeveloperName = 'High_Probability_Opportunities'" \
+  --use-tooling-api \
+  -q "SELECT Id, Name, DeveloperName, SobjectType FROM ListView WHERE SobjectType = 'Opportunity' AND DeveloperName = 'High_Probability_Opportunities'" \
   --json | tee "$UNIT_DIR/UNIT_3_CHALLENGE_VERIFICATION_AUDIT.json"
 ```
 
