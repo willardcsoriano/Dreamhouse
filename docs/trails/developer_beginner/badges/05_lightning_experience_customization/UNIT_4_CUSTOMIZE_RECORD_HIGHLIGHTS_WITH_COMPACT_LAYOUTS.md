@@ -7,6 +7,19 @@
 
 ---
 
+## Requirement to CLI Command Mapping Matrix
+
+| Requirement ID | Requirement Summary | Target Component | Solved By CLI Command |
+| :--- | :--- | :--- | :--- |
+| **`[REQ-5.4.G1.1]`** | Create `Energy_Audit_Compact_Layout` | `Energy_Audit__c` Compact Layout | `cat << 'EOF' > force-app/main/default/objects/Energy_Audit__c/compactLayouts/Energy_Audit_Compact_Layout.compactLayout-meta.xml` |
+| **`[REQ-5.4.G1.2]`** | Assign Primary Compact Layout | `Energy_Audit__c` Metadata | `<compactLayoutAssignment>Energy_Audit_Compact_Layout</compactLayoutAssignment>` in `Energy_Audit__c.object-meta.xml` |
+| **`[REQ-5.4.C1.1]`** | Create `New_Oppty_Compact_Layout` | `Opportunity` Compact Layout | `cat << 'EOF' > force-app/main/default/objects/Opportunity/compactLayouts/New_Oppty_Compact_Layout.compactLayout-meta.xml` |
+| **`[REQ-5.4.C1.2]`** | Assign Primary Compact Layout | `Opportunity` Metadata | `cat << 'EOF' > force-app/main/default/objects/Opportunity/Opportunity.object-meta.xml` |
+| **`[REQ-5.4.DEP]`** | Deploy Metadata to Org | Org Cloud Metadata API | `sf project deploy start -d force-app/main/default/objects/Energy_Audit__c -d force-app/main/default/objects/Opportunity -o myDevOrg --json` |
+| **`[REQ-5.4.AUD]`** | Verify Org Configuration | Tooling API Query | `sf data query -o myDevOrg --use-tooling-api -q "SELECT Id, DeveloperName, MasterLabel, SobjectType FROM CompactLayout WHERE DeveloperName IN ('Energy_Audit_Compact_Layout', 'New_Oppty_Compact_Layout')" --json` |
+
+---
+
 ## Introduction & Learning Objectives
 
 Compact layouts control which fields users see in the **Highlights Panel** at the top of a record page in Lightning Experience. They also control fields displayed in expanded lookup cards when hovering over a link in record details, and in the Salesforce mobile app record view.
@@ -32,11 +45,13 @@ A **Compact Layout** organizes key fields for quick recognition across desktop a
 
 ---
 
-## Consolidated Requirements & Solutions
+## Detailed Requirements & Executable CLI Solutions
 
 ### 1. `[REQ-5.4.G1]` Energy Audit Compact Layout (Guided Walk-Through)
 
 Maria Jimenez wants to highlight the most critical energy metrics at the top of `Energy_Audit__c` records.
+
+#### `[REQ-5.4.G1.1]` & `[REQ-5.4.G1.2]` Create Metadata & Primary Assignment
 
 - **Target Object:** `Energy_Audit__c`
 - **Compact Layout Label:** `Energy Audit Compact Layout`
@@ -47,13 +62,32 @@ Maria Jimenez wants to highlight the most critical energy metrics at the top of 
   3. `Annual_Energy_Usage_kWh__c` (Annual Energy Usage (kWh))
   4. `Average_Annual_Electric_Cost__c` (Average Annual Electric Cost)
   5. `Type_of_Installation__c` (Type of Installation)
-- **Assignment:** Set as Primary Compact Layout (`compactLayoutAssignment`)
+
+**Matched CLI Execution Command:**
+```bash
+mkdir -p force-app/main/default/objects/Energy_Audit__c/compactLayouts
+
+cat << 'EOF' > force-app/main/default/objects/Energy_Audit__c/compactLayouts/Energy_Audit_Compact_Layout.compactLayout-meta.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Energy_Audit_Compact_Layout</fullName>
+    <fields>Name</fields>
+    <fields>Account__c</fields>
+    <fields>Annual_Energy_Usage_kWh__c</fields>
+    <fields>Average_Annual_Electric_Cost__c</fields>
+    <fields>Type_of_Installation__c</fields>
+    <label>Energy Audit Compact Layout</label>
+</CompactLayout>
+EOF
+```
 
 ---
 
 ### 2. `[REQ-5.4.C1]` Opportunity Compact Layout (Hands-On Challenge)
 
 When Ursa Major Solar salespeople are on site with a customer, they need key opportunity metrics right at the top of the record.
+
+#### `[REQ-5.4.C1.1]` & `[REQ-5.4.C1.2]` Create Metadata & Primary Assignment
 
 - **Target Object:** `Opportunity`
 - **Compact Layout Label:** `New Oppty Compact Layout`
@@ -65,30 +99,13 @@ When Ursa Major Solar salespeople are on site with a customer, they need key opp
   4. `StageName` (Stage)
   5. `Amount` (Amount)
   6. `OwnerId` (Opportunity Owner)
-- **Assignment:** Set as Primary Compact Layout (`compactLayoutAssignment`)
 
----
+**Matched CLI Execution Commands:**
+```bash
+mkdir -p force-app/main/default/objects/Opportunity/compactLayouts
 
-## Step-by-Step SFDX Deployment Protocol
-
-### Step 1: Create Compact Layout Metadata Files
-
-#### `force-app/main/default/objects/Energy_Audit__c/compactLayouts/Energy_Audit_Compact_Layout.compactLayout-meta.xml`
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Energy_Audit_Compact_Layout</fullName>
-    <fields>Name</fields>
-    <fields>Account__c</fields>
-    <fields>Annual_Energy_Usage_kWh__c</fields>
-    <fields>Average_Annual_Electric_Cost__c</fields>
-    <fields>Type_of_Installation__c</fields>
-    <label>Energy Audit Compact Layout</label>
-</CompactLayout>
-```
-
-#### `force-app/main/default/objects/Opportunity/compactLayouts/New_Oppty_Compact_Layout.compactLayout-meta.xml`
-```xml
+# 1. Create CompactLayout metadata file
+cat << 'EOF' > force-app/main/default/objects/Opportunity/compactLayouts/New_Oppty_Compact_Layout.compactLayout-meta.xml
 <?xml version="1.0" encoding="UTF-8"?>
 <CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>New_Oppty_Compact_Layout</fullName>
@@ -100,28 +117,20 @@ When Ursa Major Solar salespeople are on site with a customer, they need key opp
     <fields>OwnerId</fields>
     <label>New Oppty Compact Layout</label>
 </CompactLayout>
-```
+EOF
 
----
-
-### Step 2: Assign Primary Compact Layouts on Object Metadata
-
-#### Update `force-app/main/default/objects/Energy_Audit__c/Energy_Audit__c.object-meta.xml`
-```xml
-<compactLayoutAssignment>Energy_Audit_Compact_Layout</compactLayoutAssignment>
-```
-
-#### Create `force-app/main/default/objects/Opportunity/Opportunity.object-meta.xml`
-```xml
+# 2. Assign Primary Compact Layout in Object Metadata
+cat << 'EOF' > force-app/main/default/objects/Opportunity/Opportunity.object-meta.xml
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
     <compactLayoutAssignment>New_Oppty_Compact_Layout</compactLayoutAssignment>
 </CustomObject>
+EOF
 ```
 
 ---
 
-### Step 3: Atomic SFDX CLI Deployment
+### 3. `[REQ-5.4.DEP]` Atomic SFDX CLI Deployment Command
 
 Deploy the metadata components directly to your connected Salesforce org (`myDevOrg`):
 
@@ -138,7 +147,7 @@ sf project deploy start \
 
 ---
 
-## Verification Audit
+### 4. `[REQ-5.4.AUD]` Verification Audit Command
 
 Verify the deployed `CompactLayout` metadata using Tooling API SOQL:
 
@@ -151,30 +160,6 @@ sf data query \
   --use-tooling-api \
   -q "SELECT Id, DeveloperName, MasterLabel, SobjectType FROM CompactLayout WHERE DeveloperName IN ('Energy_Audit_Compact_Layout', 'New_Oppty_Compact_Layout')" \
   --json | tee "$UNIT_DIR/UNIT_4_VERIFICATION_AUDIT.json"
-```
-
-### Expected Tooling API Response (`--json`):
-
-```json
-{
-  "status": 0,
-  "result": {
-    "records": [
-      {
-        "DeveloperName": "Energy_Audit_Compact_Layout",
-        "MasterLabel": "Energy Audit Compact Layout",
-        "SobjectType": "Energy_Audit__c"
-      },
-      {
-        "DeveloperName": "New_Oppty_Compact_Layout",
-        "MasterLabel": "New Oppty Compact Layout",
-        "SobjectType": "Opportunity"
-      }
-    ],
-    "totalSize": 2,
-    "done": true
-  }
-}
 ```
 
 ---
