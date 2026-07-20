@@ -171,11 +171,18 @@ sf project deploy start \
 UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
 mkdir -p "$UNIT_DIR"
 
-# 2. Query Account Channel_Customers ListView to verify deployment status
-sf data query \
-  -o trailhead-playground \
-  -q "SELECT Id, Name, DeveloperName, SobjectType FROM ListView WHERE SobjectType = 'Account' AND DeveloperName = 'Channel_Customers'" \
-  --json | tee "$UNIT_DIR/UNIT_3_GUIDED_LISTVIEW_AUDIT.json"
+# 2. Query Account Channel_Customers ListView and format Request-Response Audit JSON payload
+QUERY="SELECT Id, Name, DeveloperName, SobjectType FROM ListView WHERE SobjectType = 'Account' AND DeveloperName = 'Channel_Customers'"
+RESPONSE=$(sf data query -o trailhead-playground -q "$QUERY" --json)
+
+jq -n \
+  --arg req "[REQ-5.3.G1.1] - [REQ-5.3.G3.1]" \
+  --arg cmd "sf data query" \
+  --arg org "trailhead-playground" \
+  --arg query "$QUERY" \
+  --argjson out "$RESPONSE" \
+  '{requirementId: $req, input: {command: $cmd, targetOrg: $org, query: $query}, output: $out}' \
+  > "$UNIT_DIR/UNIT_3_GUIDED_LISTVIEW_AUDIT.json"
 ```
 
 ##### Expected JSON Output (`UNIT_3_GUIDED_LISTVIEW_AUDIT.json`)
@@ -184,22 +191,31 @@ sf data query \
 
 ```json
 {
-  "status": 0,
-  "result": {
-    "records": [
-      {
-        "attributes": {
-          "type": "ListView",
-          "url": "/services/data/v60.0/sobjects/ListView/00BfL0000012345AAA"
-        },
-        "Id": "00BfL0000012345AAA",
-        "Name": "Channel Customers",
-        "DeveloperName": "Channel_Customers",
-        "SobjectType": "Account"
-      }
-    ],
-    "totalSize": 1,
-    "done": true
+  "requirementId": "[REQ-5.3.G1.1] - [REQ-5.3.G3.1]",
+  "input": {
+    "command": "sf data query",
+    "targetOrg": "trailhead-playground",
+    "query": "SELECT Id, Name, DeveloperName, SobjectType FROM ListView WHERE SobjectType = 'Account' AND DeveloperName = 'Channel_Customers'"
+  },
+  "output": {
+    "status": 0,
+    "result": {
+      "records": [
+        {
+          "attributes": {
+            "type": "ListView",
+            "url": "/services/data/v67.0/sobjects/ListView/00BdL00001GEl8cUAD"
+          },
+          "Id": "00BdL00001GEl8cUAD",
+          "Name": "Channel Customers",
+          "DeveloperName": "Channel_Customers",
+          "SobjectType": "Account"
+        }
+      ],
+      "totalSize": 1,
+      "done": true
+    },
+    "warnings": []
   }
 }
 ```
@@ -289,11 +305,18 @@ sf project deploy start \
 UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
 mkdir -p "$UNIT_DIR"
 
-# 2. Query Opportunity High_Probability_Opportunities ListView to confirm deployment and record audit JSON
-sf data query \
-  -o trailhead-playground \
-  -q "SELECT Id, Name, DeveloperName, SobjectType FROM ListView WHERE SobjectType = 'Opportunity' AND DeveloperName = 'High_Probability_Opportunities'" \
-  --json | tee "$UNIT_DIR/UNIT_3_CHALLENGE_VERIFICATION_AUDIT.json"
+# 2. Query Opportunity High_Probability_Opportunities ListView and format Request-Response Audit JSON payload
+QUERY="SELECT Id, Name, DeveloperName, SobjectType FROM ListView WHERE SobjectType = 'Opportunity' AND DeveloperName = 'High_Probability_Opportunities'"
+RESPONSE=$(sf data query -o trailhead-playground -q "$QUERY" --json)
+
+jq -n \
+  --arg req "[REQ-5.3.C1.1] - [REQ-5.3.C1.4]" \
+  --arg cmd "sf data query" \
+  --arg org "trailhead-playground" \
+  --arg query "$QUERY" \
+  --argjson out "$RESPONSE" \
+  '{requirementId: $req, input: {command: $cmd, targetOrg: $org, query: $query}, output: $out}' \
+  > "$UNIT_DIR/UNIT_3_CHALLENGE_VERIFICATION_AUDIT.json"
 ```
 
 #### Expected JSON Output (`UNIT_3_CHALLENGE_VERIFICATION_AUDIT.json`)
@@ -302,22 +325,31 @@ sf data query \
 
 ```json
 {
-  "status": 0,
-  "result": {
-    "records": [
-      {
-        "attributes": {
-          "type": "ListView",
-          "url": "/services/data/v60.0/sobjects/ListView/00BfL0000067890CCC"
-        },
-        "Id": "00BfL0000067890CCC",
-        "Name": "High Probability Opportunities",
-        "DeveloperName": "High_Probability_Opportunities",
-        "SobjectType": "Opportunity"
-      }
-    ],
-    "totalSize": 1,
-    "done": true
+  "requirementId": "[REQ-5.3.C1.1] - [REQ-5.3.C1.4]",
+  "input": {
+    "command": "sf data query",
+    "targetOrg": "trailhead-playground",
+    "query": "SELECT Id, Name, DeveloperName, SobjectType FROM ListView WHERE SobjectType = 'Opportunity' AND DeveloperName = 'High_Probability_Opportunities'"
+  },
+  "output": {
+    "status": 0,
+    "result": {
+      "records": [
+        {
+          "attributes": {
+            "type": "ListView",
+            "url": "/services/data/v67.0/sobjects/ListView/00BdL00001GDB5ZUAX"
+          },
+          "Id": "00BdL00001GDB5ZUAX",
+          "Name": "High Probability Opportunities",
+          "DeveloperName": "High_Probability_Opportunities",
+          "SobjectType": "Opportunity"
+        }
+      ],
+      "totalSize": 1,
+      "done": true
+    },
+    "warnings": []
   }
 }
 ```
