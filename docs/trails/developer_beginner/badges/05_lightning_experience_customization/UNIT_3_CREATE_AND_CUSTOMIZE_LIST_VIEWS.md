@@ -122,7 +122,7 @@ cat << 'EOF' > force-app/main/default/objects/Account/listViews/Channel_Customer
     <fullName>Channel_Customers</fullName>
     <columns>ACCOUNT.NAME</columns>
     <columns>ACCOUNT.INDUSTRY</columns>
-    <columns>ACCOUNT.CUSTOMER_PRIORITY</columns>
+    <columns>CustomerPriority__c</columns>
     <filterScope>Everything</filterScope>
     <filters>
         <field>ACCOUNT.TYPE</field>
