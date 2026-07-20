@@ -7,6 +7,7 @@
         <type>Text</type>
         <trackFeedHistory>true</trackFeedHistory>
     </nameField>
+    <compactLayoutAssignment>Energy_Audit_Compact_Layout</compactLayoutAssignment>
     <sharingModel>ReadWrite</sharingModel>
     <deploymentStatus>Deployed</deploymentStatus>
     <enableSearch>true</enableSearch>
