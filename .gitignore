@@ -8,6 +8,9 @@
 .localdevserver/
 deploy-options.json
 
+# Gemini CLI cache
+.gemini/
+
 # LWC VSCode autocomplete
 **/lwc/jsconfig.json
 
