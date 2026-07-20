@@ -75,7 +75,7 @@ cat << 'EOF' > force-app/main/default/objects/Account/listViews/Channel_Customer
     <fullName>Channel_Customers</fullName>
     <columns>ACCOUNT.NAME</columns>
     <columns>ACCOUNT.SITE</columns>
-    <columns>ACCOUNT.PHONE_NUMBER</columns>
+    <columns>ACCOUNT.PHONE1</columns>
     <columns>ACCOUNT.TYPE</columns>
     <columns>CORE.USERS.ALIAS</columns>
     <filterScope>Everything</filterScope>
