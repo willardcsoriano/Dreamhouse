@@ -143,3 +143,20 @@ $ sf data query -o trailhead-playground -q \
    - **Context:** `Developer Beginner > Badge 05: Lightning Experience Customization > Unit 2: Create and Customize Agentforce 360 Platform Apps`
    - **Hiccup:** Trailhead unit instructions specified adding the `Chatter` tab to navigation items. Defining `<tabs>standard-Chatter</tabs>` in `CustomApplication` XML metadata caused deployment to fail with `Tab standard-Chatter can't be added to Lightning app Energy_Consultations because it's not supported in Lightning apps`.
    - **Resolution:** In Salesforce Metadata API for `uiType: Lightning`, the standard Chatter feed tab identifier is `<tabs>standard-Feed</tabs>`, whereas `standard-Chatter` refers to the legacy Salesforce Classic Chatter tab. Updated metadata schema to `<tabs>standard-Feed</tabs>`, resolving deployment error `0AfdL00000durUbSAI`.
+
+##### Unit 3: Create and Customize List Views
+
+1. **Metadata API vs. Client UI Component Boundaries (List View Charts vs. List Views):**
+   - **Context:** `Developer Beginner > Badge 05: Lightning Experience Customization > Unit 3: Create and Customize List Views`
+   - **Hiccup:** Attempting to query `ListViewChart` via SOQL returned `INVALID_TYPE: sObject type 'ListViewChart' is not supported`.
+   - **Resolution:** Clarified component boundaries: Custom List Views (`ListView`) are deployable Metadata API XML files (`.listView-meta.xml`), whereas List View Charts (`Donut Chart`, `Bar Chart`) are interactive client UI widgets configured directly in the Lightning Experience browser toolbar (`📊` icon).
+
+2. **ListView Column API Naming Conventions (`ACCOUNT.PHONE1` & `CustomerPriority__c`):**
+   - **Context:** `Developer Beginner > Badge 05: Lightning Experience Customization > Unit 3: Create and Customize List Views`
+   - **Hiccup:** Referencing `ACCOUNT.PHONE_NUMBER` or `ACCOUNT.CUSTOMER_PRIORITY` inside `<columns>` blocks in `ListView` metadata XML caused deployment failures (`Could not resolve list view column`).
+   - **Resolution:** Standard phone field on Account in Metadata API is `<columns>ACCOUNT.PHONE1</columns>`, and custom fields on Account use exact custom API names (`<columns>CustomerPriority__c</columns>`).
+
+3. **Request-Response Audit JSON Protocol Upgrade:**
+   - **Context:** `Developer Beginner > Badge 05: Lightning Experience Customization > Unit 3: Create and Customize List Views`
+   - **Hiccup:** Raw CLI stdout redirects (`--json | tee`) saved only the Salesforce response payload, leaving no visibility into the original query or input command parameters in audit log files.
+   - **Resolution:** Upgraded Unit 3 audit logging code blocks to use `jq` to wrap both `input` (command, targetOrg, query) and `output` (Salesforce response, totalSize, record ID) into unified Request-Response Audit JSON logs (`UNIT_3_GUIDED_LISTVIEW_AUDIT.json` and `UNIT_3_CHALLENGE_VERIFICATION_AUDIT.json`).
