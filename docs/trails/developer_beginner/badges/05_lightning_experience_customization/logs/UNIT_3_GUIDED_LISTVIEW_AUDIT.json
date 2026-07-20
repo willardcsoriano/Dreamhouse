@@ -1,15 +1,20 @@
 {
-  "name": "NamedOrgNotFoundError",
-  "message": "Parsing --target-org \n\tNo authorization information found for Rimes.\nSee more help with --help",
-  "exitCode": 2,
-  "actions": [
-    "It looks like you mistyped the username or alias. Did you mean \"trailhead-playground\"?"
-  ],
-  "context": "DataSoqlQueryCommand",
-  "stack": "NamedOrgNotFoundError: Parsing --target-org \n\tNo authorization information found for Rimes.\nSee more help with --help\n    at SfCommandError.from (file:///home/willard/.nvm/versions/node/v24.18.0/lib/node_modules/@salesforce/cli/node_modules/@salesforce/sf-plugins-core/lib/SfCommandError.js:48:16)\n    at DataSoqlQueryCommand.catch (file:///home/willard/.nvm/versions/node/v24.18.0/lib/node_modules/@salesforce/cli/node_modules/@salesforce/sf-plugins-core/lib/sfCommand.js:332:47)\n    at DataSoqlQueryCommand._run (/home/willard/.nvm/versions/node/v24.18.0/lib/node_modules/@salesforce/cli/node_modules/@oclif/core/lib/command.js:187:29)\n    at async Config.runCommand (/home/willard/.nvm/versions/node/v24.18.0/lib/node_modules/@salesforce/cli/node_modules/@oclif/core/lib/config/config.js:422:25)\n    at async run (/home/willard/.nvm/versions/node/v24.18.0/lib/node_modules/@salesforce/cli/node_modules/@oclif/core/lib/main.js:97:16)\n    at async file:///home/willard/.nvm/versions/node/v24.18.0/lib/node_modules/@salesforce/cli/bin/run.js:15:1",
-  "cause": "undefined",
-  "warnings": [],
-  "code": "NamedOrgNotFoundError",
-  "status": 2,
-  "commandName": "DataSoqlQueryCommand"
+  "status": 0,
+  "result": {
+    "records": [
+      {
+        "attributes": {
+          "type": "ListView",
+          "url": "/services/data/v67.0/sobjects/ListView/00BdL00001GEl8cUAD"
+        },
+        "Id": "00BdL00001GEl8cUAD",
+        "Name": "Channel Customers",
+        "DeveloperName": "Channel_Customers",
+        "SobjectType": "Account"
+      }
+    ],
+    "totalSize": 1,
+    "done": true
+  },
+  "warnings": []
 }
