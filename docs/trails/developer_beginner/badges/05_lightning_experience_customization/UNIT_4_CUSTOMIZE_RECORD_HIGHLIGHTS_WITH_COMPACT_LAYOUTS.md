@@ -7,6 +7,91 @@
 
 ---
 
+## One-Shot Execution Protocol (3 Commands Total)
+
+For fast execution, you can complete and verify the entire unit (both Guided Activity and Challenge) in **3 terminal commands**:
+
+### Command 1: Generate All XML Metadata Files
+```bash
+mkdir -p force-app/main/default/objects/Energy_Audit__c/compactLayouts force-app/main/default/objects/Opportunity/compactLayouts
+
+# 1. Energy Audit Compact Layout XML
+cat << 'EOF' > force-app/main/default/objects/Energy_Audit__c/compactLayouts/Energy_Audit_Compact_Layout.compactLayout-meta.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Salesforce Compact Layout Definition for Energy_Audit__c Custom Object -->
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Energy_Audit_Compact_Layout</fullName>
+    <fields>Name</fields> <!-- Energy Audit Name (primary bold header field) -->
+    <fields>Account__c</fields> <!-- Parent Account Lookup -->
+    <fields>Annual_Energy_Usage_kWh__c</fields> <!-- Custom numeric usage field -->
+    <fields>Average_Annual_Electric_Cost__c</fields> <!-- Custom currency cost field -->
+    <fields>Type_of_Installation__c</fields> <!-- Custom picklist installation type -->
+    <label>Energy Audit Compact Layout</label>
+</CompactLayout>
+EOF
+
+# 2. Energy Audit Object Metadata Assignment
+cat << 'EOF' > force-app/main/default/objects/Energy_Audit__c/Energy_Audit__c.object-meta.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Energy Audit</label>
+    <pluralLabel>Energy Audits</pluralLabel>
+    <compactLayoutAssignment>Energy_Audit_Compact_Layout</compactLayoutAssignment>
+    <nameField>
+        <label>Energy Audit Name</label>
+        <type>Text</type>
+        <trackFeedHistory>true</trackFeedHistory>
+    </nameField>
+    <sharingModel>ReadWrite</sharingModel>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <enableSearch>true</enableSearch>
+    <enableFeeds>true</enableFeeds>
+</CustomObject>
+EOF
+
+# 3. Opportunity Compact Layout XML
+cat << 'EOF' > force-app/main/default/objects/Opportunity/compactLayouts/New_Oppty_Compact_Layout.compactLayout-meta.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Salesforce Compact Layout Definition for Opportunity Standard Object -->
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>New_Oppty_Compact_Layout</fullName>
+    <fields>Name</fields> <!-- 1. Opportunity Name (bold header) -->
+    <fields>Probability</fields> <!-- 2. Win Probability (%) -->
+    <fields>CloseDate</fields> <!-- 3. Expected Close Date -->
+    <fields>StageName</fields> <!-- 4. Sales Opportunity Stage -->
+    <fields>Amount</fields> <!-- 5. Revenue / Deal Amount -->
+    <fields>OwnerId</fields> <!-- 6. Opportunity Record Owner -->
+    <label>New Oppty Compact Layout</label>
+</CompactLayout>
+EOF
+
+# 4. Opportunity Object Metadata Assignment
+cat << 'EOF' > force-app/main/default/objects/Opportunity/Opportunity.object-meta.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <compactLayoutAssignment>New_Oppty_Compact_Layout</compactLayoutAssignment>
+</CustomObject>
+EOF
+```
+
+### Command 2: Deploy All Metadata to Salesforce Org
+```bash
+sf project deploy start \
+  -d force-app/main/default/objects/Energy_Audit__c \
+  -d force-app/main/default/objects/Opportunity \
+  -o myDevOrg
+```
+
+### Command 3: Audit Verification Query via Tooling API
+```bash
+sf data query \
+  -o myDevOrg \
+  --use-tooling-api \
+  -q "SELECT Id, DeveloperName, MasterLabel, SobjectType FROM CompactLayout WHERE DeveloperName IN ('Energy_Audit_Compact_Layout', 'New_Oppty_Compact_Layout')"
+```
+
+---
+
 ## Requirement to CLI Command Mapping Matrix
 
 | Activity Type | Requirement ID | Summary | Target Component | Solved By CLI Command |
@@ -40,46 +125,27 @@ Maria Jimenez wants to highlight the most critical energy metrics at the top of 
 
 ### 1. `[REQ-5.4.G1.1]` & `[REQ-5.4.G1.2]` Create Metadata & Assign Primary Layout
 
-- **Target Object:** `Energy_Audit__c`
-- **Compact Layout Label:** `Energy Audit Compact Layout`
-- **Developer Name:** `Energy_Audit_Compact_Layout`
-- **Fields (In Exact Order):**
-  1. `Name` (Energy Audit Name)
-  2. `Account__c` (Account)
-  3. `Annual_Energy_Usage_kWh__c` (Annual Energy Usage (kWh))
-  4. `Average_Annual_Electric_Cost__c` (Average Annual Electric Cost)
-  5. `Type_of_Installation__c` (Type of Installation)
-
 ```bash
-# Create target directory for Energy_Audit__c compact layout metadata
 mkdir -p force-app/main/default/objects/Energy_Audit__c/compactLayouts
 
-# 1. Generate XML metadata file for Energy Audit compact layout
 cat << 'EOF' > force-app/main/default/objects/Energy_Audit__c/compactLayouts/Energy_Audit_Compact_Layout.compactLayout-meta.xml
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Salesforce Compact Layout Definition for Energy_Audit__c Custom Object -->
 <CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
-    <!-- Unique developer API name of the compact layout -->
     <fullName>Energy_Audit_Compact_Layout</fullName>
-    <!-- Ordered field list displayed in the Highlights Panel -->
-    <fields>Name</fields> <!-- Energy Audit Name (primary bold header field) -->
-    <fields>Account__c</fields> <!-- Parent Account Lookup -->
-    <fields>Annual_Energy_Usage_kWh__c</fields> <!-- Custom numeric usage field -->
-    <fields>Average_Annual_Electric_Cost__c</fields> <!-- Custom currency cost field -->
-    <fields>Type_of_Installation__c</fields> <!-- Custom picklist installation type -->
-    <!-- Human-readable label displayed in Setup UI -->
+    <fields>Name</fields>
+    <fields>Account__c</fields>
+    <fields>Annual_Energy_Usage_kWh__c</fields>
+    <fields>Average_Annual_Electric_Cost__c</fields>
+    <fields>Type_of_Installation__c</fields>
     <label>Energy Audit Compact Layout</label>
 </CompactLayout>
 EOF
 
-# 2. Assign Primary Compact Layout in Energy_Audit__c Metadata
 cat << 'EOF' > force-app/main/default/objects/Energy_Audit__c/Energy_Audit__c.object-meta.xml
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Custom Object Metadata Definition for Energy_Audit__c -->
 <CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
     <label>Energy Audit</label>
     <pluralLabel>Energy Audits</pluralLabel>
-    <!-- Sets Energy_Audit_Compact_Layout as primary default compact layout -->
     <compactLayoutAssignment>Energy_Audit_Compact_Layout</compactLayoutAssignment>
     <nameField>
         <label>Energy Audit Name</label>
@@ -99,15 +165,9 @@ EOF
 ### 2. `[REQ-5.4.G1.DEP]` Deploy Guided Activity Metadata
 
 ```bash
-# Set up output directory for SFDX deploy JSON logs
-UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
-mkdir -p "$UNIT_DIR"
-
-# Deploy Energy_Audit__c metadata to target org (myDevOrg)
 sf project deploy start \
   -d force-app/main/default/objects/Energy_Audit__c \
-  -o myDevOrg \
-  --json | tee "$UNIT_DIR/UNIT_4_GUIDED_DEPLOY_COMPACT_LAYOUT.json"
+  -o myDevOrg
 ```
 
 ---
@@ -115,16 +175,10 @@ sf project deploy start \
 ### 3. `[REQ-5.4.G1.AUD]` Audit Guided Activity Deployment
 
 ```bash
-# Set up output directory for audit logs
-UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
-mkdir -p "$UNIT_DIR"
-
-# Query deployed Energy Audit compact layout via Tooling API
 sf data query \
   -o myDevOrg \
   --use-tooling-api \
-  -q "SELECT Id, DeveloperName, MasterLabel, SobjectType FROM CompactLayout WHERE DeveloperName='Energy_Audit_Compact_Layout'" \
-  --json | tee "$UNIT_DIR/UNIT_4_GUIDED_AUDIT.json"
+  -q "SELECT Id, DeveloperName, MasterLabel, SobjectType FROM CompactLayout WHERE DeveloperName='Energy_Audit_Compact_Layout'"
 ```
 
 ---
@@ -135,46 +189,26 @@ When Ursa Major Solar salespeople are on site with a customer, they need key opp
 
 ### 1. `[REQ-5.4.C1.1]` & `[REQ-5.4.C1.2]` Create Metadata & Assign Primary Layout
 
-- **Target Object:** `Opportunity`
-- **Compact Layout Label:** `New Oppty Compact Layout`
-- **Developer Name:** `New_Oppty_Compact_Layout`
-- **Fields (In Exact Order):**
-  1. `Name` (Opportunity Name)
-  2. `Probability` (Probability (%))
-  3. `CloseDate` (Close Date)
-  4. `StageName` (Stage)
-  5. `Amount` (Amount)
-  6. `OwnerId` (Opportunity Owner)
-
 ```bash
-# Create target directory for Opportunity compact layout metadata
 mkdir -p force-app/main/default/objects/Opportunity/compactLayouts
 
-# 1. Generate XML metadata file for Opportunity compact layout
 cat << 'EOF' > force-app/main/default/objects/Opportunity/compactLayouts/New_Oppty_Compact_Layout.compactLayout-meta.xml
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Salesforce Compact Layout Definition for Opportunity Standard Object -->
 <CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
-    <!-- Unique developer API name matching Trailhead challenge requirement -->
     <fullName>New_Oppty_Compact_Layout</fullName>
-    <!-- Ordered fields for key record metrics visible in the Highlights Panel -->
-    <fields>Name</fields> <!-- 1. Opportunity Name (bold header) -->
-    <fields>Probability</fields> <!-- 2. Win Probability (%) -->
-    <fields>CloseDate</fields> <!-- 3. Expected Close Date -->
-    <fields>StageName</fields> <!-- 4. Sales Opportunity Stage -->
-    <fields>Amount</fields> <!-- 5. Revenue / Deal Amount -->
-    <fields>OwnerId</fields> <!-- 6. Opportunity Record Owner -->
-    <!-- Human-readable UI label -->
+    <fields>Name</fields>
+    <fields>Probability</fields>
+    <fields>CloseDate</fields>
+    <fields>StageName</fields>
+    <fields>Amount</fields>
+    <fields>OwnerId</fields>
     <label>New Oppty Compact Layout</label>
 </CompactLayout>
 EOF
 
-# 2. Assign Primary Compact Layout in Opportunity Object Metadata
 cat << 'EOF' > force-app/main/default/objects/Opportunity/Opportunity.object-meta.xml
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Object Metadata Definition for Opportunity Standard Object -->
 <CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
-    <!-- Sets New_Oppty_Compact_Layout as primary default compact layout -->
     <compactLayoutAssignment>New_Oppty_Compact_Layout</compactLayoutAssignment>
 </CustomObject>
 EOF
@@ -185,15 +219,9 @@ EOF
 ### 2. `[REQ-5.4.C1.DEP]` Deploy Challenge Metadata
 
 ```bash
-# Set up output directory for SFDX deploy JSON logs
-UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
-mkdir -p "$UNIT_DIR"
-
-# Deploy Opportunity metadata to target org (myDevOrg)
 sf project deploy start \
   -d force-app/main/default/objects/Opportunity \
-  -o myDevOrg \
-  --json | tee "$UNIT_DIR/UNIT_4_CHALLENGE_DEPLOY_COMPACT_LAYOUT.json"
+  -o myDevOrg
 ```
 
 ---
@@ -201,16 +229,10 @@ sf project deploy start \
 ### 3. `[REQ-5.4.C1.AUD]` Audit Challenge Deployment
 
 ```bash
-# Set up output directory for audit logs
-UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
-mkdir -p "$UNIT_DIR"
-
-# Query deployed Opportunity compact layout via Tooling API
 sf data query \
   -o myDevOrg \
   --use-tooling-api \
-  -q "SELECT Id, DeveloperName, MasterLabel, SobjectType FROM CompactLayout WHERE DeveloperName='New_Oppty_Compact_Layout'" \
-  --json | tee "$UNIT_DIR/UNIT_4_CHALLENGE_AUDIT.json"
+  -q "SELECT Id, DeveloperName, MasterLabel, SobjectType FROM CompactLayout WHERE DeveloperName='New_Oppty_Compact_Layout'"
 ```
 
 ---
