@@ -53,6 +53,14 @@ For every `[GUI]`-tagged Requirement ID: still write out the exact Trailhead cli
 
 The GUI click-path is how the artifact gets authored once; the deploy command is what makes it a documented, reproducible CLI payload from then on.
 
+**Flag the execution order explicitly — don't rely on the `[CLI]`/`[GUI]` tag alone to convey it.** A reader scanning the doc (or the developer about to execute it) needs to know, without inferring it from section structure, whether a section requires the browser at all:
+
+- `[GUI]` sections: open with **"Browser first — nothing to run in the terminal until this is done."**, then after the click-path, the retrieve/deploy block opens with **"Terminal only — run this after the browser steps above, not instead of them."**
+- `[CLI]`-only sections: open with **"No browser needed — run these commands directly."**
+- Mixed sections (`[GUI]` + `[CLI]`, e.g. an Activation-wizard requirement closed out with retrieve/deploy): open with **"Browser first, then terminal."**
+
+Also add a short "Execution order, at a glance" summary near the top of the doc (after the CLI/GUI classification explanation) listing which Requirement IDs need the browser and which don't — a reader shouldn't have to walk every section to know that up front.
+
 ## Stage 4 — Human Execution & Audit (never delegated)
 
 Per Rule 4.4, AI drafts files only — it never runs `sf`, `git commit`, `git checkout`, or touches the live org. The developer runs the One-Shot commands against the target org and pastes the raw `--json` output back. That output is saved verbatim, one file per command, under `badges/<NN_badge>/logs/UNIT_<N>_<DEPLOY|VERIFICATION_AUDIT>....json` — see the Unit 4 `logs/` directory for the reference naming.
