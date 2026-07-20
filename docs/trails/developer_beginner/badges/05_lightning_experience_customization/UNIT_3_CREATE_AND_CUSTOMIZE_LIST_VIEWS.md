@@ -73,6 +73,47 @@ In Salesforce Lightning Experience, list views present data in tabular format fo
 
 ---
 
+#### `[SOL-5.3.G1.CLI]` SFDX CLI Metadata Deployment (Automated Solution for Activities 1 & 2)
+
+- **Solving Requirements:** `[REQ-5.3.G1.1]` and `[REQ-5.3.G2.1]`
+- **Metadata File:** `force-app/main/default/objects/Account/listViews/Channel_Customers.listView-meta.xml`
+
+**Solves Requirements:** `[REQ-5.3.G1.1]`, `[REQ-5.3.G2.1]`
+
+```bash
+# 1. Create the Account Channel_Customers ListView Metadata XML locally
+mkdir -p force-app/main/default/objects/Account/listViews
+
+cat << 'EOF' > force-app/main/default/objects/Account/listViews/Channel_Customers.listView-meta.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Channel_Customers</fullName>
+    <columns>ACCOUNT.NAME</columns>
+    <columns>ACCOUNT.INDUSTRY</columns>
+    <columns>ACCOUNT.CUSTOMER_PRIORITY</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>ACCOUNT.TYPE</field>
+        <operation>equals</operation>
+        <value>Customer - Channel</value>
+    </filters>
+    <filters>
+        <field>ACCOUNT.ADDRESS1_STATE</field>
+        <operation>equals</operation>
+        <value>WA,OR,CA</value>
+    </filters>
+    <label>Channel Customers</label>
+</ListView>
+EOF
+
+# 2. Deploy the Account ListView Metadata directly to target org 'trailhead-playground'
+sf project deploy start \
+  -d force-app/main/default/objects/Account/listViews/Channel_Customers.listView-meta.xml \
+  -o trailhead-playground
+```
+
+---
+
 #### `[SOL-5.3.G3.1]` Activity 3 Solution: Create Opportunity Donut Chart (`Pipeline Total Value`)
 
 - **Scenario:** Erin wants to visualize total pipeline value by Account for all opportunities.
