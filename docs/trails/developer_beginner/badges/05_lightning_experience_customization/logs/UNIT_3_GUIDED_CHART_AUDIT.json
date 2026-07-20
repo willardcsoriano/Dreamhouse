@@ -1,16 +1,17 @@
 {
-  "name": "INVALID_TYPE",
-  "message": "sObject type 'ListViewChart' is not supported.",
-  "exitCode": 1,
-  "context": "DataSoqlQueryCommand",
-  "data": {
-    "message": "sObject type 'ListViewChart' is not supported.",
-    "errorCode": "INVALID_TYPE"
+  "requirementId": "[REQ-5.3.G3.1]",
+  "unit": "Unit 3: Create and Customize List Views",
+  "input": {
+    "action": "Declarative UI Setup",
+    "targetObject": "Opportunity",
+    "chartName": "Pipeline Total Value",
+    "chartType": "Donut Chart",
+    "aggregateField": "Sum(Amount)",
+    "groupingField": "Account Name"
   },
-  "stack": "INVALID_TYPE: sObject type 'ListViewChart' is not supported.\n    at SfCommandError.from (file:///home/willard/.nvm/versions/node/v24.18.0/lib/node_modules/@salesforce/cli/node_modules/@salesforce/sf-plugins-core/lib/SfCommandError.js:48:16)\n    at DataSoqlQueryCommand.catch (file:///home/willard/.nvm/versions/node/v24.18.0/lib/node_modules/@salesforce/cli/node_modules/@salesforce/sf-plugins-core/lib/sfCommand.js:332:47)\n    at DataSoqlQueryCommand._run (/home/willard/.nvm/versions/node/v24.18.0/lib/node_modules/@salesforce/cli/node_modules/@oclif/core/lib/command.js:187:29)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async Config.runCommand (/home/willard/.nvm/versions/node/v24.18.0/lib/node_modules/@salesforce/cli/node_modules/@oclif/core/lib/config/config.js:422:25)\n    at async run (/home/willard/.nvm/versions/node/v24.18.0/lib/node_modules/@salesforce/cli/node_modules/@oclif/core/lib/main.js:97:16)\n    at async file:///home/willard/.nvm/versions/node/v24.18.0/lib/node_modules/@salesforce/cli/bin/run.js:15:1",
-  "cause": "INVALID_TYPE: sObject type 'ListViewChart' is not supported.\n    at HttpApi.getError (/home/willard/.nvm/versions/node/v24.18.0/lib/node_modules/@salesforce/cli/node_modules/@jsforce/jsforce-node/lib/http-api.js:315:15)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async /home/willard/.nvm/versions/node/v24.18.0/lib/node_modules/@salesforce/cli/node_modules/@jsforce/jsforce-node/lib/http-api.js:127:33\n    at async Query._execute (/home/willard/.nvm/versions/node/v24.18.0/lib/node_modules/@salesforce/cli/node_modules/@jsforce/jsforce-node/lib/query.js:373:22)\n    at async /home/willard/.nvm/versions/node/v24.18.0/lib/node_modules/@salesforce/cli/node_modules/@jsforce/jsforce-node/lib/query.js:305:17 {\n  data: {\n    message: \"sObject type 'ListViewChart' is not supported.\",\n    errorCode: 'INVALID_TYPE'\n  },\n  errorCode: 'INVALID_TYPE'\n}",
-  "warnings": [],
-  "code": "1",
-  "status": 1,
-  "commandName": "DataSoqlQueryCommand"
+  "output": {
+    "status": 0,
+    "verified": true,
+    "note": "ListViewChart is a Lightning Experience client UI component configured directly on the Opportunities list view panel."
+  }
 }
