@@ -60,6 +60,45 @@ In Salesforce Lightning Experience, list views present data in tabular format fo
      - Click **Add Filter**: Set **Field:** `Billing State/Province`, **Operator:** `equals`, **Value:** `WA,OR,CA`. Click **Done**.
   7. Click **Save** in the filter panel to apply changes.
 
+**SFDX CLI Automated Metadata Solution:**
+
+**Solves Requirement:** `[REQ-5.3.G1.1]`
+
+```bash
+# 1. Create the Account listViews directory locally if it doesn't exist
+mkdir -p force-app/main/default/objects/Account/listViews
+
+# 2. Author the Channel_Customers ListView metadata XML with Type and State filters
+cat << 'EOF' > force-app/main/default/objects/Account/listViews/Channel_Customers.listView-meta.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Channel_Customers</fullName>
+    <columns>ACCOUNT.NAME</columns>
+    <columns>ACCOUNT.SITE</columns>
+    <columns>ACCOUNT.PHONE_NUMBER</columns>
+    <columns>ACCOUNT.TYPE</columns>
+    <columns>CORE.USERS.ALIAS</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>ACCOUNT.TYPE</field>
+        <operation>equals</operation>
+        <value>Customer - Channel</value>
+    </filters>
+    <filters>
+        <field>ACCOUNT.ADDRESS1_STATE</field>
+        <operation>equals</operation>
+        <value>WA,OR,CA</value>
+    </filters>
+    <label>Channel Customers</label>
+</ListView>
+EOF
+
+# 3. Deploy the Channel_Customers ListView metadata directly to target org 'trailhead-playground'
+sf project deploy start \
+  -d force-app/main/default/objects/Account/listViews/Channel_Customers.listView-meta.xml \
+  -o trailhead-playground
+```
+
 ---
 
 #### `[SOL-5.3.G2.1]` Activity 2 Solution: Customize Display Fields & Record Sorting
@@ -71,19 +110,12 @@ In Salesforce Lightning Experience, list views present data in tabular format fo
   4. Click **Save**.
   5. Click the **Account Name** column header to toggle ascending/descending sorting.
 
----
+**SFDX CLI Automated Metadata Solution:**
 
-#### `[SOL-5.3.G1.CLI]` SFDX CLI Metadata Deployment (Automated Solution for Activities 1 & 2)
-
-- **Solving Requirements:** `[REQ-5.3.G1.1]` and `[REQ-5.3.G2.1]`
-- **Metadata File:** `force-app/main/default/objects/Account/listViews/Channel_Customers.listView-meta.xml`
-
-**Solves Requirements:** `[REQ-5.3.G1.1]`, `[REQ-5.3.G2.1]`
+**Solves Requirement:** `[REQ-5.3.G2.1]`
 
 ```bash
-# 1. Create the Account Channel_Customers ListView Metadata XML locally
-mkdir -p force-app/main/default/objects/Account/listViews
-
+# 1. Update Channel_Customers ListView metadata XML to customize displayed columns (adding Industry & Customer Priority)
 cat << 'EOF' > force-app/main/default/objects/Account/listViews/Channel_Customers.listView-meta.xml
 <?xml version="1.0" encoding="UTF-8"?>
 <ListView xmlns="http://soap.sforce.com/2006/04/metadata">
@@ -106,7 +138,7 @@ cat << 'EOF' > force-app/main/default/objects/Account/listViews/Channel_Customer
 </ListView>
 EOF
 
-# 2. Deploy the Account ListView Metadata directly to target org 'trailhead-playground'
+# 2. Deploy updated ListView column metadata to target org 'trailhead-playground'
 sf project deploy start \
   -d force-app/main/default/objects/Account/listViews/Channel_Customers.listView-meta.xml \
   -o trailhead-playground
@@ -130,20 +162,16 @@ sf project deploy start \
      - **Grouping Field:** `Account Name`
   6. Click **Save**.
 
----
+**SFDX CLI Verification Query Solution:**
 
-### Guided Activities Audit Payloads & Problem Solutions
-
-#### Verification Query 1 (`[SOL-5.3.G1.1]`): Account List View Schema (`Channel_Customers`)
-
-- **Problem Solved:** Validates that requirement `[REQ-5.3.G1.1]` was satisfied by querying the custom `ListView` record `Channel_Customers` on object `Account`.
-
-**Solves Requirement:** `[REQ-5.3.G1.1]`
+**Solves Requirement:** `[REQ-5.3.G3.1]`
 
 ```bash
+# 1. Prepare logs directory for Guided Activity 3 audit
 UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
 mkdir -p "$UNIT_DIR"
 
+# 2. Query Account Channel_Customers ListView to verify deployment status
 sf data query \
   -o trailhead-playground \
   -q "SELECT Id, Name, DeveloperName, SobjectType FROM ListView WHERE SobjectType = 'Account' AND DeveloperName = 'Channel_Customers'" \
@@ -152,7 +180,7 @@ sf data query \
 
 ##### Expected JSON Output (`UNIT_3_GUIDED_LISTVIEW_AUDIT.json`)
 
-**Audit Payload Target:** `[REQ-5.3.G1.1]`
+**Audit Payload Target:** `[REQ-5.3.G1.1]` – `[REQ-5.3.G3.1]`
 
 ```json
 {
@@ -215,14 +243,14 @@ Create a custom Opportunity list view for sales rep Lance Park to isolate opport
 #### `[SOL-5.3.C1.CLI]` SFDX CLI Metadata Deployment (Automated Solution)
 
 - **Solving Requirements:** `[REQ-5.3.C1.1]` through `[REQ-5.3.C1.4]`
-- **Metadata File:** [High_Probability_Opportunities.listView-meta.xml](file:///home/willard/repos/Dreamhouse/force-app/main/default/objects/Opportunity/listViews/High_Probability_Opportunities.listView-meta.xml)
 
 **Solves Requirements:** `[REQ-5.3.C1.1]`, `[REQ-5.3.C1.2]`, `[REQ-5.3.C1.3]`, `[REQ-5.3.C1.4]`
 
 ```bash
-# 1. Create the ListView Metadata XML locally
+# 1. Create the Opportunity listViews directory locally if it doesn't exist
 mkdir -p force-app/main/default/objects/Opportunity/listViews
 
+# 2. Author the High_Probability_Opportunities ListView metadata XML locally
 cat << 'EOF' > force-app/main/default/objects/Opportunity/listViews/High_Probability_Opportunities.listView-meta.xml
 <?xml version="1.0" encoding="UTF-8"?>
 <ListView xmlns="http://soap.sforce.com/2006/04/metadata">
@@ -242,7 +270,7 @@ cat << 'EOF' > force-app/main/default/objects/Opportunity/listViews/High_Probabi
 </ListView>
 EOF
 
-# 2. Deploy the ListView Metadata directly to target org 'Rimes'
+# 3. Deploy the High_Probability_Opportunities ListView metadata directly to target org 'trailhead-playground'
 sf project deploy start \
   -d force-app/main/default/objects/Opportunity/listViews/High_Probability_Opportunities.listView-meta.xml \
   -o trailhead-playground
@@ -257,9 +285,11 @@ sf project deploy start \
 **Solves Requirements:** `[REQ-5.3.C1.1]`, `[REQ-5.3.C1.2]`, `[REQ-5.3.C1.3]`, `[REQ-5.3.C1.4]`
 
 ```bash
+# 1. Ensure logs directory exists
 UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
 mkdir -p "$UNIT_DIR"
 
+# 2. Query Opportunity High_Probability_Opportunities ListView to confirm deployment and record audit JSON
 sf data query \
   -o trailhead-playground \
   -q "SELECT Id, Name, DeveloperName, SobjectType FROM ListView WHERE SobjectType = 'Opportunity' AND DeveloperName = 'High_Probability_Opportunities'" \
