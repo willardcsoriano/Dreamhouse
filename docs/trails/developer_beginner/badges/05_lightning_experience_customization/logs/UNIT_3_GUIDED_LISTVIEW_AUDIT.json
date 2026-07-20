@@ -1,0 +1,28 @@
+{
+  "requirementId": "[REQ-5.3.G1.1] - [REQ-5.3.G3.1]",
+  "input": {
+    "command": "sf data query",
+    "targetOrg": "trailhead-playground",
+    "query": "SELECT Id, Name, DeveloperName, SobjectType FROM ListView WHERE SobjectType = 'Account' AND DeveloperName = 'Channel_Customers'"
+  },
+  "output": {
+    "status": 0,
+    "result": {
+      "records": [
+        {
+          "attributes": {
+            "type": "ListView",
+            "url": "/services/data/v67.0/sobjects/ListView/00BdL00001GEl8cUAD"
+          },
+          "Id": "00BdL00001GEl8cUAD",
+          "Name": "Channel Customers",
+          "DeveloperName": "Channel_Customers",
+          "SobjectType": "Account"
+        }
+      ],
+      "totalSize": 1,
+      "done": true
+    },
+    "warnings": []
+  }
+}

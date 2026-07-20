@@ -1,0 +1,17 @@
+{
+  "requirementId": "[REQ-5.3.G3.1]",
+  "unit": "Unit 3: Create and Customize List Views",
+  "input": {
+    "action": "Declarative UI Setup",
+    "targetObject": "Opportunity",
+    "chartName": "Pipeline Total Value",
+    "chartType": "Donut Chart",
+    "aggregateField": "Sum(Amount)",
+    "groupingField": "Account Name"
+  },
+  "output": {
+    "status": 0,
+    "verified": true,
+    "note": "ListViewChart is a Lightning Experience client UI component configured directly on the Opportunities list view panel."
+  }
+}

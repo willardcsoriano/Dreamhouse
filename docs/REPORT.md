@@ -1,6 +1,6 @@
 # Trailhead Progress Report
 
-**Date:** July 19, 2026  
+**Date:** July 20, 2026  
 **Subject:** Developer Beginner Trailhead Progress & Learnings
 
 ---
@@ -55,7 +55,21 @@
 
 1. **Out-of-Order Badge Completion & Setup Friction:** Completed the first badge, then unknowingly jumped directly to Badge 3 inside the web Playground without VS Code. Discovering that Badge 2 was skipped (which covered the initial VS Code connection) caused significant confusion and consumed extra time connecting the Trailhead Playground org to VS Code. Additionally, navigating the Salesforce GUI initially presented a steep learning curve, though following the included tutorial videos helped clarify the navigation.
 2. **Hardware Limitations & Remote VM Migration:** Local hardware constraints (8 GB RAM) were insufficient to run VS Code alongside developer tooling without performance degradation. To resolve this, development was migrated to a 16 GB Hetzner VM via Remote SSH, which required setting up the development stack from scratch and cost setup time.
-3. **CLI Deployment vs. GUI Challenge Verification ("Ghost Fields"):** Completing activities via the Salesforce CLI (`sf project deploy start`) instead of the point-and-click Setup GUI caused Trailhead challenge checks to fail with misleading "field does not exist" errors. Unlike the Setup UI wizard, CLI metadata deployments do not automatically grant Field-Level Security (FLS) access permissions to user profiles. This created "ghost fields" that existed in the database schema but remained completely invisible to SOQL and Trailhead. This was resolved by diagnosing the missing access via Tooling API SOQL queries and appending explicit `fieldPermissions` into `Admin.profile-meta.xml` before deploying:
+
+---
+
+## Unit-Level Engineering Hiccups & Resolutions
+
+### Trail: Developer Beginner
+
+#### Badge 04: Data Modeling
+
+##### Unit 2 & 3: Create Custom Objects & Create Object Relationships
+
+1. **CLI Deployment vs. GUI Challenge Verification ("Ghost Fields"):**
+   - **Context:** `Developer Beginner > Badge 04: Data Modeling > Unit 3: Create Object Relationships`
+   - **Hiccup:** Completing activities via the Salesforce CLI (`sf project deploy start`) instead of the point-and-click Setup GUI caused Trailhead challenge checks to fail with misleading "field does not exist" errors. Unlike the Setup UI wizard, CLI metadata deployments do not automatically grant Field-Level Security (FLS) access permissions to user profiles. This created "ghost fields" that existed in the database schema but remained completely invisible to SOQL and Trailhead.
+   - **Resolution:** Diagnosed the missing access via Tooling API SOQL queries on `FieldPermissions` and appended explicit `fieldPermissions` into `Admin.profile-meta.xml` before deploying schema and profile metadata atomically:
 
 ```bash
 # 1. Confirm field exists in the schema via Tooling API
@@ -104,10 +118,6 @@ $ sf data query -o trailhead-playground -q \
 
 ---
 
-## Unit-Level Engineering Hiccups & Resolutions
-
-### Trail: Developer Beginner
-
 #### Badge 05: Lightning Experience Customization
 
 ##### Unit 1: Set Up Your Org
@@ -143,3 +153,20 @@ $ sf data query -o trailhead-playground -q \
    - **Context:** `Developer Beginner > Badge 05: Lightning Experience Customization > Unit 2: Create and Customize Agentforce 360 Platform Apps`
    - **Hiccup:** Trailhead unit instructions specified adding the `Chatter` tab to navigation items. Defining `<tabs>standard-Chatter</tabs>` in `CustomApplication` XML metadata caused deployment to fail with `Tab standard-Chatter can't be added to Lightning app Energy_Consultations because it's not supported in Lightning apps`.
    - **Resolution:** In Salesforce Metadata API for `uiType: Lightning`, the standard Chatter feed tab identifier is `<tabs>standard-Feed</tabs>`, whereas `standard-Chatter` refers to the legacy Salesforce Classic Chatter tab. Updated metadata schema to `<tabs>standard-Feed</tabs>`, resolving deployment error `0AfdL00000durUbSAI`.
+
+##### Unit 3: Create and Customize List Views
+
+1. **Metadata API vs. Client UI Component Boundaries (List View Charts vs. List Views):**
+   - **Context:** `Developer Beginner > Badge 05: Lightning Experience Customization > Unit 3: Create and Customize List Views`
+   - **Hiccup:** Attempting to query `ListViewChart` via SOQL returned `INVALID_TYPE: sObject type 'ListViewChart' is not supported`.
+   - **Resolution:** Clarified component boundaries: Custom List Views (`ListView`) are deployable Metadata API XML files (`.listView-meta.xml`), whereas List View Charts (`Donut Chart`, `Bar Chart`) are interactive client UI widgets configured directly in the Lightning Experience browser toolbar (`📊` icon).
+
+2. **ListView Column API Naming Conventions (`ACCOUNT.PHONE1` & `CustomerPriority__c`):**
+   - **Context:** `Developer Beginner > Badge 05: Lightning Experience Customization > Unit 3: Create and Customize List Views`
+   - **Hiccup:** Referencing `ACCOUNT.PHONE_NUMBER` or `ACCOUNT.CUSTOMER_PRIORITY` inside `<columns>` blocks in `ListView` metadata XML caused deployment failures (`Could not resolve list view column`).
+   - **Resolution:** Standard phone field on Account in Metadata API is `<columns>ACCOUNT.PHONE1</columns>`, and custom fields on Account use exact custom API names (`<columns>CustomerPriority__c</columns>`).
+
+3. **Request-Response Audit JSON Protocol Upgrade:**
+   - **Context:** `Developer Beginner > Badge 05: Lightning Experience Customization > Unit 3: Create and Customize List Views`
+   - **Hiccup:** Raw CLI stdout redirects (`--json | tee`) saved only the Salesforce response payload, leaving no visibility into the original query or input command parameters in audit log files.
+   - **Resolution:** Upgraded Unit 3 audit logging code blocks to use `jq` to wrap both `input` (command, targetOrg, query) and `output` (Salesforce response, totalSize, record ID) into unified Request-Response Audit JSON logs (`UNIT_3_GUIDED_LISTVIEW_AUDIT.json` and `UNIT_3_CHALLENGE_VERIFICATION_AUDIT.json`).

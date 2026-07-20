@@ -1,0 +1,146 @@
+{
+  "status": 0,
+  "result": {
+    "records": [
+      {
+        "attributes": {
+          "type": "FieldDefinition",
+          "url": "/services/data/v67.0/tooling/sobjects/FieldDefinition/01IdL00000G86Wr.00NdL00002YiFbR"
+        },
+        "QualifiedApiName": "Account__c",
+        "DataType": "Lookup(Account)"
+      },
+      {
+        "attributes": {
+          "type": "FieldDefinition",
+          "url": "/services/data/v67.0/tooling/sobjects/FieldDefinition/01IdL00000G86Wr.00NdL00002YiFbS"
+        },
+        "QualifiedApiName": "Annual_Energy_Usage_kWh__c",
+        "DataType": "Number(18, 0)"
+      },
+      {
+        "attributes": {
+          "type": "FieldDefinition",
+          "url": "/services/data/v67.0/tooling/sobjects/FieldDefinition/01IdL00000G86Wr.00NdL00002YiFbT"
+        },
+        "QualifiedApiName": "Audit_Notes__c",
+        "DataType": "Long Text Area(32768)"
+      },
+      {
+        "attributes": {
+          "type": "FieldDefinition",
+          "url": "/services/data/v67.0/tooling/sobjects/FieldDefinition/01IdL00000G86Wr.00NdL00002YiFbU"
+        },
+        "QualifiedApiName": "Average_Annual_Electric_Cost__c",
+        "DataType": "Currency(14, 2)"
+      },
+      {
+        "attributes": {
+          "type": "FieldDefinition",
+          "url": "/services/data/v67.0/tooling/sobjects/FieldDefinition/01IdL00000G86Wr.CreatedBy"
+        },
+        "QualifiedApiName": "CreatedById",
+        "DataType": "Lookup(User)"
+      },
+      {
+        "attributes": {
+          "type": "FieldDefinition",
+          "url": "/services/data/v67.0/tooling/sobjects/FieldDefinition/01IdL00000G86Wr.CreatedDate"
+        },
+        "QualifiedApiName": "CreatedDate",
+        "DataType": "Date/Time"
+      },
+      {
+        "attributes": {
+          "type": "FieldDefinition",
+          "url": "/services/data/v67.0/tooling/sobjects/FieldDefinition/01IdL00000G86Wr.Id"
+        },
+        "QualifiedApiName": "Id",
+        "DataType": "Lookup()"
+      },
+      {
+        "attributes": {
+          "type": "FieldDefinition",
+          "url": "/services/data/v67.0/tooling/sobjects/FieldDefinition/01IdL00000G86Wr.IsDeleted"
+        },
+        "QualifiedApiName": "IsDeleted",
+        "DataType": "Checkbox"
+      },
+      {
+        "attributes": {
+          "type": "FieldDefinition",
+          "url": "/services/data/v67.0/tooling/sobjects/FieldDefinition/01IdL00000G86Wr.LastModifiedBy"
+        },
+        "QualifiedApiName": "LastModifiedById",
+        "DataType": "Lookup(User)"
+      },
+      {
+        "attributes": {
+          "type": "FieldDefinition",
+          "url": "/services/data/v67.0/tooling/sobjects/FieldDefinition/01IdL00000G86Wr.LastModifiedDate"
+        },
+        "QualifiedApiName": "LastModifiedDate",
+        "DataType": "Date/Time"
+      },
+      {
+        "attributes": {
+          "type": "FieldDefinition",
+          "url": "/services/data/v67.0/tooling/sobjects/FieldDefinition/01IdL00000G86Wr.LastReferencedDate"
+        },
+        "QualifiedApiName": "LastReferencedDate",
+        "DataType": "Date/Time"
+      },
+      {
+        "attributes": {
+          "type": "FieldDefinition",
+          "url": "/services/data/v67.0/tooling/sobjects/FieldDefinition/01IdL00000G86Wr.LastViewedDate"
+        },
+        "QualifiedApiName": "LastViewedDate",
+        "DataType": "Date/Time"
+      },
+      {
+        "attributes": {
+          "type": "FieldDefinition",
+          "url": "/services/data/v67.0/tooling/sobjects/FieldDefinition/01IdL00000G86Wr.Name"
+        },
+        "QualifiedApiName": "Name",
+        "DataType": "Text(80)"
+      },
+      {
+        "attributes": {
+          "type": "FieldDefinition",
+          "url": "/services/data/v67.0/tooling/sobjects/FieldDefinition/01IdL00000G86Wr.Owner"
+        },
+        "QualifiedApiName": "OwnerId",
+        "DataType": "Lookup(User,Group)"
+      },
+      {
+        "attributes": {
+          "type": "FieldDefinition",
+          "url": "/services/data/v67.0/tooling/sobjects/FieldDefinition/01IdL00000G86Wr.SystemModstamp"
+        },
+        "QualifiedApiName": "SystemModstamp",
+        "DataType": "Date/Time"
+      },
+      {
+        "attributes": {
+          "type": "FieldDefinition",
+          "url": "/services/data/v67.0/tooling/sobjects/FieldDefinition/01IdL00000G86Wr.00NdL00002YiFbV"
+        },
+        "QualifiedApiName": "Type_of_Installation__c",
+        "DataType": "Picklist"
+      },
+      {
+        "attributes": {
+          "type": "FieldDefinition",
+          "url": "/services/data/v67.0/tooling/sobjects/FieldDefinition/01IdL00000G86Wr.UserRecordAccess"
+        },
+        "QualifiedApiName": "UserRecordAccessId",
+        "DataType": "Lookup(User Record Access)"
+      }
+    ],
+    "totalSize": 17,
+    "done": true
+  },
+  "warnings": []
+}
