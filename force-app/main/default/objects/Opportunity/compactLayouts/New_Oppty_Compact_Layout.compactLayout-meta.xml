@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Salesforce Compact Layout Definition for Opportunity Standard Object -->
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <!-- Unique developer API name matching Trailhead challenge requirement -->
+    <fullName>New_Oppty_Compact_Layout</fullName>
+    <!-- Ordered fields for key record metrics visible in the Highlights Panel -->
+    <fields>Name</fields> <!-- 1. Opportunity Name (bold header) -->
+    <fields>Probability</fields> <!-- 2. Win Probability (%) -->
+    <fields>CloseDate</fields> <!-- 3. Expected Close Date -->
+    <fields>StageName</fields> <!-- 4. Sales Opportunity Stage -->
+    <fields>Amount</fields> <!-- 5. Revenue / Deal Amount -->
+    <fields>OwnerId</fields> <!-- 6. Opportunity Record Owner -->
+    <!-- Human-readable UI label -->
+    <label>New Oppty Compact Layout</label>
+</CompactLayout>

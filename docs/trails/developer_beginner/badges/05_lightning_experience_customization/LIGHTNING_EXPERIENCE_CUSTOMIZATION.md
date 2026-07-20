@@ -27,10 +27,19 @@ This badge covers customizing the Lightning Experience user interface for DreamH
 
 ### 2. [Unit 2: Create and Customize Agentforce 360 Platform Apps (formerly Lightning Apps)](UNIT_2_CREATE_AND_CUSTOMIZE_LIGHTNING_APPS.md)
 
-- **File Link (Absolute):** [UNIT_2_CREATE_AND_CUSTOMIZE_LIGHTNING_APPS.md](file:///home/willard/repos/Dreamhouse/docs/trails/developer_beginner/badges/05_lightning_experience_customization/UNIT_2_CREATE_AND_CUSTOMIZE_LIGHTNING_APPS.md)
+- **File Link (Absolute):** [UNIT_2_CREATE_AND_CUSTOMIZE_LIGHTNING_APPS.md](file:///home/willard/projects/Dreamhouse/docs/trails/developer_beginner/badges/05_lightning_experience_customization/UNIT_2_CREATE_AND_CUSTOMIZE_LIGHTNING_APPS.md)
 - **Focus:** Custom Application `Energy Consultations` (`Energy_Consultations.app-meta.xml`), custom branding (`#FA8B05`), navigation items order (`Home`, `Chatter`, `Groups`, `Energy_Audit__c`, `Account`, `Contact`, `Product2`, `Task`), and profile application visibility (`Admin`).
 - **Tooling Paradigm:** 100% Hands-on SFDX CLI (`sf project deploy start` & `sf data query --use-tooling-api`).
 - **Status:** **DOCUMENTED (Ready for Execution)**
+
+---
+
+### 4. [Unit 4: Customize Record Highlights with Compact Layouts](UNIT_4_CUSTOMIZE_RECORD_HIGHLIGHTS_WITH_COMPACT_LAYOUTS.md)
+
+- **File Link (Absolute):** [UNIT_4_CUSTOMIZE_RECORD_HIGHLIGHTS_WITH_COMPACT_LAYOUTS.md](file:///home/willard/projects/Dreamhouse/docs/trails/developer_beginner/badges/05_lightning_experience_customization/UNIT_4_CUSTOMIZE_RECORD_HIGHLIGHTS_WITH_COMPACT_LAYOUTS.md)
+- **Focus:** Compact Layouts (`Energy_Audit_Compact_Layout` on `Energy_Audit__c` and `New_Oppty_Compact_Layout` on `Opportunity`), primary compact layout assignment.
+- **Tooling Paradigm:** 100% Hands-on SFDX CLI (`sf project deploy start` & `sf data query --use-tooling-api`).
+- **Status:** **COMPLETED & VERIFIED**
 
 ---
 

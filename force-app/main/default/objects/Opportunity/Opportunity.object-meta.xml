@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Object Metadata Definition for Opportunity Standard Object -->
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <!-- Sets New_Oppty_Compact_Layout as primary default compact layout -->
+    <compactLayoutAssignment>New_Oppty_Compact_Layout</compactLayoutAssignment>
+</CustomObject>
