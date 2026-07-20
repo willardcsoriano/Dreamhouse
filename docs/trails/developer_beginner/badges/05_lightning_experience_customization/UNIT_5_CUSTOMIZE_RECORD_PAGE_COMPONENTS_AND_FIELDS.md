@@ -27,6 +27,11 @@ So this doc tags every requirement `[CLI]` or `[GUI]` per the classification rul
 - `[CLI]` — hand-authored (or retrieved-then-patched) metadata: the two page-layout related-list swaps.
 - `[GUI]` — built once in the Lightning App Builder / Activation wizard per the Trailhead click-path, then closed out with a **retrieve → deploy** round trip: `sf project retrieve start` pulls the builder-generated result into source, and `sf project deploy start` on that exact retrieved file is the reproducible, auditable payload from then on — the thing you'd actually re-run against a fresh sandbox instead of re-clicking the wizard.
 
+**Execution order, at a glance:**
+
+- **`G1`, `G3`, `C1`, `C3` (`[GUI]`):** do the browser click-path first — nothing to run until that's done. Only after saving/activating do you switch to the terminal and run retrieve → deploy.
+- **`G2`, `C2` (`[CLI]` only):** no browser steps at all. Run retrieve → hand-edit → deploy directly from the terminal.
+
 ---
 
 ## Requirement to CLI Command Mapping Matrix
@@ -74,6 +79,8 @@ Maria wants a sales-specific Energy Audit record page: reordered fields via Dyna
 
 ### 1. `[REQ-5.5.G1.1]`–`[REQ-5.5.G1.5]` Build the Page in Lightning App Builder — `[GUI]`
 
+**Browser first — nothing to run in the terminal until this is done.**
+
 1. App Launcher → **Energy Consultations** → **Energy Audits** tab → **All** list view → open **Burlington evaluation**.
 2. Setup menu (gear icon) → **Edit Page**.
 3. Page properties: set **Label** = `Energy Audit Record Page for Sales`, **API Name** = `Energy_Audit_Record_Page_for_Sales`.
@@ -82,6 +89,8 @@ Maria wants a sales-specific Energy Audit record page: reordered fields via Dyna
 6. **Save** → **Not Yet** (don't activate yet).
 
 ### 2. `[REQ-5.5.G1.RET]` Retrieve, Then Deploy as a Redeployable Payload — `[CLI]`
+
+**Terminal only — run this after the browser steps above, not instead of them.**
 
 ```bash
 # 1. Pull the builder-generated page into source (one-time, GUI-authored artifact)
@@ -100,6 +109,8 @@ sf project deploy start \
 ---
 
 ### 3. `[REQ-5.5.G2.RETRIEVE]`–`[REQ-5.5.G2.DEP]` Add the Files Related List — `[CLI]`
+
+**No browser needed — run these commands directly.**
 
 Salesforce auto-generated a default page layout for `Energy_Audit__c` when the object was first deployed (Unit 1) — that layout was never pulled into local source, so retrieve it first rather than hand-authoring a `Layout` file blind and risking silently dropping fields or sections it already has.
 
@@ -131,6 +142,8 @@ sf project deploy start \
 
 ### 4. `[REQ-5.5.G3.1]`–`[REQ-5.5.G3.RET]` Activate for the Sales Profile — `[GUI]` + `[CLI]`
 
+**Browser first, then terminal.**
+
 1. Setup → Home tab → Quick Find **App Builder** → **Lightning App Builder** → **Edit** next to **Energy Audit Record Page for Sales**.
 2. **Activation** → **App, Record Type, and Profile** tab → **Assign to Apps, Record Types, and Profiles**.
 3. Step through the wizard: assign to the **Energy Consultations** app, **Desktop and phone** form factor, **Master** record type, and both **Custom: Sales Profile** and **System Administrator** (System Administrator only so the assignment is visible while logged in as admin — Maria's real users only need Sales Profile).
@@ -158,11 +171,15 @@ Give Contact records a trimmed field set and swap Notes & Attachments for Files.
 
 ### 1. `[REQ-5.5.C1.1]`–`[REQ-5.5.C1.3]` Build the Contact Page — `[GUI]`
 
+**Browser first — nothing to run in the terminal until this is done.**
+
 1. Open a Contact record → Setup menu → **Edit Page**.
 2. Upgrade to Dynamic Forms, using **Contact Layout** as the source.
 3. Remove these fields from the page: **Fax**, **Other Phone**, **Home Phone**.
 
 ### 2. `[REQ-5.5.C1.RET]` Retrieve, Then Deploy as a Redeployable Payload — `[CLI]`
+
+**Terminal only — run this after the browser steps above, not instead of them.**
 
 Confirm the FlexiPage's actual API name in App Builder's page properties before retrieving — Lightning App Builder auto-generates a name when cloning the org-default Contact page, and it isn't specified by the challenge text.
 
@@ -183,6 +200,8 @@ sf project deploy start \
 ---
 
 ### 3. `[REQ-5.5.C2.RETRIEVE]`–`[REQ-5.5.C2.DEP]` Swap the Related List — `[CLI]`
+
+**No browser needed — run these commands directly.**
 
 ```bash
 # 1. Pull Contact Layout as an edit baseline
@@ -213,6 +232,8 @@ sf project deploy start \
 ---
 
 ### 4. `[REQ-5.5.C3.1]`–`[REQ-5.5.C3.RET]` Activate as Org Default — `[GUI]` + `[CLI]`
+
+**Browser first, then terminal.**
 
 1. **Save** the Contact page.
 2. **Activation** → **Org Default** → assign both **Desktop** and **Phone** form factors → **Save**.
