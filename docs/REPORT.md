@@ -1,6 +1,6 @@
 # Trailhead Progress Report
 
-**Date:** July 19, 2026  
+**Date:** July 20, 2026  
 **Subject:** Developer Beginner Trailhead Progress & Learnings
 
 ---
@@ -55,7 +55,21 @@
 
 1. **Out-of-Order Badge Completion & Setup Friction:** Completed the first badge, then unknowingly jumped directly to Badge 3 inside the web Playground without VS Code. Discovering that Badge 2 was skipped (which covered the initial VS Code connection) caused significant confusion and consumed extra time connecting the Trailhead Playground org to VS Code. Additionally, navigating the Salesforce GUI initially presented a steep learning curve, though following the included tutorial videos helped clarify the navigation.
 2. **Hardware Limitations & Remote VM Migration:** Local hardware constraints (8 GB RAM) were insufficient to run VS Code alongside developer tooling without performance degradation. To resolve this, development was migrated to a 16 GB Hetzner VM via Remote SSH, which required setting up the development stack from scratch and cost setup time.
-3. **CLI Deployment vs. GUI Challenge Verification ("Ghost Fields"):** Completing activities via the Salesforce CLI (`sf project deploy start`) instead of the point-and-click Setup GUI caused Trailhead challenge checks to fail with misleading "field does not exist" errors. Unlike the Setup UI wizard, CLI metadata deployments do not automatically grant Field-Level Security (FLS) access permissions to user profiles. This created "ghost fields" that existed in the database schema but remained completely invisible to SOQL and Trailhead. This was resolved by diagnosing the missing access via Tooling API SOQL queries and appending explicit `fieldPermissions` into `Admin.profile-meta.xml` before deploying:
+
+---
+
+## Unit-Level Engineering Hiccups & Resolutions
+
+### Trail: Developer Beginner
+
+#### Badge 04: Data Modeling
+
+##### Unit 2 & 3: Create Custom Objects & Create Object Relationships
+
+1. **CLI Deployment vs. GUI Challenge Verification ("Ghost Fields"):**
+   - **Context:** `Developer Beginner > Badge 04: Data Modeling > Unit 3: Create Object Relationships`
+   - **Hiccup:** Completing activities via the Salesforce CLI (`sf project deploy start`) instead of the point-and-click Setup GUI caused Trailhead challenge checks to fail with misleading "field does not exist" errors. Unlike the Setup UI wizard, CLI metadata deployments do not automatically grant Field-Level Security (FLS) access permissions to user profiles. This created "ghost fields" that existed in the database schema but remained completely invisible to SOQL and Trailhead.
+   - **Resolution:** Diagnosed the missing access via Tooling API SOQL queries on `FieldPermissions` and appended explicit `fieldPermissions` into `Admin.profile-meta.xml` before deploying schema and profile metadata atomically:
 
 ```bash
 # 1. Confirm field exists in the schema via Tooling API
@@ -103,10 +117,6 @@ $ sf data query -o trailhead-playground -q \
 ```
 
 ---
-
-## Unit-Level Engineering Hiccups & Resolutions
-
-### Trail: Developer Beginner
 
 #### Badge 05: Lightning Experience Customization
 
