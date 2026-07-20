@@ -5,6 +5,20 @@
 
 ---
 
+## Table of Contents
+
+- [Learnings](#learnings)
+- [Supplemental Learnings](#supplemental-learnings)
+- [Roadblocks](#roadblocks)
+- [Unit-Level Engineering Hiccups & Resolutions](#unit-level-engineering-hiccups-resolutions)
+  - [Trail: Developer Beginner](#trail-developer-beginner)
+    - [Badge 04: Data Modeling](#badge-04-data-modeling)
+      - [Unit 2 & 3: Create Custom Objects & Create Object Relationships](#unit-2-3-create-custom-objects-create-object-relationships)
+    - [Badge 05: Lightning Experience Customization](#badge-05-lightning-experience-customization)
+      - [Unit 1: Set Up Your Org](#unit-1-set-up-your-org)
+      - [Unit 2: Create and Customize Agentforce 360 Platform Apps (formerly Lightning Apps)](#unit-2-create-and-customize-agentforce-360-platform-apps-formerly-lightning-apps)
+      - [Unit 3: Create and Customize List Views](#unit-3-create-and-customize-list-views)
+
 ## Learnings
 
 1. **Enterprise Operations Tracking:** Salesforce is used extensively by businesses to track and manage end-to-end business operations seamlessly within a single unified platform.
@@ -35,6 +49,7 @@
    - **The "Ghost Field" Phenomenon:** Deploying schema without profile `fieldPermissions` produces "ghost fields"—fields that exist in the database but are completely hidden from the GUI, throw `No such column` errors in SOQL queries, and cause Trailhead verification checks to fail.
    - **GUI Parity & CLI Automation:** In the Salesforce Setup GUI, Step 3 of the field creation wizard displays a page of checkboxes that automatically grants FLS visibility to profiles. When working via CLI/source XML, non-interactive Stream Editing (`sed -i '/<\/Profile>/i ...'`) acts as the exact CLI equivalent of checking those GUI visibility boxes.
    - **Mandatory Pattern:** Schema creation (`CustomField`) and Security provisioning (`fieldPermissions`) MUST always be executed as a single atomic unit.
+   - **Pattern Recurred as "Ghost Tabs" (Badge 05, Unit 1):** The same root cause — a Setup GUI wizard silently bundling a profile-level permission grant that a raw CLI metadata deploy skips — recurred for `tabVisibilities`, not just `fieldPermissions`. This was flagged as a known risk going into Badge 05 and still wasn't caught until Unit 5, days later, when navigating to the tab for the first time. **Generalized rule:** any component created via CLI that has a corresponding GUI wizard step for per-profile visibility (fields, tabs, record types, apps) needs its profile visibility grant checked explicitly — don't assume the field-specific mitigation covers the whole class of bug. See the Unit 1 hiccup below for the full trace.
 
 5. **The Hybrid SFDX CLI + `--json` Execution Protocol:**
    - **The Sweet Spot:** Combining hands-on SFDX CLI execution with the `--json` output flag provides the ultimate developer hybrid: **100% hands-on CLI learning retention** (mastering flags like `-d`, `-o`, `-q`) paired with **100% deterministic JSON payload traceability** matching MCP protocol auditability standards.
@@ -146,6 +161,30 @@ $ sf data query -o trailhead-playground -q \
    - **Context:** `Developer Beginner > Badge 05: Lightning Experience Customization > Unit 1: Set Up Your Org`
    - **Hiccup:** Auto-committing and auto-executing CLI fixes created friction with hands-on learning retention.
    - **Resolution:** Established **Rule 4.4** in `docs/SALESFORCE_DEVELOPMENT_RULES.md`, strictly separating file authoring (AI assistant permitted) from terminal execution and Git shipping (reserved exclusively for developer).
+
+6. **CLI Tab Deployment Skips Profile Visibility Grant (The "Ghost Tab" Anti-Pattern):**
+   - **Context:** `Developer Beginner > Badge 05: Lightning Experience Customization > Unit 1: Set Up Your Org` (surfaced during Unit 5 execution, days later, while navigating to the tab for the first time)
+   - **Hiccup:** The `Energy_Audit__c` custom tab was deployed via raw CLI metadata (`CustomTab.tab-meta.xml`) and correctly wired into the `Energy_Consultations` app's `<tabs>` list in Unit 2, but never appeared in the App Launcher or nav bar. Unlike the Setup GUI's "New Custom Tab" wizard — which has an explicit step granting per-profile tab visibility — the CLI-only deploy skipped that grant entirely, leaving `Admin.profile-meta.xml` with zero `<tabVisibilities>` entries. Same root cause as the Ghost Field anti-pattern (item 4 above), just for tab visibility instead of FLS — and notably, it recurred despite the Ghost Field precedent already being a known watch-item going into this badge.
+   - **Resolution:** Added an explicit `tabVisibilities` grant to `Admin.profile-meta.xml` and deployed it in isolation:
+
+```bash
+# 1. Confirm zero tabVisibilities entries exist for the Admin profile
+$ grep -c "<tabVisibilities>" force-app/main/default/profiles/Admin.profile-meta.xml
+0
+
+# 2. Add explicit tab visibility grant to Admin.profile-meta.xml
+<tabVisibilities>
+    <tab>Energy_Audit__c</tab>
+    <visibility>DefaultOn</visibility>
+</tabVisibilities>
+
+# 3. Deploy the profile change in isolation
+$ sf project deploy start -m "Profile:Admin" -o trailhead-playground --json
+
+Status: Succeeded | 1/1 Components Deployed
+```
+
+     After deploying, the **Energy Audits** tab appeared correctly under the **Energy Consultations** app in the nav bar and App Launcher.
 
 ##### Unit 2: Create and Customize Agentforce 360 Platform Apps (formerly Lightning Apps)
 
