@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Salesforce Compact Layout Definition for Energy_Audit__c Custom Object -->
 <CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <!-- Unique developer API name of the compact layout -->
     <fullName>Energy_Audit_Compact_Layout</fullName>
-    <fields>Name</fields>
-    <fields>Account__c</fields>
-    <fields>Annual_Energy_Usage_kWh__c</fields>
-    <fields>Average_Annual_Electric_Cost__c</fields>
-    <fields>Type_of_Installation__c</fields>
+    <!-- Ordered field list displayed in the Highlights Panel (top to bottom / left to right) -->
+    <fields>Name</fields> <!-- Energy Audit Name (primary bold header field) -->
+    <fields>Account__c</fields> <!-- Parent Account Lookup -->
+    <fields>Annual_Energy_Usage_kWh__c</fields> <!-- Custom numeric usage field -->
+    <fields>Average_Annual_Electric_Cost__c</fields> <!-- Custom currency cost field -->
+    <fields>Type_of_Installation__c</fields> <!-- Custom picklist installation type -->
+    <!-- Human-readable label displayed in Setup UI -->
     <label>Energy Audit Compact Layout</label>
 </CompactLayout>
