@@ -54,7 +54,7 @@ LWC is a modern standards-based UI framework built natively on browser web compo
 
 - **`force-app/main/default/`** - Package source directory containing custom objects (`Offer__c`, `Property__c`, `Energy_Audit__c`), Apex classes, LWCs, and profiles.
 - **`docs/REPORT.md`** - Global Trailhead progress report and roadblocks.
-- **`docs/SALESFORCE_DEVELOPMENT_RULES.md`** - Mandatory Salesforce CLI & MCP Server Development Rules.
+- **`docs/reference/SALESFORCE_DEVELOPMENT_RULES.md`** - Mandatory Salesforce CLI & MCP Server Development Rules.
 - **`docs/trails/developer_beginner/`** - Developer Beginner Trailhead Dashboard and 10 numbered badge directories (`01_` through `10_`).
 
 ---

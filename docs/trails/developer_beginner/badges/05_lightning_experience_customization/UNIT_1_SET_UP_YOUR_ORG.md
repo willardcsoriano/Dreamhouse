@@ -665,4 +665,4 @@ Once verified, click **Check Challenge to Earn 500 Points** on your Trailhead Pl
 
 5. **Developer vs. AI Agent Responsibility Boundaries (Rule 4.4):**
    - **Hiccup:** Auto-committing and auto-executing CLI fixes created friction with hands-on learning retention.
-   - **Resolution:** Established **Rule 4.4** in `docs/SALESFORCE_DEVELOPMENT_RULES.md`, strictly separating file authoring (AI assistant permitted) from terminal execution and Git shipping (reserved exclusively for developer).
+   - **Resolution:** Established **Rule 4.4** in `docs/reference/SALESFORCE_DEVELOPMENT_RULES.md`, strictly separating file authoring (AI assistant permitted) from terminal execution and Git shipping (reserved exclusively for developer).
