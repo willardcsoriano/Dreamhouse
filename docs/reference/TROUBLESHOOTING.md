@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a standalone, quick-lookup reference for Trailhead challenge check failures on this project — kept separate from the broader `DEVELOPER_REFERENCE.md` and `DEVELOPMENT_SETUP.md` docs so it's fast to find the next time a challenge check fails for a non-obvious reason (e.g., after Trailhead re-links the Playground to VS Code/the CLI, or after any future org re-authentication). Each entry below documents a specific misleading Trailhead error message, its real root cause, the exact diagnostic commands used to confirm it, the fix, and any dead-end hypotheses that were tried and ruled out along the way so they aren't retried. Covers two incidents so far: a "field does not exist / wrong type" error that was actually a missing field-level security grant, and a wrong-org authentication mismatch that made every challenge check fail regardless of what was deployed.
+This is a standalone, quick-lookup reference for Trailhead challenge check failures on this project — kept separate from the broader `DEVELOPER_REFERENCE.md` and `DEVELOPMENT_SETUP.md` docs so it's fast to find the next time a challenge check fails for a non-obvious reason (e.g., after Trailhead re-links the Playground to VS Code/the CLI, or after any future org re-authentication). Each entry below documents a specific misleading Trailhead error message, its real root cause, the exact diagnostic commands used to confirm it, the fix, and any dead-end hypotheses that were tried and ruled out along the way so they aren't retried. Covers four incidents so far: a "field does not exist / wrong type" error that was actually a missing field-level security grant, a wrong-org authentication mismatch that made every challenge check fail regardless of what was deployed, a Files related-list value that isn't in Salesforce's own documentation, and a record-page activation mode that turns out not to be deployable via any API at all.
 
 ---
 
@@ -20,6 +20,19 @@ This is a standalone, quick-lookup reference for Trailhead challenge check failu
   - [Symptom](#symptom-1)
   - [Root Cause](#root-cause-1)
   - [Fix](#fix-1)
+- [Files Related List Value Not in Salesforce's Own Documentation](#files-related-list-value-not-in-salesforces-own-documentation)
+  - [Symptom](#symptom-2)
+  - [Root Cause](#root-cause-2)
+  - [Diagnostic Method](#diagnostic-method-1)
+  - [Fix](#fix-2)
+  - [Ruled-Out Values](#ruled-out-values)
+  - [Prevention Rule](#prevention-rule-1)
+- [Org-Default Record Page Activation Isn't Deployable via Any API](#org-default-record-page-activation-isnt-deployable-via-any-api)
+  - [Symptom](#symptom-3)
+  - [Root Cause](#root-cause-3)
+  - [Diagnostic Method](#diagnostic-method-2)
+  - [Fix](#fix-3)
+  - [Prevention Rule](#prevention-rule-2)
 
 ## Field-Level Security Not Granted by Metadata API Deploys
 
@@ -131,3 +144,79 @@ The Salesforce CLI was authenticated to a personal Salesforce Developer org rath
    sf config set target-org <alias>
    ```
 5. Re-deploy (or simply re-check, if the metadata was already correct) once the CLI and the challenge page agree on the org.
+
+---
+
+## Files Related List Value Not in Salesforce's Own Documentation
+
+### Symptom
+
+Adding a "Files" related list to a page layout via Metadata API — trying documented-sounding values like `AttachedContentDocuments` or `RelatedContentDocumentList` in a `<relatedLists><relatedList>` block — fails deployment every time:
+
+```
+Cannot find related list:AttachedContentDocuments
+```
+
+or
+
+```
+Cannot find related list:RelatedContentDocumentList
+```
+
+...even though both names look plausible and follow Salesforce's usual naming conventions for other related lists (`RelatedContactList`, `RelatedOpportunityList`, etc.).
+
+### Root Cause
+
+The Metadata API's `Layout.relatedLists.relatedList` field has no comprehensive published list of valid values — Salesforce's own Metadata API reference just says "the name of the related list," without enumerating them. Multiple plausible-sounding names circulate in blog posts and community answers, but the actual value Salesforce assigns for a Files-type related list is `RelatedFileList` — not either of the more "modern-sounding" ContentDocument-based names that show up in searches.
+
+### Diagnostic Method
+
+No SOQL/Tooling API query reliably returns valid `relatedList` values ahead of time, and checking other already-deployed layouts in the same org for a working example isn't guaranteed to help — Files may not already be present anywhere. The only reliable method: add the Files related list through the classic Page Layout editor's GUI (drag **Files** from the Related Lists palette onto the layout, **Save**), then retrieve that exact layout and read the resulting `<relatedList>` value directly:
+
+```bash
+sf project retrieve start -m "Layout:<Object>-<Layout Name>" -o <org> --json
+grep -A2 "relatedList" "force-app/main/default/layouts/<Object>-<Layout Name>.layout-meta.xml"
+```
+
+### Fix
+
+Use the confirmed value directly — no GUI trip needed on subsequent objects, since this value isn't object-specific:
+
+```xml
+<relatedLists>
+    <relatedList>RelatedFileList</relatedList>
+</relatedLists>
+```
+
+### Ruled-Out Values
+
+- `AttachedContentDocuments` — fails with `Cannot find related list:AttachedContentDocuments`
+- `RelatedContentDocumentList` — fails with `Cannot find related list:RelatedContentDocumentList`
+
+### Prevention Rule
+
+For any related list type without a confirmed value on file, don't guess from naming convention or blog posts — add it via the GUI once on any layout, retrieve, and read the real value before hand-authoring it elsewhere. `RelatedFileList` is now confirmed for this org/API version; reuse it directly.
+
+---
+
+## Org-Default Record Page Activation Isn't Deployable via Any API
+
+### Symptom
+
+Wanting to assign a Lightning Record Page (`FlexiPage`) as the **Org Default** for an object entirely via CLI/Metadata API, with no metadata type found — `FlexiPage`, `Layout`, `CustomApplication`, nor any Tooling API object — that represents this assignment.
+
+### Root Cause
+
+"Assign as Org Default" record page activation is genuinely not represented in any Salesforce metadata type. Confirmed by checking three separate sources: the `FlexiPage` Metadata API reference (documents `type`, `sobjectType`, and region/component structure, but nothing for default-activation state), the general Metadata API developer guide, and the Tooling API object list. This is a permanent platform limitation, not a documentation gap that better searching would close.
+
+### Diagnostic Method
+
+Retrieve the `FlexiPage` after performing the Org Default activation via the browser, and compare it against the pre-activation version — there is no diff. The activation state genuinely lives outside anything retrievable via source.
+
+### Fix
+
+This one action must be done via browser click every time: Lightning App Builder → **Activation** → **Org Default** → assign form factors (Desktop/Phone) → **Save**. Everything else about a record page — its structure, and its **App, Record Type, and Profile** assignment (a _different_ activation mode) via `profileActionOverrides` on the owning `CustomApplication` — can be deployed via CLI. Only Org Default activation specifically cannot.
+
+### Prevention Rule
+
+Don't spend time searching for a CLI path to Org Default record page activation — it doesn't exist, confirmed. Budget for one browser click per object needing this, and use the retrieve/deploy round trip afterward only to confirm state (it will correctly show `Unchanged`), not to try to capture the assignment itself.

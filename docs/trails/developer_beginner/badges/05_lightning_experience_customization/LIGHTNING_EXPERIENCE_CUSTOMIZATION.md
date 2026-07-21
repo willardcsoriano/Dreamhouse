@@ -22,6 +22,7 @@ This badge covers customizing the Lightning Experience user interface for DreamH
   - [2. [Unit 2: Create and Customize Agentforce 360 Platform Apps (formerly Lightning Apps)](UNIT_2_CREATE_AND_CUSTOMIZE_LIGHTNING_APPS.md)](#2-unit-2-create-and-customize-agentforce-360-platform-apps-formerly-lightning-appsunit_2_create_and_customize_lightning_appsmd)
   - [3. [Unit 3: Create and Customize List Views](UNIT_3_CREATE_AND_CUSTOMIZE_LIST_VIEWS.md)](#3-unit-3-create-and-customize-list-viewsunit_3_create_and_customize_list_viewsmd)
   - [4. [Unit 4: Customize Record Highlights with Compact Layouts](UNIT_4_CUSTOMIZE_RECORD_HIGHLIGHTS_WITH_COMPACT_LAYOUTS.md)](#4-unit-4-customize-record-highlights-with-compact-layoutsunit_4_customize_record_highlights_with_compact_layoutsmd)
+  - [5. [Unit 5: Customize Record Page Components and Fields](UNIT_5_CUSTOMIZE_RECORD_PAGE_COMPONENTS_AND_FIELDS.md)](#5-unit-5-customize-record-page-components-and-fieldsunit_5_customize_record_page_components_and_fieldsmd)
 - [Execution Protocol](#execution-protocol)
 
 ## Badge Units Index
@@ -58,6 +59,15 @@ This badge covers customizing the Lightning Experience user interface for DreamH
 - **File Link (Absolute):** [UNIT_4_CUSTOMIZE_RECORD_HIGHLIGHTS_WITH_COMPACT_LAYOUTS.md](file:///home/willard/repos/Dreamhouse/docs/trails/developer_beginner/badges/05_lightning_experience_customization/UNIT_4_CUSTOMIZE_RECORD_HIGHLIGHTS_WITH_COMPACT_LAYOUTS.md)
 - **Focus:** Compact Layouts (`Energy_Audit_Compact_Layout` on `Energy_Audit__c` and `New_Oppty_Compact_Layout` on `Opportunity`), primary compact layout assignment.
 - **Tooling Paradigm:** 100% Hands-on SFDX CLI (`sf project deploy start` & `sf data query --use-tooling-api`).
+- **Status:** **COMPLETED & VERIFIED**
+
+---
+
+### 5. [Unit 5: Customize Record Page Components and Fields](UNIT_5_CUSTOMIZE_RECORD_PAGE_COMPONENTS_AND_FIELDS.md)
+
+- **File Link (Absolute):** [UNIT_5_CUSTOMIZE_RECORD_PAGE_COMPONENTS_AND_FIELDS.md](file:///home/willard/repos/Dreamhouse/docs/trails/developer_beginner/badges/05_lightning_experience_customization/UNIT_5_CUSTOMIZE_RECORD_PAGE_COMPONENTS_AND_FIELDS.md)
+- **Focus:** Dynamic Forms record pages (`Energy_Audit_Record_Page_for_Sales`, `Contact_Record_Page_for_Sales`), Files related lists on `Energy_Audit__c` and `Contact` layouts, and page activation (App/Record-Type/Profile for Energy Audit, Org Default for Contact).
+- **Tooling Paradigm:** Hybrid — Lightning App Builder for Dynamic Forms conversion and both required Activation clicks (confirmed non-deployable via any Metadata/Tooling API), 100% Hands-on SFDX CLI for everything else, including a from-scratch hand-authored `FlexiPage` for Contact modeled on Energy Audit's proven, already-deployed structure.
 - **Status:** **COMPLETED & VERIFIED**
 
 ---
