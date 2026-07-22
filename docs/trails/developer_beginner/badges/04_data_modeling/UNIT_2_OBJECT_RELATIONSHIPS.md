@@ -61,22 +61,31 @@ A third relationship type, hierarchical, is a special type of lookup only availa
 
 ## Create a Custom Object
 
-DreamHouse wants a way to track users who mark particular properties as favorites on their website. To start, create a custom object called Favorite: Object Manager → Create → Custom Object → Label `Favorite`, Plural Label `Favorites`, check **Launch New Custom Tab Wizard** → Save → pick a tab style → Next, Next, Save.
+DreamHouse wants a way to track users who mark particular properties as favorites on their website. To start, create a custom object called Favorite and add a field to the object.
+
+1. Click the **Object Manager** tab.
+2. Click **Create | Custom Object** in the top-right corner.
+3. For Label, enter `Favorite`.
+4. For Plural Label, enter `Favorites`.
+5. Check the box for **Launch New Custom Tab Wizard** after saving this custom object.
+6. Leave the rest of the values as default and click **Save**.
+7. On the New Custom Object Tab page, click the **Tab Style** field and select a style you like.
+8. Click **Next**, **Next**, and **Save**.
 
 ```bash
 # Favorite__c custom object — Text name field, ControlledByParent sharing (required for the Master-Detail detail side)
 cat << 'EOF' > force-app/main/default/objects/Favorite__c/Favorite__c.object-meta.xml
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
-    <label>Favorite</label>
-    <pluralLabel>Favorites</pluralLabel>
+    <label>Favorite</label>                          <!-- "Label" field from the New Custom Object form -->
+    <pluralLabel>Favorites</pluralLabel>              <!-- "Plural Label" field -->
     <nameField>
-        <label>Favorite Name</label>
-        <type>Text</type>
+        <label>Favorite Name</label>                  <!-- Name shown on every Favorite record -->
+        <type>Text</type>                             <!-- Plain text name (Trailhead left this as the default) -->
     </nameField>
-    <sharingModel>ControlledByParent</sharingModel>
+    <sharingModel>ControlledByParent</sharingModel>          <!-- Who can see a Favorite record: same access as its parent Property, once the Master-Detail field below is added -->
     <externalSharingModel>ControlledByParent</externalSharingModel>
-    <deploymentStatus>Deployed</deploymentStatus>
+    <deploymentStatus>Deployed</deploymentStatus>     <!-- Object is live, not "In Development" -->
     <enableActivities>false</enableActivities>
     <enableBulkApi>true</enableBulkApi>
     <enableFeeds>false</enableFeeds>
@@ -93,7 +102,7 @@ cat << 'EOF' > force-app/main/default/tabs/Favorite__c.tab-meta.xml
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
     <customObject>true</customObject>
-    <motif>Custom19: Heart</motif>
+    <motif>Custom19: Heart</motif>   <!-- The "Tab Style" icon/color you'd pick in the wizard -->
 </CustomTab>
 EOF
 
@@ -103,52 +112,69 @@ sed -i '/<\/Profile>/i \    <tabVisibilities>\n        <tab>Favorite__c</tab>\n 
 
 ## Create a Lookup Relationship
 
-Next, create two custom relationship fields on the Favorite object. First, create a lookup relationship that lists the users who select Favorite for a property: Object Manager | Favorite → Fields & Relationships → New → Lookup Relationship → Related To: **Contact** → Field Name `Contact` → Next, Next, Save.
+Next, create two custom relationship fields on the Favorite object. First, create a lookup relationship that lists the users who select Favorite for a property.
+
+1. From Setup, go to **Object Manager | Favorite**.
+2. On the sidebar, click **Fields & Relationships**.
+3. Click **New**.
+4. Choose **Lookup Relationship** and click **Next**.
+5. For Related To, choose **Contact**. For the purposes of DreamHouse, contacts represent potential home buyers.
+6. Click **Next**.
+7. For Field Name, enter `Contact`, then click **Next**.
+8. Click **Next**, **Next**, and **Save**.
 
 ```bash
-# Contact__c Lookup field on Favorite__c — links to Contact, SetNull on delete
+# Contact__c Lookup field on Favorite__c — links to Contact, SetNull on delete; relationshipName deploys as Favorites1 (Salesforce auto-suffixed it, plain "Favorites" was already taken)
 cat << 'EOF' > force-app/main/default/objects/Favorite__c/fields/Contact__c.field-meta.xml
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Contact__c</fullName>
-    <label>Contact</label>
-    <type>Lookup</type>
-    <referenceTo>Contact</referenceTo>
-    <relationshipName>Favorites1</relationshipName>
-    <relationshipLabel>Favorites</relationshipLabel>
-    <deleteConstraint>SetNull</deleteConstraint>
-    <required>false</required>
+    <fullName>Contact__c</fullName>                    <!-- "Field Name" you typed in the wizard -->
+    <label>Contact</label>                              <!-- Field Label shown on the page -->
+    <type>Lookup</type>                                 <!-- "Lookup Relationship" field type -->
+    <referenceTo>Contact</referenceTo>                  <!-- "Related To" — which object this looks up to -->
+    <relationshipName>Favorites1</relationshipName>     <!-- Deploys as Favorites1, not Favorites — Salesforce auto-suffixed it because the plain name "Favorites" was already taken elsewhere in the org -->
+    <relationshipLabel>Favorites</relationshipLabel>    <!-- What shows on the Related tab of a Contact record -->
+    <deleteConstraint>SetNull</deleteConstraint>        <!-- If the Contact is deleted, clear this field instead of blocking the delete or cascading it -->
+    <required>false</required>                          <!-- Not a required field, so it needs its own visibility grant below -->
     <trackTrending>false</trackTrending>
 </CustomField>
 EOF
 
-# Provision Field-Level Security (FLS) for the Lookup field
+# Provision Field-Level Security (FLS) so the field isn't invisible by default — required because Contact__c isn't a required field (Rule above)
 sed -i '/<\/Profile>/i \    <fieldPermissions>\n        <editable>true</editable>\n        <field>Favorite__c.Contact__c</field>\n        <readable>true</readable>\n    </fieldPermissions>' force-app/main/default/profiles/Admin.profile-meta.xml
 ```
 
-> Deployed as `Favorites1`, not `Favorites` — Salesforce auto-suffixed it because the plain name was already taken elsewhere. Confirmed against the live org rather than guessed.
-
 ## Create a Master-Detail Relationship
 
-Now, create a second relationship field. You want a master-detail relationship where Property is the master and Favorite is the detail: Object Manager | Favorite → Fields & Relationships → New → Master-Detail Relationship → Related To: **Property** → Field Name `Property` → Next, Next, Save.
+Now, create a second relationship field. You want a master-detail relationship where Property is the master and Favorite is the detail.
+
+1. On the Object Manager page for the custom object, click **Fields & Relationships**.
+2. Click **New**.
+3. Select **Master-Detail Relationship** and click **Next**.
+4. For Related To, choose **Property**.
+5. Click **Next**.
+6. For Field Name, enter `Property` and click **Next**.
+7. Click **Next**, **Next**, and **Save**.
 
 ```bash
 # Property__c Master-Detail field on Favorite__c — links to Property__c, no fieldPermissions block (Master-Detail inherits security from the parent)
 cat << 'EOF' > force-app/main/default/objects/Favorite__c/fields/Property__c.field-meta.xml
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Property__c</fullName>
-    <label>Property</label>
-    <type>MasterDetail</type>
-    <referenceTo>Property__c</referenceTo>
-    <relationshipName>Favorites1</relationshipName>
-    <relationshipLabel>Favorites</relationshipLabel>
+    <fullName>Property__c</fullName>                    <!-- "Field Name" you typed in the wizard -->
+    <label>Property</label>                              <!-- Field Label shown on the page -->
+    <type>MasterDetail</type>                            <!-- "Master-Detail Relationship" field type -->
+    <referenceTo>Property__c</referenceTo>               <!-- "Related To" — Property is the master, Favorite is the detail -->
+    <relationshipName>Favorites1</relationshipName>      <!-- Deploys as Favorites1, same auto-suffix as the Contact lookup above -->
+    <relationshipLabel>Favorites</relationshipLabel>     <!-- What shows on the Related tab of a Property record -->
     <relationshipOrder>0</relationshipOrder>
     <reparentableMasterDetail>false</reparentableMasterDetail>
     <writeRequiresMasterRead>false</writeRequiresMasterRead>
     <trackTrending>false</trackTrending>
 </CustomField>
 EOF
+
+# No fieldPermissions block for this field: Master-Detail fields always inherit security from their parent object, and the Metadata API rejects an explicit fieldPermissions entry here
 ```
 
 Deploy everything for Favorite in one atomic push, then verify:
@@ -196,40 +222,45 @@ Great job! Our Favorite object is all set up.
 
 ## Hands-On Challenge
 
-The challenge applies the same lookup + master-detail pattern from above to the `Offer__c` object built in Unit 1, linking it to `Property__c` (Master-Detail) and `Contact` (Lookup).
+The challenge applies the same lookup + master-detail pattern from above to the `Offer__c` object built in Unit 1:
+
+- Master-Detail relationship to `Property__c`
+- Lookup relationship to `Contact`
 
 ```bash
 # Property__c Master-Detail field on Offer__c — links to Property__c, Offers relationship name, no fieldPermissions block
 cat << 'EOF' > force-app/main/default/objects/Offer__c/fields/Property__c.field-meta.xml
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Property__c</fullName>
-    <label>Property</label>
-    <type>MasterDetail</type>
-    <referenceTo>Property__c</referenceTo>
-    <relationshipName>Offers</relationshipName>
+    <fullName>Property__c</fullName>                    <!-- "Field Name" you'd type in the wizard -->
+    <label>Property</label>                              <!-- Field Label shown on the page -->
+    <type>MasterDetail</type>                            <!-- "Master-Detail Relationship" field type -->
+    <referenceTo>Property__c</referenceTo>               <!-- "Related To" — Property is the master, Offer is the detail -->
+    <relationshipName>Offers</relationshipName>          <!-- What shows on the Related tab of a Property record -->
     <relationshipLabel>Offers</relationshipLabel>
     <reparentableMasterDetail>false</reparentableMasterDetail>
     <writeRequiresMasterRead>false</writeRequiresMasterRead>
 </CustomField>
 EOF
 
+# No fieldPermissions block for Property__c: Master-Detail fields always inherit security from their parent object
+
 # Contact__c Lookup field on Offer__c — links to Contact, SetNull on delete, Offers relationship name
 cat << 'EOF' > force-app/main/default/objects/Offer__c/fields/Contact__c.field-meta.xml
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Contact__c</fullName>
-    <label>Contact</label>
-    <type>Lookup</type>
-    <referenceTo>Contact</referenceTo>
-    <relationshipName>Offers</relationshipName>
+    <fullName>Contact__c</fullName>                    <!-- "Field Name" you'd type in the wizard -->
+    <label>Contact</label>                              <!-- Field Label shown on the page -->
+    <type>Lookup</type>                                 <!-- "Lookup Relationship" field type -->
+    <referenceTo>Contact</referenceTo>                  <!-- "Related To" — which object this looks up to -->
+    <relationshipName>Offers</relationshipName>         <!-- What shows on the Related tab of a Contact record -->
     <relationshipLabel>Offers</relationshipLabel>
-    <deleteConstraint>SetNull</deleteConstraint>
-    <required>false</required>
+    <deleteConstraint>SetNull</deleteConstraint>        <!-- If the Contact is deleted, clear this field instead of blocking the delete or cascading it -->
+    <required>false</required>                          <!-- Not a required field, so it needs its own visibility grant below -->
 </CustomField>
 EOF
 
-# Provision Field-Level Security (FLS) for the Lookup field
+# Provision Field-Level Security (FLS) so the field isn't invisible by default — required because Contact__c isn't a required field
 sed -i '/<\/Profile>/i \    <fieldPermissions>\n        <editable>true</editable>\n        <field>Offer__c.Contact__c</field>\n        <readable>true</readable>\n    </fieldPermissions>' force-app/main/default/profiles/Admin.profile-meta.xml
 ```
 
