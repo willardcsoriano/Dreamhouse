@@ -8,6 +8,12 @@
 
 ---
 
+## Table of Contents
+
+- [Trail Progress Overview](#trail-progress-overview)
+- [Badges Syllabus Index](#badges-syllabus-index)
+- [Execution & Branching Standard for this Trail](#execution-branching-standard-for-this-trail)
+
 ## Trail Progress Overview
 
 ```text
@@ -23,7 +29,7 @@
 | **01** | **Agentforce 360 Platform Development Basics** |  +400  |       —        | **Completed** _(Jul 16, 2026)_ | **[badges/01_agentforce_360/](badges/01_agentforce_360_platform_development_basics/AGENTFORCE_360_PLATFORM_DEVELOPMENT_BASICS.md)** |
 | **02** | **Get Started with Salesforce Development**    |  +400  |       —        | **Completed** _(Jul 16, 2026)_ | **[badges/02_get_started/](badges/02_get_started_with_salesforce_development/GET_STARTED_WITH_SALESFORCE_DEVELOPMENT.md)**          |
 | **03** | **Quick Start: Tour the Sample App Gallery**   |  +200  |       —        | **Completed** _(Jul 15, 2026)_ | **[badges/03_sample_app/](badges/03_quick_start_tour_the_sample_app_gallery/QUICK_START_TOUR_THE_SAMPLE_APP_GALLERY.md)**           |
-| **04** | **Data Modeling**                              | +1,500 |       —        | **Completed** _(Jul 18, 2026)_ | **[badges/04_data_modeling/](badges/04_data_modeling/DATA_MODELING.md)**                                                            |
+| **04** | **Data Modeling**                              | +1,500 |       —        | **Completed** _(Jul 18, 2026)_ | **[badges/04_data_modeling/](badges/04_data_modeling/)**                                                                            |
 | **05** | **Lightning Experience Customization**         | +2,700 |     ~3 hrs     |       ⏳ **IN PROGRESS**       | **[badges/05_lightning_customization/](badges/05_lightning_experience_customization/LIGHTNING_EXPERIENCE_CUSTOMIZATION.md)**        |
 | **06** | **Formulas and Validations**                   | +1,500 |     ~1 hr      |           ⏸️ Pending           | **[badges/06_formulas_validations/](badges/06_formulas_and_validations/FORMULAS_AND_VALIDATIONS.md)**                               |
 | **07** | **Flow Builder Basics**                        |  +800  |    ~40 mins    |           ⏸️ Pending           | **[badges/07_flow_builder/](badges/07_flow_builder_basics/FLOW_BUILDER_BASICS.md)**                                                 |
