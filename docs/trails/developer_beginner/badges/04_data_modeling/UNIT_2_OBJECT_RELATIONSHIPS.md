@@ -16,6 +16,8 @@
 - [Add a Favorite Property](#add-a-favorite-property)
 - [Resources](#resources)
 - [Hands-On Challenge](#hands-on-challenge)
+  - [Your Challenge — Create relationships for the Offer object](#your-challenge-create-relationships-for-the-offer-object)
+- [Technical Post-Mortem & Engineering Learnings](#technical-post-mortem-engineering-learnings)
 
 ## Learning Objectives
 
@@ -25,17 +27,27 @@ After completing this unit, you'll be able to:
 - Create or modify a lookup relationship.
 - Create or modify a master-detail relationship.
 
+> **Accessibility:** This unit requires some additional instructions for screen reader users. To access a detailed screen reader version of this unit, click this link: Open Trailhead screen reader instructions.
+
 ## What Are Object Relationships?
 
 Now that you're comfortable with objects and fields, it's time to take things to the next level with object relationships. Object relationships are a special field type that connects two objects together.
 
 Think about a standard object like Account. If a sales rep opens an account, they've probably been talking to a few people at that account's company. They've probably made contacts like executives or IT managers and stored those contacts' information in Salesforce.
 
-It makes sense, then, that there should be a relationship between the Account object and the Contact object. And there is! When you look at an account record in Salesforce, you can see that there's a section for contacts on the Related tab, with a button that lets you quickly add a contact to an account.
+It makes sense, then, that there should be a relationship between the Account object and the Contact object. And there is!
+
+When you look at an account record in Salesforce, you can see that there's a section for contacts on the Related tab. You can also see that there's a button that lets you quickly add a contact to an account.
+
+_An account record with two related contacts._
 
 The Account to Contact relationship is an example of a standard relationship in Salesforce. But just like objects and fields, you can build custom relationships as well. In the last unit, you created two objects: Property and Offer. Wouldn't it be great if all the offers made on a home showed up on its record in Salesforce?
 
+Before you do that, you should learn about the different kinds of relationships you can create in Salesforce.
+
 ## The Wide World of Object Relationships
+
+> Note: Where possible, we changed noninclusive terms to align with our company value of Equality. We maintained certain terms to avoid any effect on customer implementations.
 
 There are two main types of object relationships: lookup and master-detail.
 
@@ -43,7 +55,7 @@ There are two main types of object relationships: lookup and master-detail.
 
 In our Account to Contact example above, the relationship between the two objects is a lookup relationship. A lookup relationship essentially links two objects together so that you can "look up" one object from the related items on another object.
 
-Lookup relationships can be one-to-one or one-to-many. The Account to Contact relationship is one-to-many because a single account can have many related contacts.
+Lookup relationships can be one-to-one or one-to-many. The Account to Contact relationship is one-to-many because a single account can have many related contacts. For our DreamHouse scenario, you could create a one-to-one relationship between the Property object and a Home Seller object.
 
 ### Master-Detail Relationships
 
@@ -51,17 +63,27 @@ While lookup relationships are fairly casual, master-detail relationships are a 
 
 For example, say the owner of a property wanted to take their home off the market. DreamHouse wouldn't want to keep any offers made on that property. With a master-detail relationship between Property and Offer, you can delete the property and all its associated offers from your system.
 
+_A property with several related offers._
+
 ### More on Relationships
 
-Typically, you use lookup relationships when objects are only related in some cases. Objects in lookup relationships usually work as stand-alone objects and have their own tabs in the user interface.
+Just like in real life, relationships are complicated. Here's a bit more information to help you differentiate between lookup and master-detail relationships.
 
-In a master-detail relationship, the detail object doesn't work as a stand-alone — it's highly dependent on the master. If a record on the master object is deleted, all its related detail records are deleted as well. When you're creating master-detail relationships, you always create the relationship field on the detail object.
+Typically, you use lookup relationships when objects are only related in some cases. Sometimes a contact is associated with a specific account, but sometimes it's just a contact. Objects in lookup relationships usually work as stand-alone objects and have their own tabs in the user interface.
 
-A third relationship type, hierarchical, is a special type of lookup only available on the User object — used for things like management chains between users.
+In a master-detail relationship, the detail object doesn't work as a stand-alone. It's highly dependent on the master. In fact, if a record on the master object is deleted, all its related detail records are deleted as well. When you're creating master-detail relationships, you always create the relationship field on the detail object.
+
+Finally, you could run into a third relationship type called a hierarchical relationship. Hierarchical relationships are a special type of lookup relationship. The main difference between the two is that hierarchical relationships are only available on the User object. You can use them for things like creating management chains between users.
+
+When you start adding relationships between objects, remember that you're increasing the complexity of your data model. That's not a bad thing, but be extra cautious when you do things like change and delete objects, records, or fields. Check out the resources section for more information on relationship behaviors.
 
 ## Create a Custom Object
 
-DreamHouse wants a way to track users who mark particular properties as favorites on their website. To start, create a custom object called Favorite and add a field to the object.
+You're ready to jump back in with D'Angelo to build some relationships for the DreamHouse app. Say DreamHouse wanted a way to track users who mark particular properties as favorites on their website. This feature can help DreamHouse's real estate brokers reach out to potential home buyers.
+
+> Note: Even if you're completing this module as part of the Admin Beginner trail, be sure you use the new Trailhead Playground you created in the previous unit.
+
+To start, create a custom object called Favorite and add a field to the object.
 
 1. Click the **Object Manager** tab.
 2. Click **Create | Custom Object** in the top-right corner.
@@ -183,19 +205,19 @@ Deploy everything for Favorite in one atomic push, then verify:
 mkdir -p docs/trails/developer_beginner/badges/04_data_modeling/logs
 
 # Deploy Favorite__c object, tab, fields, and profile FLS/tab-visibility grants atomically
-sf project deploy start \
-  -d force-app/main/default/objects/Favorite__c \
-  -d force-app/main/default/tabs \
-  -d force-app/main/default/profiles \
-  -o trailhead-playground \
-  --json | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_2_GUIDED_DEPLOY_AUDIT.json
+CMD="sf project deploy start -d force-app/main/default/objects/Favorite__c -d force-app/main/default/tabs -d force-app/main/default/profiles -o trailhead-playground --json"
+{ jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } \
+  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_2_GUIDED_DEPLOY_AUDIT.json
 
 # Verify Favorite__c field data types deployed correctly via Tooling API
-sf data query \
-  -o trailhead-playground \
-  --use-tooling-api \
-  -q "SELECT QualifiedApiName, DataType FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = 'Favorite__c'" \
-  --json | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_2_GUIDED_VERIFICATION_AUDIT.json
+CMD="sf data query -o trailhead-playground --use-tooling-api -q \"SELECT QualifiedApiName, DataType FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = 'Favorite__c'\" --json"
+{ jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } \
+  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_2_GUIDED_VERIFICATION_AUDIT.json
+
+# Verify the sed-based FLS grant on Contact__c and the tab-visibility grant actually landed on the Admin profile
+CMD="sf data query -o trailhead-playground --use-tooling-api -q \"SELECT Field, PermissionsRead, PermissionsEdit FROM FieldPermissions WHERE SobjectType='Favorite__c'\" --json"
+{ jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } \
+  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_2_GUIDED_VERIFICATION_AUDIT_FIELDPERMISSIONS.json
 ```
 
 Now, if you look at a Property record, you'll see Favorites listed in the Related tab.
@@ -213,19 +235,45 @@ Next, take a look at how to view favorite properties.
 
 Great job! Our Favorite object is all set up.
 
+No CLI equivalent — creating a demo Favorite record through the UI is the point of this step, not something to script.
+
 ## Resources
 
 - Salesforce Help: Object Relationships Overview
 - Salesforce Help: Considerations for Object Relationships
 
+> Note: Where possible, we changed noninclusive terms to align with our company value of Equality. This is a work in progress, so if you find a term to evaluate for inclusive language, click Provide feedback for this badge in the right sidebar to submit it.
+
 ---
 
 ## Hands-On Challenge
 
-The challenge applies the same lookup + master-detail pattern from above to the `Offer__c` object built in Unit 1:
++500 points
 
-- Master-Detail relationship to `Property__c`
-- Lookup relationship to `Contact`
+**Get Ready:** You'll be completing this unit in your own hands-on org. Click Launch to get started, or click the name of your org to choose a different one.
+
+### Your Challenge — Create relationships for the Offer object
+
+The object you created for the previous challenge is pretty handy. Imagine how much more useful it would be if brokers could specify which client made an offer and which property the client wants to buy. Add two relationships to the Offer object so brokers can capture this data in Salesforce. Create a Master-Detail relationship with the Property object and a Lookup relationship with the Contact object.
+
+Even if you're completing this module as part of the Admin Beginner trail, be sure you use the new Trailhead Playground you created in the previous unit.
+
+**Before You Start:**
+
+- Create the Property object as described in the previous unit.
+
+**Challenge Requirements:**
+
+1. Create a custom Master-Detail field on the Offer object
+   - Data Type: Master-Detail
+   - Related To: Property
+   - Field Label: `Property`
+   - Field Name: `Property`
+2. Create a custom Lookup Relationship field on the Offer object
+   - Data Type: Lookup Relationship
+   - Related To: Contact
+   - Field Label: `Contact`
+   - Field Name: `Contact`
 
 ```bash
 # Property__c Master-Detail field on Offer__c — links to Property__c, Offers relationship name, no fieldPermissions block
@@ -268,23 +316,21 @@ sed -i '/<\/Profile>/i \    <fieldPermissions>\n        <editable>true</editable
 mkdir -p docs/trails/developer_beginner/badges/04_data_modeling/logs
 
 # Deploy Offer__c relationship fields and profile FLS grant atomically
-sf project deploy start \
-  -d force-app/main/default/objects/Offer__c \
-  -d force-app/main/default/profiles \
-  -o trailhead-playground \
-  --json | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_2_CHALLENGE_DEPLOY_AUDIT.json
+CMD="sf project deploy start -d force-app/main/default/objects/Offer__c -d force-app/main/default/profiles -o trailhead-playground --json"
+{ jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } \
+  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_2_CHALLENGE_DEPLOY_AUDIT.json
 
 # Verify Offer__c field data types deployed correctly via Tooling API
-sf data query \
-  -o trailhead-playground \
-  --use-tooling-api \
-  -q "SELECT QualifiedApiName, DataType FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = 'Offer__c'" \
-  --json | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_2_CHALLENGE_VERIFICATION_AUDIT_SCHEMA.json
+CMD="sf data query -o trailhead-playground --use-tooling-api -q \"SELECT QualifiedApiName, DataType FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = 'Offer__c'\" --json"
+{ jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } \
+  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_2_CHALLENGE_VERIFICATION_AUDIT_SCHEMA.json
 
 # Verify Admin profile FieldPermissions on Offer__c.Contact__c; Master-Detail Property__c has no row by design
-sf data query \
-  -o trailhead-playground \
-  --use-tooling-api \
-  -q "SELECT Field, PermissionsRead, PermissionsEdit FROM FieldPermissions WHERE SobjectType='Offer__c'" \
-  --json | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_2_CHALLENGE_VERIFICATION_AUDIT_FIELDPERMISSIONS.json
+CMD="sf data query -o trailhead-playground --use-tooling-api -q \"SELECT Field, PermissionsRead, PermissionsEdit FROM FieldPermissions WHERE SobjectType='Offer__c'\" --json"
+{ jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } \
+  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_2_CHALLENGE_VERIFICATION_AUDIT_FIELDPERMISSIONS.json
 ```
+
+## Technical Post-Mortem & Engineering Learnings
+
+_No hiccups logged yet — append Hiccup → Resolution pairs here after running Stage 4 against the target org._
