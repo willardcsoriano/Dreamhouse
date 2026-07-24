@@ -2,16 +2,14 @@
 
 ## Overview
 
-This document codifies the process used to turn a raw, scraped Trailhead unit — Guided Activity plus Hands-On Challenge, written for point-and-click GUI use — into a CLI-first, `--json`-audited technical doc under `docs/trails/`. The pipeline has four stages: scrape (paste raw unit content), polish (restructure into the standard doc skeleton and tag every instruction with a Requirement ID), CLI payload (draft the terminal commands that reproduce each GUI step, plus a condensed one-shot script and a requirement-to-command mapping table), and human execution (the developer alone runs `sf`/`git` against the live org and pastes back the `--json` output, per Rule 4.4 in `docs/reference/SALESFORCE_DEVELOPMENT_RULES.md`). It also covers when it's safe to fan this out to parallel subagents — one per unit — and where it isn't, because later units in a badge reuse object/field/profile names decided in earlier ones and several roll-up files are shared across the whole badge.
-
----
+This document codifies the process for turning a raw, scraped Trailhead unit into a polished, CLI-first technical doc under `docs/trails/`. The raw scrape is treated as an immutable scaffold: its prose is never edited, condensed, or rewritten — only reformatted into markdown headings, bold, and lists. Below each instruction — Guided Activity and Hands-On Challenge alike — the pipeline adds a CLI-equivalent payload for developers who prefer the terminal: a deploy code block, plus a separate verification code block that proves the change actually landed in the org, not just that the deploy command exited zero. Steps with no Metadata API surface are left as GUI-only, called out plainly rather than forced into a fake CLI payload. There are four stages: paste the raw content, draft the unit doc from it word for word, add CLI and verification payloads, then human execution against the live org. The last section covers what may run in parallel across a badge's units and what has to stay sequential.
 
 ## Table of Contents
 
 - [Overview](#overview)
 - [Stage 1 — Scrape](#stage-1-scrape)
-- [Stage 2 — Polish](#stage-2-polish)
-- [Stage 3 — CLI Payload](#stage-3-cli-payload)
+- [Stage 2 — Draft the Unit Doc](#stage-2-draft-the-unit-doc)
+- [Stage 3 — CLI Payload + Verification](#stage-3-cli-payload-verification)
 - [Stage 4 — Human Execution & Audit (never delegated)](#stage-4-human-execution-audit-never-delegated)
 - [Stage 5 — Post-Mortem](#stage-5-post-mortem)
 - [Output Skeleton (per unit doc)](#output-skeleton-per-unit-doc)
@@ -19,81 +17,79 @@ This document codifies the process used to turn a raw, scraped Trailhead unit �
 
 ## Stage 1 — Scrape
 
-**Input:** raw Trailhead unit text, saved by the developer to whatever path is fastest in the moment (repo root, wrong badge folder, ad-hoc filename like `badge5unit5.md`) — speed of capture matters more than placement at this point. Locating and relocating the file to its canonical path is part of Stage 2, not something the developer needs to get right up front.
+Paste the raw Trailhead unit text — Guided Activity **and** Hands-On Challenge, word for word — into `docs/trails/developer_beginner/badges/<NN_badge>/raw/UNIT_<N>_RAW_GUIDED_ACTIVITY.md`. It's easy to stop pasting once the graded challenge starts; don't. Where the file lives matters less than completeness at this point — get the whole unit's text in, and worry about polish at Stage 2.
 
-## Stage 2 — Polish
+**The raw file is a scaffold, not a draft.** Once pasted, it is never edited to fix wording, condense a paragraph, or "clean it up" — the only edits a raw file should ever see are corrections of an actual copy-paste mistake (a dropped line, a mis-pasted alt-text fragment). Every later stage reads from the raw file; none of them write back to it.
 
-First, relocate the raw scrape to its canonical path — `docs/trails/developer_beginner/badges/<NN_badge>/UNIT_<N>_<NAME>.md` — and remove the ad-hoc original once its content has been folded in; don't leave both copies sitting side by side. Then restructure the text into the standard unit-doc skeleton (see **Output Skeleton** below), and assign a **Requirement ID** to every discrete, independently-verifiable GUI instruction:
+## Stage 2 — Draft the Unit Doc
 
-```
-[REQ-<badge>.<unit>.<G|C><item>.<step>]
-```
+Create `docs/trails/developer_beginner/badges/<NN_badge>/UNIT_<N>_<NAME>.md` and copy the raw file's prose into it **word for word** — every sentence, every list item, both the Guided Activity and the Hands-On Challenge.
 
-- `G` = Guided Activity, `C` = Hands-On Challenge, `<item>` = 1-based item number within that part.
-- `<step>` = sub-step number (`.1`, `.2`, …) for multi-part instructions, or the fixed suffixes `.DEP` (deploy) / `.AUD` (audit query) — see `[REQ-5.4.G1.1]`, `[REQ-5.4.G1.DEP]`, `[REQ-5.4.G1.AUD]` in Unit 4 for the reference pattern.
+"Polish" here means markdown formatting only: turn plain-text headings into `##`/`###`, turn numbered click-paths into ordered lists, bold the literal values a reader has to type (`Property`, `Currency`, …), render Trailhead's tables as markdown tables, add the `**Source:**` link. It does **not** mean shortening a paragraph, dropping a sentence that reads like filler, or rephrasing something "more clearly." If Trailhead's own copy changes in a future re-scrape, the doc changes to match it exactly; until then, the raw file is the wording's source of truth, not the drafter's judgment.
 
-**Then classify every Requirement ID as `[CLI]` or `[GUI]`** — not everything Trailhead calls a "step" has a clean Metadata API surface. The full decision rule, with a worked example and a running table of every metadata type classified so far, lives in `docs/reference/CLI_GUI_BOUNDARIES.md` — consult it (and update its table) whenever a new metadata type shows up in a unit draft.
+Skip nothing — including narrative framing sentences that don't map to a graded step, and Trailhead's own boilerplate notes (accessibility callouts, inclusive-language notices). They're part of what Trailhead actually said, so they're part of the doc.
 
-## Stage 3 — CLI Payload
+## Stage 3 — CLI Payload + Verification
 
-For every `[CLI]`-tagged Requirement ID, draft the CLI command block that reproduces the GUI step exactly — heredoc'd XML for metadata, `sf project deploy start ... --json` to ship it, `sf data query ... --use-tooling-api --json` to verify it. Apply the existing rules from `docs/reference/SALESFORCE_DEVELOPMENT_RULES.md` while drafting — schema and FLS deployed atomically (Rule 2.1), never add `fieldPermissions` for Master-Detail or required fields (Rules 2.2–2.3), always explicit `-o <org>` (Rule 3.1). Then produce two roll-ups:
+For every discrete instruction that has a Metadata API / CLI surface, add two fenced `bash` code blocks directly under that step's prose:
 
-- **One-Shot Execution Protocol:** the same commands, consolidated into the minimum number of terminal commands (generate files → deploy → audit).
-- **Requirement to CLI Command Mapping Matrix:** one row per Requirement ID — Activity Type, Requirement ID, Access (`CLI`/`GUI`), Summary, Target Component, Solved By CLI Command / GUI Steps.
+1. **Payload** — the heredoc'd XML/config plus `sf project deploy start ... --json`, applying the standing rules in `docs/reference/SALESFORCE_DEVELOPMENT_RULES.md`: schema and FLS deployed atomically (Rule 2.1), no `fieldPermissions` for Master-Detail or required fields (Rules 2.2–2.3), always an explicit `-o <org>` (Rule 3.1).
+2. **Verification** — a separate `sf data query --use-tooling-api --json` (or equivalent) that confirms the specific thing that step put at risk actually landed: a field's data type, an FLS grant, a tab visibility. This is not the same block as the deploy, and it isn't optional — a `--json` deploy result with a clean exit status only proves the command didn't error, not that the org now matches what the step describes.
 
-For every `[GUI]`-tagged Requirement ID: still write out the exact Trailhead click-path (worth documenting for repeatability, and for reading aloud), then close with a **retrieve → deploy** round trip rather than stopping at retrieve:
+Before drafting a payload, decide whether the step is actually worth hand-authoring as XML: only do it when (1) the Metadata API reference has a worked example of your exact structure, (2) the XML uses identifiers you'd choose yourself rather than builder-assigned ones, and (3) a structurally valid deploy is actually equivalent to whatever check you're trying to satisfy. If any of those three fails — a wizard-driven Setup screen, a canvas-generated structure with internal IDs, anything Trailhead's own builder produces that you'd otherwise be guessing at — it's `[GUI]`, not `[CLI]`.
 
-1. `sf project retrieve start -m "<MetadataType>:<Member>"` — pull the builder-generated result into source control. This is the one-time step; it never gets faked or hand-authored.
-2. `sf project deploy start -m "<MetadataType>:<Member>" --json` — redeploy that exact retrieved file. This is what makes the artifact reproducible: the retrieved XML becomes a real, version-controlled payload you can push to another org (a fresh sandbox, a second Trailhead Playground) without re-clicking through the wizard, and the deploy's `--json` result is the audit record for the requirement — not the retrieve.
+Multiple steps that build toward one logical unit of schema (an object plus its fields, a field plus its FLS grant) can share one payload block and one verification block at the end of that group — they don't need to be deployed and verified one at a time, as long as the verification query actually checks every piece the group touched.
 
-The GUI click-path is how the artifact gets authored once; the deploy command is what makes it a documented, reproducible CLI payload from then on.
-
-**Flag the execution order explicitly — don't rely on the `[CLI]`/`[GUI]` tag alone to convey it.** A reader scanning the doc (or the developer about to execute it) needs to know, without inferring it from section structure, whether a section requires the browser at all:
-
-- `[GUI]` sections: open with **"Browser first — nothing to run in the terminal until this is done."**, then after the click-path, the retrieve/deploy block opens with **"Terminal only — run this after the browser steps above, not instead of them."**
-- `[CLI]`-only sections: open with **"No browser needed — run these commands directly."**
-- Mixed sections (`[GUI]` + `[CLI]`, e.g. an Activation-wizard requirement closed out with retrieve/deploy): open with **"Browser first, then terminal."**
-
-Also add a short "Execution order, at a glance" summary near the top of the doc (after the CLI/GUI classification explanation) listing which Requirement IDs need the browser and which don't — a reader shouldn't have to walk every section to know that up front.
+For a step with no clean CLI surface — a wizard-driven Setup screen, Schema Builder's canvas, an explicitly open-ended "make it whatever you want" demo — don't force a payload. Write one line directly under the prose: **"No CLI equivalent — do this in the browser."** If the wizard's output is itself worth capturing in source control, follow up with a retrieve → deploy round trip instead of a hand-authored payload: `sf project retrieve start -m "<MetadataType>:<Member>"` once, to pull the builder-generated result into source control, then `sf project deploy start -m "<MetadataType>:<Member>" --json` from then on to redeploy that exact retrieved file. The click-path is how the artifact gets authored correctly once; the deploy command is what makes it a reproducible CLI payload after that.
 
 ## Stage 4 — Human Execution & Audit (never delegated)
 
-Per Rule 4.4, AI drafts files only — it never runs `sf`, `git commit`, `git checkout`, or touches the live org. The developer runs the One-Shot commands against the target org and pastes the raw `--json` output back. That output is saved verbatim, one file per command, under `badges/<NN_badge>/logs/UNIT_<N>_<DEPLOY|VERIFICATION_AUDIT>....json` — see the Unit 4 `logs/` directory for the reference naming.
+Per Rule 4.4, AI drafts files only — it never runs `sf`, `git commit`, or touches the live org. The developer runs the deploy and verification commands against the target org, one file per command, under `badges/<NN_badge>/logs/UNIT_<N>_<DEPLOY|VERIFICATION>....json`.
+
+**The log file records the command, not just its output.** A raw `--json` blob with no record of what produced it is useless once it's sitting alone in a `logs/` folder next to a dozen others. Every payload and verification block assigns the exact command to a `CMD` variable first, then captures both in the same file as two JSON Lines — a `{"command": ...}` record followed by the real `--json` output:
+
+```bash
+CMD="sf project deploy start -d force-app/main/default/objects/Property__c -o trailhead-playground --json"
+{ jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } | tee badges/<NN_badge>/logs/UNIT_<N>_GUIDED_DEPLOY_AUDIT.json
+```
+
+`jq -n --arg` handles quoting the command safely (SOQL's embedded single quotes, `sed`'s embedded double quotes) without hand-escaping it into the log line. This is what every payload/verification block in a unit doc should look like — not a bare `sf ...` invocation.
 
 ## Stage 5 — Post-Mortem
 
-Any hiccup hit during Stage 4 gets appended to that unit doc's **Technical Post-Mortem & Engineering Learnings** section as a Hiccup → Resolution pair, and periodically rolled up into `docs/REPORT.md`'s Learnings/Roadblocks sections.
+Any hiccup hit during Stage 4 gets appended to the unit doc's **Technical Post-Mortem & Engineering Learnings** section as a Hiccup → Resolution pair, and periodically rolled up into `docs/REPORT.md`.
 
 ---
 
 ## Output Skeleton (per unit doc)
 
 ```
-# Trailhead Unit: <Unit Name>
-Trail / Badge / Unit / Source URL header
+# <Unit Name>
+**Source:** link
 
-## One-Shot Execution Protocol (N Commands Total)
-## Requirement to CLI Command Mapping Matrix
-## Introduction & Learning Objectives
-## Part 1: Guided Activity (<Object/Component>)
-  ### <n>. [REQ-...] <step title>  — one subsection per Requirement ID, code block per step
-## Part 2: Hands-On Challenge (<Object/Component>)
-  (same shape as Part 1)
-## Resources & Reference Documentation
+## Learning Objectives
+## <one section per Trailhead heading, in order — prose, then payload + verification (or the GUI-only line) inline>
+## Resources
+
+---
+
+## Hands-On Challenge
+  <same shape as the Guided Activity — prose, then payload + verification>
+
 ## Technical Post-Mortem & Engineering Learnings
 ```
 
-File path: `docs/trails/developer_beginner/badges/<NN_badge>/UNIT_<N>_<NAME>.md`. Raw JSON outputs: `docs/trails/developer_beginner/badges/<NN_badge>/logs/`.
+File path: `docs/trails/developer_beginner/badges/<NN_badge>/UNIT_<N>_<NAME>.md`. Raw source: `.../raw/UNIT_<N>_RAW_GUIDED_ACTIVITY.md`. Deploy/verification logs: `.../logs/`.
 
 ---
 
 ## Parallelizing Across Units
 
-Stages 2–3 (content authoring) are the parallelizable part — each unit's draft is a distinct file, so one subagent per unit is safe to run concurrently. Stage 4 is never delegated and never parallel — it's one developer, one org, run in order.
+Stages 2–3 (content authoring) are the parallelizable part — each unit's draft is a distinct file, so one subagent per unit is safe to run concurrently, as long as that unit's raw content has already been pasted in full. Stage 4 is never delegated and never parallel — it's one developer, one org, run in order.
 
 Two things break naive fan-out, so hand every subagent a short shared-context note before it starts:
 
-- **Naming continuity:** later units reference object/field/profile names decided earlier in the same badge (e.g., `Energy_Audit__c`, `Type_of_Installation__c`). A subagent drafting Unit 3 blind can invent a name that collides with what Unit 1 already established.
-- **Shared roll-up files:** `badges/README.md` (badge sitemap table) and `DEVELOPER_BEGINNER_TRAIL.md` (trail progress table) are edited once per unit, by the coordinator, after each subagent's draft lands — never by two subagents at once.
+- **Naming continuity** — later units reference object/field names decided earlier in the same badge (e.g., `Property__c`, `Offer__c`). A subagent drafting Unit 3 blind can invent a name that collides with what Unit 1 already established.
+- **Shared roll-up files** — a badge's index doc, if one exists, and the trail progress table are edited once per unit, by the coordinator, after each subagent's draft lands — never by two subagents at once.
 
-Practical flow: paste in raw content for as many units as you've scraped → subagents fan out one-per-unit against this pipeline plus the current naming registry → drafts get reviewed and the two roll-up tables updated once → you take Stage 4 from there.
+Practical flow: paste in raw content for as many units as you've scraped → subagents fan out one-per-unit against this pipeline plus the current naming registry → drafts get reviewed and the roll-up files updated once → you take Stage 4 from there.
