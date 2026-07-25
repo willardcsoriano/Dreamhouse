@@ -7,6 +7,31 @@
 
 ---
 
+## Table of Contents
+
+- [Introduction & Learning Objectives](#introduction-learning-objectives)
+  - [Meet Ursa Major Solar](#meet-ursa-major-solar)
+- [Guided Activities (Consolidated Requirements & Solutions)](#guided-activities-consolidated-requirements-solutions)
+  - [Create a Custom Object](#create-a-custom-object)
+    - [`[REQ-5.1.G1.1]` Create Custom Object (`Energy_Audit__c`)](#req-51g11-create-custom-object-energy_audit__c)
+  - [Create a Custom Object Tab](#create-a-custom-object-tab)
+    - [`[REQ-5.1.G2.1]` Create Custom Object Tab (`Energy_Audit__c`)](#req-51g21-create-custom-object-tab-energy_audit__c)
+  - [Create Custom Fields](#create-custom-fields)
+    - [`[REQ-5.1.G3.1] – [REQ-5.1.G3.5]` Create & Deploy Custom Fields (`Energy_Audit__c`)](#req-51g31-req-51g35-create-deploy-custom-fields-energy_audit__c)
+  - [Create Energy Audit Records](#create-energy-audit-records)
+    - [`[REQ-5.1.G4.1] – [REQ-5.1.G4.4]` Insert Energy Audit Records](#req-51g41-req-51g44-insert-energy-audit-records)
+  - [Enable Feed Tracking](#enable-feed-tracking)
+    - [`[REQ-5.1.G5.1]` Enable Feed Tracking (`Energy_Audit__c`)](#req-51g51-enable-feed-tracking-energy_audit__c)
+  - [Resources](#resources)
+- [Hands-on Challenge (+500 points)](#hands-on-challenge-500-points)
+  - [Get Ready](#get-ready)
+  - [Your Challenge: Create a Custom Object and Custom Fields](#your-challenge-create-a-custom-object-and-custom-fields)
+  - [`[REQ-5.1.C1]` – `[REQ-5.1.C4]` Challenge Requirements — Already Deployed](#req-51c1-req-51c4-challenge-requirements-already-deployed)
+  - [`[REQ-5.1.C1] – [REQ-5.1.C4]` Verification Query & Challenge Check](#req-51c1-req-51c4-verification-query-challenge-check)
+    - [Expected Tooling API Output (`--json`):](#expected-tooling-api-output---json)
+- [Technical Post-Mortem & Hiccups Resolution](#technical-post-mortem-hiccups-resolution)
+  - [Key Engineering Hiccups & Solutions Encountered During Unit 1](#key-engineering-hiccups-solutions-encountered-during-unit-1)
+
 ## Introduction & Learning Objectives
 
 After completing this unit, you’ll be able to:
@@ -354,7 +379,7 @@ sf project deploy start \
 
 ---
 
-## Hands-on Challenge (+500 points) — Consolidated Requirements & Solutions
+## Hands-on Challenge (+500 points)
 
 ### Get Ready
 
@@ -401,192 +426,13 @@ If you haven’t already done so, complete the steps in this unit to create the 
 
 ---
 
-### `[REQ-5.1.C1]` Challenge 1: Custom Object Creation
+### `[REQ-5.1.C1]` – `[REQ-5.1.C4]` Challenge Requirements — Already Deployed
 
-- **Requirement Specifications:** Target: `Energy_Audit__c` | Label: `Energy Audit` | Plural: `Energy Audits` | Search: `Allow Search` | Status: `Deployed`
+This challenge builds the identical `Energy_Audit__c` object, tab, fields, and feed tracking already authored and deployed under `[REQ-5.1.G1.1]`–`[REQ-5.1.G5.1]` in the Guided Activity above — the Hands-On Challenge is that same build restated as a spec, not a second one. No additional payload to author or deploy.
 
-```bash
-mkdir -p force-app/main/default/objects/Energy_Audit__c/fields
+> **Note:** the Guided Activity narrative says `Ground mounted`; the Challenge spec says `Ground Mounted`. Salesforce picklist values are case-insensitive, so the value deployed under `[REQ-5.1.G3.1]` satisfies both wordings — do not author a second, differently-cased value.
 
-cat << 'EOF' > force-app/main/default/objects/Energy_Audit__c/Energy_Audit__c.object-meta.xml
-<?xml version="1.0" encoding="UTF-8"?>
-<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
-    <label>Energy Audit</label>
-    <pluralLabel>Energy Audits</pluralLabel>
-    <nameField>
-        <label>Energy Audit Name</label>
-        <type>Text</type>
-        <trackFeedHistory>true</trackFeedHistory>
-    </nameField>
-    <sharingModel>ReadWrite</sharingModel>
-    <deploymentStatus>Deployed</deploymentStatus>
-    <enableSearch>true</enableSearch>
-</CustomObject>
-EOF
-```
-
----
-
-### `[REQ-5.1.C2]` Challenge 2: Custom Tab Creation
-
-- **Requirement Specifications:** Target: `Energy_Audit__c` Tab | Custom Tab Motif: `Custom3: Sun`
-
-```bash
-mkdir -p force-app/main/default/tabs
-
-cat << 'EOF' > force-app/main/default/tabs/Energy_Audit__c.tab-meta.xml
-<?xml version="1.0" encoding="UTF-8"?>
-<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
-    <customObject>true</customObject>
-    <motif>Custom3: Sun</motif>
-</CustomTab>
-EOF
-```
-
----
-
-### `[REQ-5.1.C3.1]` Challenge 3.1: Generate Custom Fields XML
-
-- **Requirement Specifications Matrix:**
-  | Tag ID               | Field Type   | Label                        | API Name                          | Parameters & Specifications                                                        |
-  | :------------------- | :----------- | :--------------------------- | :-------------------------------- | :--------------------------------------------------------------------------------- |
-  | **`[REQ-5.1.C3.1]`** | Picklist     | Type of Installation         | `Type_of_Installation__c`         | Values: `Rooftop`, `Carport`, `Ground Mounted`                                     |
-  | **`[REQ-5.1.C3.2]`** | Lookup       | Account                      | `Account__c`                      | Related To: `Account` \| Required: `true` \| Constraint: `Restrict`                |
-  | **`[REQ-5.1.C3.3]`** | Currency     | Average Annual Electric Cost | `Average_Annual_Electric_Cost__c` | Precision: 16, Scale: 2 \| Required: `true` \| Help: `Annual cost per square foot` |
-  | **`[REQ-5.1.C3.4]`** | Number       | Annual Energy Usage (kWh)    | `Annual_Energy_Usage_kWh__c`      | Precision: 18, Scale: 0 \| Required: `true` \| Help: `Usage per square foot`       |
-  | **`[REQ-5.1.C3.5]`** | LongTextArea | Audit Notes                  | `Audit_Notes__c`                  | Length: 32768 \| Visible Lines: 5                                                  |
-
-```bash
-# 1. Type_of_Installation__c
-cat << 'EOF' > force-app/main/default/objects/Energy_Audit__c/fields/Type_of_Installation__c.field-meta.xml
-<?xml version="1.0" encoding="UTF-8"?>
-<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Type_of_Installation__c</fullName>
-    <label>Type of Installation</label>
-    <type>Picklist</type>
-    <valueSet>
-        <restricted>true</restricted>
-        <valueSetDefinition>
-            <sorted>false</sorted>
-            <value>
-                <fullName>Rooftop</fullName>
-                <default>true</default>
-                <label>Rooftop</label>
-            </value>
-            <value>
-                <fullName>Carport</fullName>
-                <default>false</default>
-                <label>Carport</label>
-            </value>
-            <value>
-                <fullName>Ground Mounted</fullName>
-                <default>false</default>
-                <label>Ground Mounted</label>
-            </value>
-        </valueSetDefinition>
-    </valueSet>
-</CustomField>
-EOF
-
-# 2. Account__c
-cat << 'EOF' > force-app/main/default/objects/Energy_Audit__c/fields/Account__c.field-meta.xml
-<?xml version="1.0" encoding="UTF-8"?>
-<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Account__c</fullName>
-    <label>Account</label>
-    <referenceTo>Account</referenceTo>
-    <relationshipName>Energy_Audits</relationshipName>
-    <relationshipLabel>Energy Audits</relationshipLabel>
-    <deleteConstraint>Restrict</deleteConstraint>
-    <type>Lookup</type>
-    <required>true</required>
-</CustomField>
-EOF
-
-# 3. Average_Annual_Electric_Cost__c
-cat << 'EOF' > force-app/main/default/objects/Energy_Audit__c/fields/Average_Annual_Electric_Cost__c.field-meta.xml
-<?xml version="1.0" encoding="UTF-8"?>
-<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Average_Annual_Electric_Cost__c</fullName>
-    <label>Average Annual Electric Cost</label>
-    <type>Currency</type>
-    <precision>16</precision>
-    <scale>2</scale>
-    <inlineHelpText>Annual cost per square foot</inlineHelpText>
-    <required>true</required>
-</CustomField>
-EOF
-
-# 4. Annual_Energy_Usage_kWh__c
-cat << 'EOF' > force-app/main/default/objects/Energy_Audit__c/fields/Annual_Energy_Usage_kWh__c.field-meta.xml
-<?xml version="1.0" encoding="UTF-8"?>
-<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Annual_Energy_Usage_kWh__c</fullName>
-    <label>Annual Energy Usage (kWh)</label>
-    <type>Number</type>
-    <precision>18</precision>
-    <scale>0</scale>
-    <inlineHelpText>Usage per square foot</inlineHelpText>
-    <required>true</required>
-</CustomField>
-EOF
-
-# 5. Audit_Notes__c
-cat << 'EOF' > force-app/main/default/objects/Energy_Audit__c/fields/Audit_Notes__c.field-meta.xml
-<?xml version="1.0" encoding="UTF-8"?>
-<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Audit_Notes__c</fullName>
-    <label>Audit Notes</label>
-    <type>LongTextArea</type>
-    <length>32768</length>
-    <visibleLines>5</visibleLines>
-</CustomField>
-EOF
-```
-
----
-
-### `[REQ-5.1.C3.2]` Challenge 3.2: Provision FLS & Deploy Metadata Package
-
-- **Requirement Specifications:** Deploy metadata package & FLS permissions to cloud org.
-
-```bash
-UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
-mkdir -p "$UNIT_DIR"
-
-sed -i '/<\/Profile>/i \    <fieldPermissions>\n        <editable>true</editable>\n        <field>Energy_Audit__c.Type_of_Installation__c</field>\n        <readable>true</readable>\n    </fieldPermissions>\n    <fieldPermissions>\n        <editable>true</editable>\n        <field>Energy_Audit__c.Audit_Notes__c</field>\n        <readable>true</readable>\n    </fieldPermissions>' force-app/main/default/profiles/Admin.profile-meta.xml
-
-sf project deploy start \
-  -d force-app/main/default/objects/Energy_Audit__c \
-  -d force-app/main/default/tabs \
-  -d force-app/main/default/profiles \
-  -o trailhead-playground \
-  --json | tee "$UNIT_DIR/UNIT_1_CHALLENGE_DEPLOY_AUDIT.json"
-```
-
----
-
-### `[REQ-5.1.C4]` Challenge 4: Enable Feed Tracking
-
-- **Requirement Specifications:** Enable Feed Tracking (`enableFeeds=true` on `Energy_Audit__c`) & `trackFeedHistory=true` across all 6 fields (`Name` + 5 custom fields)
-
-```bash
-UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
-mkdir -p "$UNIT_DIR"
-
-sed -i '/<nameField>/,/<\/nameField>/ { /<\/nameField>/i \        <trackFeedHistory>true</trackFeedHistory>' -e '}' force-app/main/default/objects/Energy_Audit__c/Energy_Audit__c.object-meta.xml
-sed -i '/<\/CustomObject>/i \    <enableFeeds>true</enableFeeds>' force-app/main/default/objects/Energy_Audit__c/Energy_Audit__c.object-meta.xml
-sed -i '/<\/CustomField>/i \    <trackFeedHistory>true</trackFeedHistory>' force-app/main/default/objects/Energy_Audit__c/fields/*.xml
-
-sf project deploy start \
-  -d force-app/main/default/objects/Energy_Audit__c \
-  -o trailhead-playground \
-  --json | tee -a "$UNIT_DIR/UNIT_1_CHALLENGE_DEPLOY_AUDIT.json"
-```
-
----
-
-### `[REQ-5.1.C1] – [REQ-5.1.C4]` Challenge 5: Verification Query & Challenge Check
+### `[REQ-5.1.C1] – [REQ-5.1.C4]` Verification Query & Challenge Check
 
 - **Requirement Specifications:** Verify `Energy_Audit__c` schema definitions via `--use-tooling-api --json` before clicking **Check Challenge**.
 
