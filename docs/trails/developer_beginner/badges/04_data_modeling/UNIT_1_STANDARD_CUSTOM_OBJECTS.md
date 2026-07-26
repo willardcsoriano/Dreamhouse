@@ -25,7 +25,9 @@ After completing this unit, you'll be able to:
 - Explain the difference between standard objects and custom objects.
 - List the types of custom fields an object can have.
 
-> **Accessibility:** This unit requires some additional instructions for screen reader users. To access a detailed screen reader version of this unit, click this link: Open Trailhead screen reader instructions.
+> **Note:** Accessibility
+>
+> This unit requires some additional instructions for screen reader users. To access a detailed screen reader version of this unit, click this link: Open Trailhead screen reader instructions.
 
 ## Overview of Objects
 
@@ -62,9 +64,7 @@ Objects are containers for your information, but they also give you special func
 Follow along as D'Angelo to see how he builds the Property object. You need this object later, so don't skip these steps!
 
 1. Scroll to the bottom of this page and create a Trailhead Playground. Don't skip this step! You need to use a fresh and clean Trailhead Playground for this module.
-
-   > Note: Even if you're completing this module as part of the Admin Beginner trail, be sure and create a new Trailhead Playground to complete these steps. You don't need to reinstall the Dreamhouse app in the new playground org.
-
+   > **Note:** Even if you're completing this module as part of the Admin Beginner trail, be sure and create a new Trailhead Playground to complete these steps. You don't need to reinstall the Dreamhouse app in the new playground org.
 2. Once your playground is created (it takes a minute!), press **Launch**.
 3. Click the gear icon at the top of the page and launch setup.
 4. Click the **Object Manager** tab.
@@ -79,7 +79,8 @@ Follow along as D'Angelo to see how he builds the Property object. You need this
 Steps 1–3 (playground creation, launch, Setup) have no CLI equivalent — do this in the browser. Steps 4–11 create the object itself, which does have a Metadata API surface:
 
 ```bash
-mkdir -p force-app/main/default/objects/Property__c/fields
+# Deploys Property__c object metadata with plain text name field and default ReadWrite sharing model
+mkdir -p force-app/main/default/objects/Property__c/fields # scaffolds folder structure for Property__c metadata
 
 # Property custom object — Text name field, ReadWrite sharing (default)
 cat << 'EOF' > force-app/main/default/objects/Property__c/Property__c.object-meta.xml
@@ -97,7 +98,9 @@ cat << 'EOF' > force-app/main/default/objects/Property__c/Property__c.object-met
 EOF
 ```
 
-Great job! You just created your first custom object. Now, learn about adding fields to this object. The deploy and verification for `Property__c` are folded into the **Create a Custom Field** section below, since Trailhead has you add the `Price__c` field before ever saving the object metadata to source.
+**Deploy and verification deferred — folded into the _Create a Custom Field_ step below, because Trailhead has you add the Price__c field before saving and deploying the object metadata.**
+
+Great job! You just created your first custom object. Now, learn about adding fields to this object.
 
 ## Get to Know Fields
 
@@ -138,6 +141,7 @@ The Property object you just created is pretty bare-bones. Add some custom field
 8. Click **Next**, **Next** again, and then **Save**.
 
 ```bash
+# Deploys required Price__c Currency field and deploys Property__c object schema atomically to the org, followed by Tooling API verification
 # Price__c Currency field — required, so it auto-grants universal FLS and skips fieldPermissions entirely
 cat << 'EOF' > force-app/main/default/objects/Property__c/fields/Price__c.field-meta.xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -152,17 +156,17 @@ cat << 'EOF' > force-app/main/default/objects/Property__c/fields/Price__c.field-
 </CustomField>
 EOF
 
-mkdir -p docs/trails/developer_beginner/badges/04_data_modeling/logs
+mkdir -p docs/trails/developer_beginner/badges/04_data_modeling/logs # creates logs directory for deploy/verification audit records
 
 # Deploy the Property__c object and Price__c field to the Trailhead Playground
-CMD="sf project deploy start -d force-app/main/default/objects/Property__c -o trailhead-playground --json"
+CMD="sf project deploy start -d force-app/main/default/objects/Property__c -o trailhead-playground --json" # constructs deploy command target
 { jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } \
-  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_1_GUIDED_DEPLOY_AUDIT.json
+  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_1_GUIDED_DEPLOY_AUDIT.json # executes deploy and records JSON audit log
 
 # Verify Property__c's fields, their data types, and required-ness via the Tooling API
-CMD="sf data query -o trailhead-playground --use-tooling-api --json -q \"SELECT QualifiedApiName, DataType, IsRequired FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = 'Property__c'\""
+CMD="sf data query -o trailhead-playground --use-tooling-api --json -q \"SELECT QualifiedApiName, DataType, IsRequired FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = 'Property__c'\"" # constructs verification Tooling API SOQL query
 { jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } \
-  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_1_GUIDED_VERIFICATION_AUDIT.json
+  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_1_GUIDED_VERIFICATION_AUDIT.json # executes verification query and records JSON audit log
 ```
 
 You'll see your new Price field in the list of Property fields. In the Field Name column, notice that it says `Price__c` — the "__c" is an easy way to tell that a particular field is a custom field.
@@ -227,8 +231,9 @@ When a homebuyer makes an offer to buy a property, the brokers at DreamHouse Rea
    - Field Name: `Target_Close_Date`
 
 ```bash
-mkdir -p force-app/main/default/objects/Offer__c/fields
-mkdir -p docs/trails/developer_beginner/badges/04_data_modeling/logs
+# Deploys custom Offer__c object with AutoNumber name field, Offer_Amount__c, Target_Close_Date__c, and Admin profile FLS grants atomically
+mkdir -p force-app/main/default/objects/Offer__c/fields # scaffolds directory structure for Offer__c fields
+mkdir -p docs/trails/developer_beginner/badges/04_data_modeling/logs # creates logs directory for challenge audit records
 
 # Offer custom object — AutoNumber name field, format OF-{0000}, starts at 1 by default
 cat << 'EOF' > force-app/main/default/objects/Offer__c/Offer__c.object-meta.xml
@@ -260,7 +265,7 @@ cat << 'EOF' > force-app/main/default/objects/Offer__c/fields/Offer_Amount__c.fi
 EOF
 
 # Not required — needs explicit FLS to avoid the Ghost Field anti-pattern (field exists but is invisible/non-editable by default)
-sed -i '/<\/Profile>/i \    <fieldPermissions>\n        <editable>true</editable>\n        <field>Offer__c.Offer_Amount__c</field>\n        <readable>true</readable>\n    </fieldPermissions>' force-app/main/default/profiles/Admin.profile-meta.xml
+sed -i '/<\/Profile>/i \    <fieldPermissions>\n        <editable>true</editable>\n        <field>Offer__c.Offer_Amount__c</field>\n        <readable>true</readable>\n    </fieldPermissions>' force-app/main/default/profiles/Admin.profile-meta.xml # injects FLS permission into Admin profile
 
 # Target_Close_Date__c Date field — not required, so it needs explicit FLS below
 cat << 'EOF' > force-app/main/default/objects/Offer__c/fields/Target_Close_Date__c.field-meta.xml
@@ -274,22 +279,22 @@ cat << 'EOF' > force-app/main/default/objects/Offer__c/fields/Target_Close_Date_
 EOF
 
 # Not required — needs explicit FLS to avoid the Ghost Field anti-pattern
-sed -i '/<\/Profile>/i \    <fieldPermissions>\n        <editable>true</editable>\n        <field>Offer__c.Target_Close_Date__c</field>\n        <readable>true</readable>\n    </fieldPermissions>' force-app/main/default/profiles/Admin.profile-meta.xml
+sed -i '/<\/Profile>/i \    <fieldPermissions>\n        <editable>true</editable>\n        <field>Offer__c.Target_Close_Date__c</field>\n        <readable>true</readable>\n    </fieldPermissions>' force-app/main/default/profiles/Admin.profile-meta.xml # injects FLS permission into Admin profile
 
 # Deploy Offer__c's schema and its Admin profile FLS grants atomically — never as two separate deploys that could land out of order
-CMD="sf project deploy start -d force-app/main/default/objects/Offer__c -d force-app/main/default/profiles -o trailhead-playground --json"
+CMD="sf project deploy start -d force-app/main/default/objects/Offer__c -d force-app/main/default/profiles -o trailhead-playground --json" # constructs combined deploy command
 { jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } \
-  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_1_CHALLENGE_DEPLOY_AUDIT.json
+  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_1_CHALLENGE_DEPLOY_AUDIT.json # runs deploy and captures audit log
 
 # Verify Offer__c's fields and their data types via the Tooling API
-CMD="sf data query -o trailhead-playground --use-tooling-api --json -q \"SELECT QualifiedApiName, DataType FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = 'Offer__c'\""
+CMD="sf data query -o trailhead-playground --use-tooling-api --json -q \"SELECT QualifiedApiName, DataType FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = 'Offer__c'\"" # SOQL query to inspect deployed Offer__c schema
 { jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } \
-  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_1_CHALLENGE_VERIFICATION_AUDIT_SCHEMA.json
+  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_1_CHALLENGE_VERIFICATION_AUDIT_SCHEMA.json # executes schema verification query
 
 # Verify the sed-based FLS grants actually landed on the Admin profile — confirms Offer_Amount__c and Target_Close_Date__c aren't Ghost Fields
-CMD="sf data query -o trailhead-playground --use-tooling-api --json -q \"SELECT Field, PermissionsRead, PermissionsEdit FROM FieldPermissions WHERE SobjectType='Offer__c'\""
+CMD="sf data query -o trailhead-playground --use-tooling-api --json -q \"SELECT Field, PermissionsRead, PermissionsEdit FROM FieldPermissions WHERE SobjectType='Offer__c'\"" # SOQL query to inspect Admin profile field permissions on Offer__c
 { jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } \
-  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_1_CHALLENGE_VERIFICATION_AUDIT_FIELDPERMISSIONS.json
+  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_1_CHALLENGE_VERIFICATION_AUDIT_FIELDPERMISSIONS.json # executes FLS verification query
 ```
 
 ## Technical Post-Mortem & Engineering Learnings
