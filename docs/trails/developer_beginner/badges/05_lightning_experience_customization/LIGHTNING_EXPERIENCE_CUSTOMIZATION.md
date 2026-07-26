@@ -23,6 +23,7 @@ This badge covers customizing the Lightning Experience user interface for DreamH
   - [3. [Unit 3: Create and Customize List Views](UNIT_3_CREATE_AND_CUSTOMIZE_LIST_VIEWS.md)](#3-unit-3-create-and-customize-list-viewsunit_3_create_and_customize_list_viewsmd)
   - [4. [Unit 4: Customize Record Highlights with Compact Layouts](UNIT_4_CUSTOMIZE_RECORD_HIGHLIGHTS_WITH_COMPACT_LAYOUTS.md)](#4-unit-4-customize-record-highlights-with-compact-layoutsunit_4_customize_record_highlights_with_compact_layoutsmd)
   - [5. [Unit 5: Customize Record Page Components and Fields](UNIT_5_CUSTOMIZE_RECORD_PAGE_COMPONENTS_AND_FIELDS.md)](#5-unit-5-customize-record-page-components-and-fieldsunit_5_customize_record_page_components_and_fieldsmd)
+  - [6. [Unit 6: Create Custom Buttons and Links](UNIT_6_CREATE_AND_CUSTOMIZE_BUTTONS_AND_LINKS.md)](#6-unit-6-create-custom-buttons-and-linksunit_6_create_and_customize_buttons_and_linksmd)
 - [Execution Protocol](#execution-protocol)
 
 ## Badge Units Index
@@ -69,6 +70,15 @@ This badge covers customizing the Lightning Experience user interface for DreamH
 - **Focus:** Dynamic Forms record pages (`Energy_Audit_Record_Page_for_Sales`, `Contact_Record_Page_for_Sales`), Files related lists on `Energy_Audit__c` and `Contact` layouts, and page activation (App/Record-Type/Profile for Energy Audit, Org Default for Contact).
 - **Tooling Paradigm:** Hybrid — Lightning App Builder for Dynamic Forms conversion and both required Activation clicks (confirmed non-deployable via any Metadata/Tooling API), 100% Hands-on SFDX CLI for everything else, including a from-scratch hand-authored `FlexiPage` for Contact modeled on Energy Audit's proven, already-deployed structure.
 - **Status:** **COMPLETED & VERIFIED**
+
+---
+
+### 6. [Unit 6: Create Custom Buttons and Links](UNIT_6_CREATE_AND_CUSTOMIZE_BUTTONS_AND_LINKS.md)
+
+- **File Link (Absolute):** [UNIT_6_CREATE_AND_CUSTOMIZE_BUTTONS_AND_LINKS.md](file:///home/willard/repos/Dreamhouse/docs/trails/developer_beginner/badges/05_lightning_experience_customization/UNIT_6_CREATE_AND_CUSTOMIZE_BUTTONS_AND_LINKS.md)
+- **Focus:** Custom Buttons and Links (`Audit Guidelines` list button on `Energy_Audit__c`, `Google This Account` detail page link on `Account`, `Map Location` detail page button on `Account`, `Google Info` detail page button on `Contact`).
+- **Tooling Paradigm:** Declarative Salesforce UI & SFDX metadata deployment.
+- **Status:** **DOCUMENTED (In Progress)**
 
 ---
 
