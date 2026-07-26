@@ -1,23 +1,37 @@
-# Optimize Customer Data with Standard and Custom Objects
+# Trailhead Unit: Optimize Customer Data with Standard and Custom Objects
 
-**Source:** [trailhead.salesforce.com](https://trailhead.salesforce.com/content/learn/modules/data_modeling/objects_intro?trail_id=force_com_dev_beginner)
+**Trail:** Developer Beginner  
+**Badge 04:** Data Modeling  
+**Unit 1:** Optimize Customer Data with Standard and Custom Objects  
+**Source URL:** [trailhead.salesforce.com](https://trailhead.salesforce.com/content/learn/modules/data_modeling/objects_intro?trail_id=force_com_dev_beginner)
+
+---
 
 ## Table of Contents
 
-- [Learning Objectives](#learning-objectives)
-- [Overview of Objects](#overview-of-objects)
-- [Get to Know Objects](#get-to-know-objects)
-- [Create a Custom Object](#create-a-custom-object)
-- [Get to Know Fields](#get-to-know-fields)
-- [Create a Custom Field](#create-a-custom-field)
-- [Create a Record](#create-a-record)
-- [Customize Responsibly](#customize-responsibly)
-- [Resources](#resources)
-- [Hands-On Challenge](#hands-on-challenge)
-  - [Your Challenge — Build a custom Offer object](#your-challenge-build-a-custom-offer-object)
-- [Technical Post-Mortem & Engineering Learnings](#technical-post-mortem-engineering-learnings)
+- [Introduction & Learning Objectives](#introduction--learning-objectives)
+- [Guided Activities (Consolidated Requirements & Solutions)](#guided-activities-consolidated-requirements-solutions)
+  - [Overview of Objects](#overview-of-objects)
+  - [Get to Know Objects](#get-to-know-objects)
+  - [Create a Custom Object](#create-a-custom-object)
+    - [`[REQ-4.1.G1.1]` Create Custom Object (`Property__c`)](#req-41g11-create-custom-object-property__c)
+  - [Get to Know Fields](#get-to-know-fields)
+  - [Create a Custom Field](#create-a-custom-field)
+    - [`[REQ-4.1.G2.1]` Create Custom Field (`Price__c`)](#req-41g21-create-custom-field-price__c)
+  - [Create a Record](#create-a-record)
+  - [Customize Responsibly](#customize-responsibly)
+  - [Resources](#resources)
+- [Hands-On Challenge (+500 points)](#hands-on-challenge-500-points)
+  - [Get Ready](#get-ready)
+  - [Your Challenge: Build a custom Offer object](#your-challenge-build-a-custom-offer-object)
+    - [`[REQ-4.1.C1.1]` Create Custom Object (`Offer__c`)](#req-41c11-create-custom-object-offer__c)
+    - [`[REQ-4.1.C1.2]` Create Custom Field (`Offer_Amount__c`)](#req-41c12-create-custom-field-offer_amount__c)
+    - [`[REQ-4.1.C1.3]` Create Custom Field (`Target_Close_Date__c`)](#req-41c13-create-custom-field-target_close_date__c)
+- [Technical Post-Mortem & Engineering Learnings](#technical-post-mortem--engineering-learnings)
 
-## Learning Objectives
+---
+
+## Introduction & Learning Objectives
 
 After completing this unit, you'll be able to:
 
@@ -25,9 +39,13 @@ After completing this unit, you'll be able to:
 - Explain the difference between standard objects and custom objects.
 - List the types of custom fields an object can have.
 
-> **Accessibility:** This unit requires some additional instructions for screen reader users. To access a detailed screen reader version of this unit, click this link: Open Trailhead screen reader instructions.
+> **Accessibility Note:** This unit requires some additional instructions for screen reader users. To access a detailed screen reader version of this unit, click this link: Open Trailhead screen reader instructions.
 
-## Overview of Objects
+---
+
+## Guided Activities (Consolidated Requirements & Solutions)
+
+### Overview of Objects
 
 DreamHouse is a realty company that provides a way for customers to shop for homes and contact real estate agents online. DreamHouse brokers use some of the standard Salesforce CRM functionality, like contacts and leads, to manage customer data of home buyers.
 
@@ -47,7 +65,9 @@ _A property record with the same information as the table._
 
 When we talk about the data model, we're talking about the collection of objects and fields in an app. Learn more about objects and fields so you can start building your own data model.
 
-## Get to Know Objects
+---
+
+### Get to Know Objects
 
 Salesforce supports several different types of objects. There are standard objects, custom objects, external objects, platform events, and BigObjects. In this module, we focus on the two most common types of objects: standard and custom.
 
@@ -57,13 +77,15 @@ Custom objects are objects that you create to store information that's specific 
 
 Objects are containers for your information, but they also give you special functionality. For example, when you create a custom object, the platform automatically builds things like the page layout for the user interface.
 
-## Create a Custom Object
+---
+
+### Create a Custom Object
 
 Follow along as D'Angelo to see how he builds the Property object. You need this object later, so don't skip these steps!
 
 1. Scroll to the bottom of this page and create a Trailhead Playground. Don't skip this step! You need to use a fresh and clean Trailhead Playground for this module.
 
-   > Note: Even if you're completing this module as part of the Admin Beginner trail, be sure and create a new Trailhead Playground to complete these steps. You don't need to reinstall the Dreamhouse app in the new playground org.
+   > **Note:** Even if you're completing this module as part of the Admin Beginner trail, be sure and create a new Trailhead Playground to complete these steps. You don't need to reinstall the Dreamhouse app in the new playground org.
 
 2. Once your playground is created (it takes a minute!), press **Launch**.
 3. Click the gear icon at the top of the page and launch setup.
@@ -76,7 +98,11 @@ Follow along as D'Angelo to see how he builds the Property object. You need this
 10. On the New Custom Object Tab page, click the **Tab Style** field and select a style you like. The style sets the icon to display in the UI for the object.
 11. Click **Next**, **Next**, and **Save**.
 
-Steps 1–3 (playground creation, launch, Setup) have no CLI equivalent — do this in the browser. Steps 4–11 create the object itself, which does have a Metadata API surface:
+Steps 1–3 (playground creation, launch, Setup) have no CLI equivalent — do this in the browser. Steps 4–11 create the object itself, which does have a Metadata API surface.
+
+#### `[REQ-4.1.G1.1]` Create Custom Object (`Property__c`)
+
+- **Requirement Specifications:** Target: `Property__c` | Label: `Property` | Plural: `Properties` | Record Name: `Property Name` (Text) | Sharing: `ReadWrite` | Status: `Deployed`
 
 ```bash
 mkdir -p force-app/main/default/objects/Property__c/fields
@@ -99,16 +125,18 @@ EOF
 
 Great job! You just created your first custom object. Now, learn about adding fields to this object. The deploy and verification for `Property__c` are folded into the **Create a Custom Field** section below, since Trailhead has you add the `Price__c` field before ever saving the object metadata to source.
 
-## Get to Know Fields
+---
+
+### Get to Know Fields
 
 Every standard and custom object has fields attached to it. Get familiar with the different types of fields.
 
-| Field Type | What is it?                                                                                                                                                                                                                                         | Can I get an example?                                                                  |
-| :--------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------- |
-| Identity   | An 18-character, case-insensitive value that's automatically generated for every record. You can find a record's ID in its URL. Note: Records also have a 15-character case-sensitive version of its ID that can be used for specific applications. | An account ID looks like `0015000000Gv7qJAAN`.                                         |
-| System     | Read-only fields that provide information about a record from the system, like when the record was created or when it was last changed.                                                                                                             | `CreatedDate`, `LastModifiedById`, and `LastModifiedDate`.                             |
-| Name       | All records need names so you can distinguish between them. You can use text names or auto-numbered names that automatically increment every time you create a record.                                                                              | A contact's name can be Julie Bean. A support case's name can be CA-1024.              |
-| Custom     | Fields you create on standard or custom objects are called custom fields.                                                                                                                                                                           | You can create a custom field on the Contact object to store your contacts' birthdays. |
+| Field Type   | What is it?                                                                                                                                                                                                                                         | Can I get an example?                                                                  |
+| :----------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------- |
+| **Identity** | An 18-character, case-insensitive value that's automatically generated for every record. You can find a record's ID in its URL. Note: Records also have a 15-character case-sensitive version of its ID that can be used for specific applications. | An account ID looks like `0015000000Gv7qJAAN`.                                         |
+| **System**   | Read-only fields that provide information about a record from the system, like when the record was created or when it was last changed.                                                                                                             | `CreatedDate`, `LastModifiedById`, and `LastModifiedDate`.                             |
+| **Name**     | All records need names so you can distinguish between them. You can use text names or auto-numbered names that automatically increment every time you create a record.                                                                              | A contact's name can be Julie Bean. A support case's name can be CA-1024.              |
+| **Custom**   | Fields you create on standard or custom objects are called custom fields.                                                                                                                                                                           | You can create a custom field on the Contact object to store your contacts' birthdays. |
 
 Identity, system, and name fields are standard on every object in Salesforce. Each standard object also comes with a set of prebuilt, standard fields. You can customize standard objects by adding custom fields, and you can add custom fields to your custom objects.
 
@@ -122,7 +150,9 @@ Salesforce supports a bunch of different data types, but here are a few you'll r
 
 Again, there are quite a few field types, but most of them are fairly self-explanatory. The important takeaway here is that you want to think about what kind of data you're trying to store when you create a custom field.
 
-## Create a Custom Field
+---
+
+### Create a Custom Field
 
 The Property object you just created is pretty bare-bones. Add some custom fields to it. Head back to your Trailhead Playground.
 
@@ -136,6 +166,10 @@ The Property object you just created is pretty bare-bones. Add some custom field
    - Description: "The listed sale price of the home."
 7. Check the **Required** box.
 8. Click **Next**, **Next** again, and then **Save**.
+
+#### `[REQ-4.1.G2.1]` Create Custom Field (`Price__c`)
+
+- **Requirement Specifications:** Target: `Property__c.Price__c` | Label: `Price` | Type: `Currency` | Description: `The listed sale price of the home.` | Required: `true`
 
 ```bash
 # Price__c Currency field — required, so it auto-grants universal FLS and skips fieldPermissions entirely
@@ -167,7 +201,9 @@ CMD="sf data query -o trailhead-playground --use-tooling-api --json -q \"SELECT 
 
 You'll see your new Price field in the list of Property fields. In the Field Name column, notice that it says `Price__c` — the "__c" is an easy way to tell that a particular field is a custom field.
 
-## Create a Record
+---
+
+### Create a Record
 
 Now, create a property record to see what you did.
 
@@ -182,7 +218,9 @@ _The record you just created._
 
 No CLI equivalent — creating a demo record through the UI is the point of this step, not something to script.
 
-## Customize Responsibly
+---
+
+### Customize Responsibly
 
 While it can seem easy to add and customize objects, remember that what's going on under the hood is technically complicated. Here are some best practices to keep in mind as you start customizing your own org.
 
@@ -192,7 +230,9 @@ While it can seem easy to add and customize objects, remember that what's going 
 
 **Require fields when necessary.** Sometimes, you'll want to force your users to fill out a field when they're creating a record on a certain object. Every property needs a price, right? Make important fields required to avoid incomplete data.
 
-## Resources
+---
+
+### Resources
 
 - Salesforce Help: Customize Your Salesforce Org
 - Salesforce Help: Store Information That's Unique to Your Organization
@@ -200,13 +240,13 @@ While it can seem easy to add and customize objects, remember that what's going 
 
 ---
 
-## Hands-On Challenge
+## Hands-On Challenge (+500 points)
 
-+500 points
+### Get Ready
 
-**Get Ready:** You'll be completing this unit in your own hands-on org. Click Launch to get started, or click the name of your org to choose a different one.
+You'll be completing this unit in your own hands-on org. Click Launch to get started, or click the name of your org to choose a different one.
 
-### Your Challenge — Build a custom Offer object
+### Your Challenge: Build a custom Offer object
 
 When a homebuyer makes an offer to buy a property, the brokers at DreamHouse Realty need to track the details in Salesforce. Create a custom object they can use to record the offer amount and target close date for the sale. Use auto numbering to generate the name of each offer record.
 
@@ -225,6 +265,18 @@ When a homebuyer makes an offer to buy a property, the brokers at DreamHouse Rea
    - Data Type: Date
    - Field Label: `Target Close Date`
    - Field Name: `Target_Close_Date`
+
+#### `[REQ-4.1.C1.1]` Create Custom Object (`Offer__c`)
+
+- **Requirement Specifications:** Target: `Offer__c` | Label: `Offer` | Plural: `Offers` | Name: `Offer Name` | Type: `AutoNumber` (`OF-{0000}`)
+
+#### `[REQ-4.1.C1.2]` Create Custom Field (`Offer_Amount__c`)
+
+- **Requirement Specifications:** Target: `Offer__c.Offer_Amount__c` | Label: `Offer Amount` | Type: `Currency` | Precision: `18` | Scale: `2`
+
+#### `[REQ-4.1.C1.3]` Create Custom Field (`Target_Close_Date__c`)
+
+- **Requirement Specifications:** Target: `Offer__c.Target_Close_Date__c` | Label: `Target Close Date` | Type: `Date`
 
 ```bash
 mkdir -p force-app/main/default/objects/Offer__c/fields
@@ -291,6 +343,8 @@ CMD="sf data query -o trailhead-playground --use-tooling-api --json -q \"SELECT 
 { jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } \
   | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_1_CHALLENGE_VERIFICATION_AUDIT_FIELDPERMISSIONS.json
 ```
+
+---
 
 ## Technical Post-Mortem & Engineering Learnings
 

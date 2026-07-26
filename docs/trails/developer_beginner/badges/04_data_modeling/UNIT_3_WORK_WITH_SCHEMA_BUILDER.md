@@ -1,20 +1,33 @@
-# Work with Schema Builder
+# Trailhead Unit: Work with Schema Builder
 
-**Source:** [trailhead.salesforce.com](https://trailhead.salesforce.com/content/learn/modules/data_modeling/schema_builder?trail_id=force_com_dev_beginner)
+**Trail:** Developer Beginner  
+**Badge 04:** Data Modeling  
+**Unit 3:** Work with Schema Builder  
+**Source URL:** [trailhead.salesforce.com](https://trailhead.salesforce.com/content/learn/modules/data_modeling/schema_builder?trail_id=force_com_dev_beginner)
+
+---
 
 ## Table of Contents
 
-- [Learning Objectives](#learning-objectives)
-- [See Your Data Model in Action](#see-your-data-model-in-action)
-- [Create an Object with Schema Builder](#create-an-object-with-schema-builder)
-- [Create Fields with Schema Builder](#create-fields-with-schema-builder)
-- [Sum It Up](#sum-it-up)
-- [Resources](#resources)
-- [Hands-On Challenge](#hands-on-challenge)
-  - [Your Challenge — Use Schema Builder to create a custom field for the Property object](#your-challenge-use-schema-builder-to-create-a-custom-field-for-the-property-object)
-- [Technical Post-Mortem & Engineering Learnings](#technical-post-mortem-engineering-learnings)
+- [Introduction & Learning Objectives](#introduction--learning-objectives)
+- [Guided Activities (Consolidated Requirements & Solutions)](#guided-activities-consolidated-requirements-solutions)
+  - [See Your Data Model in Action](#see-your-data-model-in-action)
+    - [`[REQ-4.3.G1.1]` See Your Data Model in Action](#req-43g11-see-your-data-model-in-action)
+  - [Create an Object with Schema Builder](#create-an-object-with-schema-builder)
+    - [`[REQ-4.3.G2.1]` Create an Object with Schema Builder](#req-43g21-create-an-object-with-schema-builder)
+  - [Create Fields with Schema Builder](#create-fields-with-schema-builder)
+    - [`[REQ-4.3.G3.1]` Create Fields with Schema Builder](#req-43g31-create-fields-with-schema-builder)
+  - [Sum It Up](#sum-it-up)
+  - [Resources](#resources)
+- [Hands-On Challenge (+500 points)](#hands-on-challenge-500-points)
+  - [Get Ready](#get-ready)
+  - [Your Challenge: Use Schema Builder to create a custom field for the Property object](#your-challenge-use-schema-builder-to-create-a-custom-field-for-the-property-object)
+    - [`[REQ-4.3.C1.1]` Create Custom Field (`Street_Address__c`)](#req-43c11-create-custom-field-street_address__c)
+- [Technical Post-Mortem & Engineering Learnings](#technical-post-mortem--engineering-learnings)
 
-## Learning Objectives
+---
+
+## Introduction & Learning Objectives
 
 After completing this unit, you'll be able to:
 
@@ -23,9 +36,13 @@ After completing this unit, you'll be able to:
 - Use Schema Builder to add a custom object to your schema.
 - Use Schema Builder to add a custom field to your schema.
 
-> **Accessibility:** This unit requires some additional instructions for screen reader users. To access a detailed screen reader version of this unit, click this link: Open Trailhead screen reader instructions.
+> **Accessibility Note:** This unit requires some additional instructions for screen reader users. To access a detailed screen reader version of this unit, click this link: Open Trailhead screen reader instructions.
 
-## See Your Data Model in Action
+---
+
+## Guided Activities (Consolidated Requirements & Solutions)
+
+### See Your Data Model in Action
 
 By now, you and D'Angelo have created a handful of custom objects, fields, and relationships. Your app's data model is starting to get a little more complicated.
 
@@ -47,9 +64,13 @@ Notice that you can drag these objects around the canvas. This doesn't change yo
 
 _D'Angelo explaining the DreamHouse app schema to Michelle._
 
+#### `[REQ-4.3.G1.1]` See Your Data Model in Action
+
 No CLI equivalent — Schema Builder's Auto-Layout canvas is a read-only visualization of objects and relationships that already exist. It doesn't create, verify, or change anything a deploy or query could confirm; do this in the browser.
 
-## Create an Object with Schema Builder
+---
+
+### Create an Object with Schema Builder
 
 You can also create objects using Schema Builder. If you prefer, you can create objects in this visual interface if you're designing your system and want to be able to revise all your customizations on the spot. Here's how it's done.
 
@@ -60,9 +81,13 @@ You can also create objects using Schema Builder. If you prefer, you can create 
 
 Your new object appears in the Schema Builder. That was quick! Next, add some fields.
 
+#### `[REQ-4.3.G2.1]` Create an Object with Schema Builder
+
 No CLI equivalent — Trailhead deliberately leaves this object's label and fields up to you ("make it whatever you want"), so there's no fixed schema to hand-author a payload against. Do this in the browser.
 
-## Create Fields with Schema Builder
+---
+
+### Create Fields with Schema Builder
 
 Creating fields with Schema Builder is just like creating objects.
 
@@ -74,28 +99,34 @@ Cool! If you go back through Object Manager, you'll see your new object shows up
 
 _A comparison of an object in Object Manager and Schema Builder._
 
+#### `[REQ-4.3.G3.1]` Create Fields with Schema Builder
+
 No CLI equivalent, for the same reason as the object above — this field's type and label are an open-ended choice, not a fixed requirement. Do this in the browser.
 
-## Sum It Up
+---
+
+### Sum It Up
 
 We've learned a lot in this module. First, you learned about the data model and the database including objects, fields, and records and created some of each for our DreamHouse app. Then you learned about relationships between objects and how you can visualize your data model using Schema Builder.
 
 As you start to dive into more advanced content, you'll see custom objects and fields everywhere. Before you know it, you'll be a data modeling pro. Happy building!
 
-## Resources
+---
+
+### Resources
 
 - Salesforce Help: Design Your Own Data Model With Schema Builder
 - Salesforce Help: Schema Builder Custom Object Definition
 
 ---
 
-## Hands-On Challenge
+## Hands-On Challenge (+500 points)
 
-+500 points
+### Get Ready
 
-**Get Ready:** You'll be completing this unit in your own hands-on org. Click Launch to get started, or click the name of your org to choose a different one.
+You'll be completing this unit in your own hands-on org. Click Launch to get started, or click the name of your org to choose a different one.
 
-### Your Challenge — Use Schema Builder to create a custom field for the Property object
+### Your Challenge: Use Schema Builder to create a custom field for the Property object
 
 DreamHouse brokers often visit properties with their clients. They want to see on the property record where the property is located. Use Schema Builder to add a street address field to the Property object.
 
@@ -103,6 +134,10 @@ DreamHouse brokers often visit properties with their clients. They want to see o
 - Field Label: `Street Address`
 - Field Name: `Street_Address`
 - Always require a value in this field in order to save a record: Selected
+
+#### `[REQ-4.3.C1.1]` Create Custom Field (`Street_Address__c`)
+
+- **Requirement Specifications:** Target: `Property__c.Street_Address__c` | Label: `Street Address` | Type: `TextArea` | Required: `true`
 
 The challenge asks you to build this through Schema Builder's canvas, but a required `TextArea` field has a small, stable, fully-documented Metadata API shape — it passes all three CLI-payload checks, so it's worth hand-authoring here rather than treated as GUI-only:
 
@@ -131,6 +166,8 @@ CMD="sf data query -o trailhead-playground --use-tooling-api -q \"SELECT Qualifi
 { jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } \
   | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_3_CHALLENGE_VERIFICATION_AUDIT.json
 ```
+
+---
 
 ## Technical Post-Mortem & Engineering Learnings
 

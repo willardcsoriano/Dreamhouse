@@ -1,25 +1,39 @@
-# Create Object Relationships
+# Trailhead Unit: Create Object Relationships
 
-**Source:** [trailhead.salesforce.com](https://trailhead.salesforce.com/content/learn/modules/data_modeling/object_relationships?trail_id=force_com_dev_beginner)
+**Trail:** Developer Beginner  
+**Badge 04:** Data Modeling  
+**Unit 2:** Create Object Relationships  
+**Source URL:** [trailhead.salesforce.com](https://trailhead.salesforce.com/content/learn/modules/data_modeling/object_relationships?trail_id=force_com_dev_beginner)
+
+---
 
 ## Table of Contents
 
-- [Learning Objectives](#learning-objectives)
-- [What Are Object Relationships?](#what-are-object-relationships)
-- [The Wide World of Object Relationships](#the-wide-world-of-object-relationships)
-  - [Lookup Relationships](#lookup-relationships)
-  - [Master-Detail Relationships](#master-detail-relationships)
-  - [More on Relationships](#more-on-relationships)
-- [Create a Custom Object](#create-a-custom-object)
-- [Create a Lookup Relationship](#create-a-lookup-relationship)
-- [Create a Master-Detail Relationship](#create-a-master-detail-relationship)
-- [Add a Favorite Property](#add-a-favorite-property)
-- [Resources](#resources)
-- [Hands-On Challenge](#hands-on-challenge)
-  - [Your Challenge — Create relationships for the Offer object](#your-challenge-create-relationships-for-the-offer-object)
-- [Technical Post-Mortem & Engineering Learnings](#technical-post-mortem-engineering-learnings)
+- [Introduction & Learning Objectives](#introduction--learning-objectives)
+- [Guided Activities (Consolidated Requirements & Solutions)](#guided-activities-consolidated-requirements-solutions)
+  - [What Are Object Relationships?](#what-are-object-relationships)
+  - [The Wide World of Object Relationships](#the-wide-world-of-object-relationships)
+    - [Lookup Relationships](#lookup-relationships)
+    - [Master-Detail Relationships](#master-detail-relationships)
+    - [More on Relationships](#more-on-relationships)
+  - [Create a Custom Object](#create-a-custom-object)
+    - [`[REQ-4.2.G1.1]` Create Custom Object (`Favorite__c`)](#req-42g11-create-custom-object-favorite__c)
+  - [Create a Lookup Relationship](#create-a-lookup-relationship)
+    - [`[REQ-4.2.G2.1]` Create Lookup Relationship (`Contact__c`)](#req-42g21-create-lookup-relationship-contact__c)
+  - [Create a Master-Detail Relationship](#create-a-master-detail-relationship)
+    - [`[REQ-4.2.G3.1]` Create Master-Detail Relationship (`Property__c`)](#req-42g31-create-master-detail-relationship-property__c)
+  - [Add a Favorite Property](#add-a-favorite-property)
+  - [Resources](#resources)
+- [Hands-On Challenge (+500 points)](#hands-on-challenge-500-points)
+  - [Get Ready](#get-ready)
+  - [Your Challenge: Create relationships for the Offer object](#your-challenge-create-relationships-for-the-offer-object)
+    - [`[REQ-4.2.C1.1]` Create Master-Detail Relationship (`Property__c`)](#req-42c11-create-master-detail-relationship-property__c)
+    - [`[REQ-4.2.C1.2]` Create Lookup Relationship (`Contact__c`)](#req-42c12-create-lookup-relationship-contact__c)
+- [Technical Post-Mortem & Engineering Learnings](#technical-post-mortem--engineering-learnings)
 
-## Learning Objectives
+---
+
+## Introduction & Learning Objectives
 
 After completing this unit, you'll be able to:
 
@@ -27,9 +41,13 @@ After completing this unit, you'll be able to:
 - Create or modify a lookup relationship.
 - Create or modify a master-detail relationship.
 
-> **Accessibility:** This unit requires some additional instructions for screen reader users. To access a detailed screen reader version of this unit, click this link: Open Trailhead screen reader instructions.
+> **Accessibility Note:** This unit requires some additional instructions for screen reader users. To access a detailed screen reader version of this unit, click this link: Open Trailhead screen reader instructions.
 
-## What Are Object Relationships?
+---
+
+## Guided Activities (Consolidated Requirements & Solutions)
+
+### What Are Object Relationships?
 
 Now that you're comfortable with objects and fields, it's time to take things to the next level with object relationships. Object relationships are a special field type that connects two objects together.
 
@@ -45,19 +63,21 @@ The Account to Contact relationship is an example of a standard relationship in 
 
 Before you do that, you should learn about the different kinds of relationships you can create in Salesforce.
 
-## The Wide World of Object Relationships
+---
 
-> Note: Where possible, we changed noninclusive terms to align with our company value of Equality. We maintained certain terms to avoid any effect on customer implementations.
+### The Wide World of Object Relationships
+
+> **Note:** Where possible, we changed noninclusive terms to align with our company value of Equality. We maintained certain terms to avoid any effect on customer implementations.
 
 There are two main types of object relationships: lookup and master-detail.
 
-### Lookup Relationships
+#### Lookup Relationships
 
 In our Account to Contact example above, the relationship between the two objects is a lookup relationship. A lookup relationship essentially links two objects together so that you can "look up" one object from the related items on another object.
 
 Lookup relationships can be one-to-one or one-to-many. The Account to Contact relationship is one-to-many because a single account can have many related contacts. For our DreamHouse scenario, you could create a one-to-one relationship between the Property object and a Home Seller object.
 
-### Master-Detail Relationships
+#### Master-Detail Relationships
 
 While lookup relationships are fairly casual, master-detail relationships are a bit tighter. In this type of relationship, one object is the master and another is the detail. The master object controls certain behaviors of the detail object, like who can view the detail's data.
 
@@ -65,7 +85,7 @@ For example, say the owner of a property wanted to take their home off the marke
 
 _A property with several related offers._
 
-### More on Relationships
+#### More on Relationships
 
 Just like in real life, relationships are complicated. Here's a bit more information to help you differentiate between lookup and master-detail relationships.
 
@@ -77,11 +97,13 @@ Finally, you could run into a third relationship type called a hierarchical rela
 
 When you start adding relationships between objects, remember that you're increasing the complexity of your data model. That's not a bad thing, but be extra cautious when you do things like change and delete objects, records, or fields. Check out the resources section for more information on relationship behaviors.
 
-## Create a Custom Object
+---
+
+### Create a Custom Object
 
 You're ready to jump back in with D'Angelo to build some relationships for the DreamHouse app. Say DreamHouse wanted a way to track users who mark particular properties as favorites on their website. This feature can help DreamHouse's real estate brokers reach out to potential home buyers.
 
-> Note: Even if you're completing this module as part of the Admin Beginner trail, be sure you use the new Trailhead Playground you created in the previous unit.
+> **Note:** Even if you're completing this module as part of the Admin Beginner trail, be sure you use the new Trailhead Playground you created in the previous unit.
 
 To start, create a custom object called Favorite and add a field to the object.
 
@@ -93,6 +115,10 @@ To start, create a custom object called Favorite and add a field to the object.
 6. Leave the rest of the values as default and click **Save**.
 7. On the New Custom Object Tab page, click the **Tab Style** field and select a style you like.
 8. Click **Next**, **Next**, and **Save**.
+
+#### `[REQ-4.2.G1.1]` Create Custom Object (`Favorite__c`)
+
+- **Requirement Specifications:** Target: `Favorite__c` | Label: `Favorite` | Plural: `Favorites` | Sharing: `ControlledByParent` (for Master-Detail detail side) | Tab: Heart (`Custom19: Heart`)
 
 ```bash
 # Favorite__c custom object — Text name field, ControlledByParent sharing (required for the Master-Detail detail side)
@@ -132,7 +158,9 @@ EOF
 sed -i '/<\/Profile>/i \    <tabVisibilities>\n        <tab>Favorite__c</tab>\n        <visibility>DefaultOn</visibility>\n    </tabVisibilities>' force-app/main/default/profiles/Admin.profile-meta.xml
 ```
 
-## Create a Lookup Relationship
+---
+
+### Create a Lookup Relationship
 
 Next, create two custom relationship fields on the Favorite object. First, create a lookup relationship that lists the users who select Favorite for a property.
 
@@ -144,6 +172,10 @@ Next, create two custom relationship fields on the Favorite object. First, creat
 6. Click **Next**.
 7. For Field Name, enter `Contact`, then click **Next**.
 8. Click **Next**, **Next**, and **Save**.
+
+#### `[REQ-4.2.G2.1]` Create Lookup Relationship (`Contact__c`)
+
+- **Requirement Specifications:** Target: `Favorite__c.Contact__c` | Type: `Lookup` | Related To: `Contact` | DeleteConstraint: `SetNull`
 
 ```bash
 # Contact__c Lookup field on Favorite__c — links to Contact, SetNull on delete; relationshipName deploys as Favorites1 (Salesforce auto-suffixed it, plain "Favorites" was already taken)
@@ -166,7 +198,9 @@ EOF
 sed -i '/<\/Profile>/i \    <fieldPermissions>\n        <editable>true</editable>\n        <field>Favorite__c.Contact__c</field>\n        <readable>true</readable>\n    </fieldPermissions>' force-app/main/default/profiles/Admin.profile-meta.xml
 ```
 
-## Create a Master-Detail Relationship
+---
+
+### Create a Master-Detail Relationship
 
 Now, create a second relationship field. You want a master-detail relationship where Property is the master and Favorite is the detail.
 
@@ -177,6 +211,10 @@ Now, create a second relationship field. You want a master-detail relationship w
 5. Click **Next**.
 6. For Field Name, enter `Property` and click **Next**.
 7. Click **Next**, **Next**, and **Save**.
+
+#### `[REQ-4.2.G3.1]` Create Master-Detail Relationship (`Property__c`)
+
+- **Requirement Specifications:** Target: `Favorite__c.Property__c` | Type: `MasterDetail` | Related To: `Property__c`
 
 ```bash
 # Property__c Master-Detail field on Favorite__c — links to Property__c, no fieldPermissions block (Master-Detail inherits security from the parent)
@@ -222,7 +260,9 @@ CMD="sf data query -o trailhead-playground --use-tooling-api -q \"SELECT Field, 
 
 Now, if you look at a Property record, you'll see Favorites listed in the Related tab.
 
-## Add a Favorite Property
+---
+
+### Add a Favorite Property
 
 Next, take a look at how to view favorite properties.
 
@@ -237,22 +277,24 @@ Great job! Our Favorite object is all set up.
 
 No CLI equivalent — creating a demo Favorite record through the UI is the point of this step, not something to script.
 
-## Resources
+---
+
+### Resources
 
 - Salesforce Help: Object Relationships Overview
 - Salesforce Help: Considerations for Object Relationships
 
-> Note: Where possible, we changed noninclusive terms to align with our company value of Equality. This is a work in progress, so if you find a term to evaluate for inclusive language, click Provide feedback for this badge in the right sidebar to submit it.
+> **Note:** Where possible, we changed noninclusive terms to align with our company value of Equality. This is a work in progress, so if you find a term to evaluate for inclusive language, click Provide feedback for this badge in the right sidebar to submit it.
 
 ---
 
-## Hands-On Challenge
+## Hands-On Challenge (+500 points)
 
-+500 points
+### Get Ready
 
-**Get Ready:** You'll be completing this unit in your own hands-on org. Click Launch to get started, or click the name of your org to choose a different one.
+You'll be completing this unit in your own hands-on org. Click Launch to get started, or click the name of your org to choose a different one.
 
-### Your Challenge — Create relationships for the Offer object
+### Your Challenge: Create relationships for the Offer object
 
 The object you created for the previous challenge is pretty handy. Imagine how much more useful it would be if brokers could specify which client made an offer and which property the client wants to buy. Add two relationships to the Offer object so brokers can capture this data in Salesforce. Create a Master-Detail relationship with the Property object and a Lookup relationship with the Contact object.
 
@@ -274,6 +316,14 @@ Even if you're completing this module as part of the Admin Beginner trail, be su
    - Related To: Contact
    - Field Label: `Contact`
    - Field Name: `Contact`
+
+#### `[REQ-4.2.C1.1]` Create Master-Detail Relationship (`Property__c`)
+
+- **Requirement Specifications:** Target: `Offer__c.Property__c` | Type: `MasterDetail` | Related To: `Property__c`
+
+#### `[REQ-4.2.C1.2]` Create Lookup Relationship (`Contact__c`)
+
+- **Requirement Specifications:** Target: `Offer__c.Contact__c` | Type: `Lookup` | Related To: `Contact` | DeleteConstraint: `SetNull`
 
 ```bash
 # Property__c Master-Detail field on Offer__c — links to Property__c, Offers relationship name, no fieldPermissions block
@@ -330,6 +380,8 @@ CMD="sf data query -o trailhead-playground --use-tooling-api -q \"SELECT Field, 
 { jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } \
   | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_2_CHALLENGE_VERIFICATION_AUDIT_FIELDPERMISSIONS.json
 ```
+
+---
 
 ## Technical Post-Mortem & Engineering Learnings
 
