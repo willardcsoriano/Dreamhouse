@@ -1,800 +1,809 @@
 # Trailhead Unit: Customize Record Page Components and Fields
 
-## Table of Contents
-
-- [Why This Unit Breaks the Unit 1/4 Pattern](#why-this-unit-breaks-the-unit-14-pattern)
-- [Requirement to CLI Command Mapping Matrix](#requirement-to-cli-command-mapping-matrix)
-- [Introduction & Learning Objectives](#introduction-learning-objectives)
-- [Part 1: Guided Activity (`Energy_Audit__c`)](#part-1-guided-activity-energy_audit__c)
-  - [1. `[REQ-5.5.G1.1]`–`[REQ-5.5.G1.5]` Build the Page in Lightning App Builder — `[GUI]`](#1-req-55g11req-55g15-build-the-page-in-lightning-app-builder-gui)
-  - [2. `[REQ-5.5.G1.RET]` Retrieve, Then Deploy as a Redeployable Payload — `[CLI]`](#2-req-55g1ret-retrieve-then-deploy-as-a-redeployable-payload-cli)
-  - [3. `[REQ-5.5.G2.RETRIEVE]`–`[REQ-5.5.G2.DEP]` Add the Files Related List — `[CLI]`](#3-req-55g2retrievereq-55g2dep-add-the-files-related-list-cli)
-  - [4. `[REQ-5.5.G3.1]`–`[REQ-5.5.G3.RET]` Activate for the Sales Profile — `[GUI]` + `[CLI]`](#4-req-55g31req-55g3ret-activate-for-the-sales-profile-gui-cli)
-- [Part 2: Hands-On Challenge (`Contact`)](#part-2-hands-on-challenge-contact)
-  - [1. `[REQ-5.5.C1.1]`–`[REQ-5.5.C1.3]` Build the Contact Page — `[CLI]` (deviation from `[GUI]`)](#1-req-55c11req-55c13-build-the-contact-page-cli-deviation-from-gui)
-  - [2. `[REQ-5.5.C1.RET]` Author, Deploy, Then Retrieve as a Redeployable Payload — `[CLI]`](#2-req-55c1ret-author-deploy-then-retrieve-as-a-redeployable-payload-cli)
-  - [3. `[REQ-5.5.C2.RETRIEVE]`–`[REQ-5.5.C2.DEP]` Swap the Related List — `[CLI]`](#3-req-55c2retrievereq-55c2dep-swap-the-related-list-cli)
-  - [4. `[REQ-5.5.C3.1]`–`[REQ-5.5.C3.RET]` Activate as Org Default — `[GUI]` + `[CLI]`](#4-req-55c31req-55c3ret-activate-as-org-default-gui-cli)
-- [Resources & Reference Documentation](#resources-reference-documentation)
-- [Technical Post-Mortem & Engineering Learnings](#technical-post-mortem-engineering-learnings)
-
-## Why This Unit Breaks the Unit 1/4 Pattern
-
-Units 1 and 4 map cleanly onto declarative metadata you can hand-author with confidence: custom fields, objects, and compact layouts all have a small, stable XML schema. This unit is different — most of it is driven by the **Lightning App Builder's Dynamic Forms migration wizard** and the **Activation wizard**, both of which generate `FlexiPage` XML with builder-assigned region UUIDs, nested facets, and wizard-specific structure that isn't practical to hand-author from memory (verified against the current Metadata API docs — see `[REQ-5.5.G1]` below). Faking a `cat << EOF` block for that would look like CLI-first documentation but would actually be untested, unverifiable XML.
-
-So this doc tags every requirement `[CLI]` or `[GUI]` per the classification rule in `docs/reference/PIPELINE.md`:
-
-- `[CLI]` — hand-authored (or retrieved-then-patched) metadata: the two page-layout related-list swaps.
-- `[GUI]` — built once in the Lightning App Builder / Activation wizard per the Trailhead click-path, then closed out with a **retrieve → deploy** round trip: `sf project retrieve start` pulls the builder-generated result into source, and `sf project deploy start` on that exact retrieved file is the reproducible, auditable payload from then on — the thing you'd actually re-run against a fresh sandbox instead of re-clicking the wizard.
-
-**Execution order, at a glance:**
-
-- **`G1`, `G3`, `C1`, `C3` (`[GUI]`):** do the browser click-path first — nothing to run until that's done. Only after saving/activating do you switch to the terminal and run retrieve → deploy.
-- **`G2`, `C2` (`[CLI]` only):** no browser steps at all. Run retrieve → hand-edit → deploy directly from the terminal.
+**Trail:** Developer Beginner  
+**Badge 05:** Lightning Experience Customization  
+**Unit 5:** Customize Record Page Components and Fields  
+**Source URL:** [trailhead.salesforce.com](https://trailhead.salesforce.com/content/learn/modules/lex_customization/lex_customization_page_layouts?trail_id=force_com_dev_beginner)
 
 ---
 
-## Requirement to CLI Command Mapping Matrix
+## Learning Objectives
 
-| Activity Type      | Requirement ID          | Access  | Summary                                                           | Target Component                                        | Solved By                                                                                                                                                          |
-| :----------------- | :---------------------- | :------ | :---------------------------------------------------------------- | :------------------------------------------------------ | :----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Guided Activity    | `[REQ-5.5.G1.1]`        | `[GUI]` | Open Edit Page from the Burlington evaluation Energy Audit record | `Energy_Audit__c` FlexiPage                             | Lightning App Builder                                                                                                                                              |
-| Guided Activity    | `[REQ-5.5.G1.2]`        | `[GUI]` | Set page Label/API Name                                           | `Energy_Audit_Record_Page_for_Sales`                    | App Builder page properties                                                                                                                                        |
-| Guided Activity    | `[REQ-5.5.G1.3]`        | `[GUI]` | Upgrade to Dynamic Forms from Energy Audit Layout                 | FlexiPage Details region                                | Dynamic Forms migration wizard                                                                                                                                     |
-| Guided Activity    | `[REQ-5.5.G1.4]`        | `[GUI]` | Reorder fields (Audit Notes, Type of Installation, Account)       | FlexiPage field instances                               | Drag-and-drop in App Builder                                                                                                                                       |
-| Guided Activity    | `[REQ-5.5.G1.5]`        | `[GUI]` | Save without activating                                           | FlexiPage                                               | App Builder Save → Not Yet                                                                                                                                         |
-| Guided Activity    | `[REQ-5.5.G1.RET]`      | `[CLI]` | Capture the built page as a redeployable payload                  | `Energy_Audit_Record_Page_for_Sales.flexipage-meta.xml` | `sf project retrieve start -m "FlexiPage:Energy_Audit_Record_Page_for_Sales"` → `sf project deploy start -m "FlexiPage:Energy_Audit_Record_Page_for_Sales" --json` |
-| Guided Activity    | `[REQ-5.5.G2.RETRIEVE]` | `[CLI]` | Pull the org-default layout as an edit baseline                   | `Energy_Audit__c-Energy Audit Layout`                   | `sf project retrieve start -m "Layout:Energy_Audit__c-Energy Audit Layout"`                                                                                        |
-| Guided Activity    | `[REQ-5.5.G2.EDIT]`     | `[CLI]` | Add the Files related list                                        | `relatedLists` block                                    | Hand-edit the retrieved `Layout` XML                                                                                                                               |
-| Guided Activity    | `[REQ-5.5.G2.DEP]`      | `[CLI]` | Deploy the patched layout                                         | `Energy_Audit__c-Energy Audit Layout`                   | `sf project deploy start -m "Layout:Energy_Audit__c-Energy Audit Layout" --json`                                                                                   |
-| Guided Activity    | `[REQ-5.5.G3.1]`        | `[GUI]` | Assign the page to App + Record Type + Profile + Form Factor      | `Energy_Consultations` app                              | Activation wizard                                                                                                                                                  |
-| Guided Activity    | `[REQ-5.5.G3.RET]`      | `[CLI]` | Capture the resulting assignment as a redeployable payload        | `Energy_Consultations.app-meta.xml`                     | `sf project retrieve start -m "CustomApplication:Energy_Consultations"` → `sf project deploy start -m "CustomApplication:Energy_Consultations" --json`             |
-| Hands-On Challenge | `[REQ-5.5.C1.1]`        | `[GUI]` | Edit Page from a Contact record                                   | Contact FlexiPage                                       | Lightning App Builder                                                                                                                                              |
-| Hands-On Challenge | `[REQ-5.5.C1.2]`        | `[GUI]` | Upgrade to Dynamic Forms from Contact Layout                      | FlexiPage Details region                                | Dynamic Forms migration wizard                                                                                                                                     |
-| Hands-On Challenge | `[REQ-5.5.C1.3]`        | `[GUI]` | Remove Fax, Other Phone, Home Phone                               | FlexiPage field instances                               | Remove in App Builder                                                                                                                                              |
-| Hands-On Challenge | `[REQ-5.5.C1.RET]`      | `[CLI]` | Capture the built page as a redeployable payload                  | `Contact_Record_Page_for_Sales.flexipage-meta.xml`      | `sf project retrieve start -m "FlexiPage:Contact_Record_Page_for_Sales"` → `sf project deploy start -m "FlexiPage:Contact_Record_Page_for_Sales" --json`           |
-| Hands-On Challenge | `[REQ-5.5.C2.RETRIEVE]` | `[CLI]` | Pull Contact's layout as an edit baseline                         | `Contact-Contact Layout`                                | `sf project retrieve start -m "Layout:Contact-Contact Layout"`                                                                                                     |
-| Hands-On Challenge | `[REQ-5.5.C2.EDIT]`     | `[CLI]` | Remove Notes & Attachments, add Files                             | `relatedLists` block                                    | Hand-edit the retrieved `Layout` XML                                                                                                                               |
-| Hands-On Challenge | `[REQ-5.5.C2.DEP]`      | `[CLI]` | Deploy the patched layout                                         | `Contact-Contact Layout`                                | `sf project deploy start -m "Layout:Contact-Contact Layout" --json`                                                                                                |
-| Hands-On Challenge | `[REQ-5.5.C3.1]`        | `[GUI]` | Save, activate as org default, both form factors                  | Contact FlexiPage                                       | Activation wizard                                                                                                                                                  |
-| Hands-On Challenge | `[REQ-5.5.C3.RET]`      | `[CLI]` | Capture the final page/assignment as a redeployable payload       | `Contact_Record_Page_for_Sales.flexipage-meta.xml`      | `sf project retrieve start -m "FlexiPage:Contact_Record_Page_for_Sales"` → `sf project deploy start -m "FlexiPage:Contact_Record_Page_for_Sales" --json`           |
-
----
-
-## Introduction & Learning Objectives
-
-Record pages in Lightning Experience are built from two layers: the **Lightning App Builder**, which controls page structure, component placement, and (via Dynamic Forms) individual field placement; and the **page layout editor**, which controls related lists, buttons, links, and quick actions. This unit works both tools to give a sales-specific view of Energy Audit records and a trimmed-down Contact record page.
-
-After completing this unit, you'll be able to:
+After completing this unit, you’ll be able to:
 
 - Create, customize, and manage Lightning pages.
 - Use the Lightning App Builder.
 - Assign a Lightning page to a profile.
 
----
-
-## Part 1: Guided Activity (`Energy_Audit__c`)
-
-Maria wants a sales-specific Energy Audit record page: reordered fields via Dynamic Forms, a Files related list, and activation scoped to the Sales profile.
-
-### 1. `[REQ-5.5.G1.1]`–`[REQ-5.5.G1.5]` Build the Page in Lightning App Builder — `[GUI]`
-
-**Browser first — nothing to run in the terminal until this is done.**
-
-1. App Launcher → **Energy Consultations** → **Energy Audits** tab → **All** list view → open **Burlington evaluation**.
-2. Setup menu (gear icon) → **Edit Page**.
-3. Page properties: set **Label** = `Energy Audit Record Page for Sales`, **API Name** = `Energy_Audit_Record_Page_for_Sales`.
-4. Click the **Details** tab on the canvas → click the **Record Detail** component → **Upgrade Now** → step through the Dynamic Forms migration wizard, selecting **Energy Audit Layout** as the source → **Finish**.
-5. Reorder fields in the right-hand column: drag **Audit Notes** above **Owner**, then drag **Type of Installation** above **Audit Notes**; confirm **Account** sits below **Energy Audit Name**.
-6. **Save** → **Not Yet** (don't activate yet).
-
-### 2. `[REQ-5.5.G1.RET]` Retrieve, Then Deploy as a Redeployable Payload — `[CLI]`
-
-**Terminal only — run this after the browser steps above, not instead of them.**
-
-```bash
-# 1. Pull the builder-generated page into source (one-time, GUI-authored artifact)
-sf project retrieve start \
-  -m "FlexiPage:Energy_Audit_Record_Page_for_Sales" \
-  -o trailhead-playground \
-  --json
-
-# 2. Redeploy that exact file, capturing raw output directly to the audit log —
-#    this is the reproducible, auditable command going forward
-UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
-mkdir -p "$UNIT_DIR"
-
-sf project deploy start \
-  -m "FlexiPage:Energy_Audit_Record_Page_for_Sales" \
-  -o trailhead-playground \
-  --json | tee "$UNIT_DIR/UNIT_5_GUIDED_FLEXIPAGE_DEPLOY_AUDIT.json"
-```
+> **Note:**  
+> **Accessibility**  
+> This unit requires some additional instructions for screen reader users. To access a detailed screen reader version of this unit, click the link below:  
+> Open Trailhead screen reader instructions.
 
 ---
 
-### 3. `[REQ-5.5.G2.RETRIEVE]`–`[REQ-5.5.G2.DEP]` Add the Files Related List — `[CLI]`
+## Record Pages
 
-**No browser needed — run these commands directly.**
+What you see when you log in to Salesforce for the first time is just the start. You can customize and personalize many things on object record pages using a combination of the Lightning App Builder and page layouts.
 
-Salesforce auto-generated a default page layout for `Energy_Audit__c` when the object was first deployed (Unit 1) — that layout was never pulled into local source, so retrieve it first rather than hand-authoring a `Layout` file blind and risking silently dropping fields or sections it already has.
+Most of the pages you see in Lightning Experience, such as the Home page and record pages, are Lightning pages. Lightning pages are a collection of components arranged in regions on the page. You can customize the structure of the page, the position of its components, and the record detail fields it displays with the Lightning App Builder. (Learn more in the Lightning App Builder module right here on Trailhead)
 
-```bash
-# 1. Pull the current org-default layout as an edit baseline
-sf project retrieve start \
-  -m "Layout:Energy_Audit__c-Energy Audit Layout" \
-  -o trailhead-playground \
-  --json
-```
+Other page contents, such as the buttons, links, actions, and related lists that appear on the page, are controlled with a different tool called the page layout editor.
 
-Open the retrieved `Energy_Audit__c-Energy Audit Layout.layout-meta.xml` and add a `relatedLists` entry for Files immediately before `</Layout>`:
+We work with both the Lightning App Builder and the page layout editor in this unit to review how to customize your Lightning record pages.
 
-**Correction:** both `AttachedContentDocuments` and `RelatedContentDocumentList` are confirmed **wrong** — each failed deployment with `Cannot find related list:...` (see `docs/REPORT.md` hiccups). No working example existed anywhere in this org to copy from, so the real value was discovered via a one-time GUI add (drag Files onto this exact layout in Setup, Save, then retrieve) — confirmed correct: **`RelatedFileList`**. This already deployed live via that GUI Save; the block below is for source-of-truth/documentation purposes, no further CLI deploy needed for this specific instance.
+The Lightning App Builder lets you:
 
-```xml
-<relatedLists>
-    <relatedList>RelatedFileList</relatedList>
-</relatedLists>
-```
+- Control which components appear on Lightning pages
+- Create custom Lightning pages for different apps and users
+- Control which fields appear on record pages
 
-```bash
-# 2. Deploy the patched layout, capturing raw output directly to the audit log
-UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
-mkdir -p "$UNIT_DIR"
+The page layout editor lets you:
 
-sf project deploy start \
-  -m "Layout:Energy_Audit__c-Energy Audit Layout" \
-  -o trailhead-playground \
-  --json | tee "$UNIT_DIR/UNIT_5_GUIDED_LAYOUT_DEPLOY_AUDIT.json"
-```
+- Control which lists of related records and custom links users see
+- Control which standard and custom buttons appear on records and related lists
+- Control which quick actions appear on the page
+
+You’re probably thinking, "Buttons, lists, record details? What is all this stuff?" Let’s tour the record page by looking at an example contact record, and then we’ll dive in and customize a page.
+
+These are the parts of a record page that you can customize to create a personalized view for different teams and processes in your org.
+
+- In the previous unit, you learned about record highlights (1) and how to customize the fields it shows using compact layouts. The record highlights area also contains a set of buttons and actions (2), which you’ll learn how to customize in a later unit.
+- The Related tab (3) contains related lists, which are lists of other records that are associated with the record you’re viewing. For example, an account can have related products, contacts, opportunities, and other custom records.
+- The Details tab (4) shows information about a record. By default, fields and links appear here. For example, a contact record detail page shows the name, address, owner, account, and other fields that are used to store information about the contact and other related records.
+
+### Related List Page
+
+We’ve mentioned buttons, links, and actions. We’ll go over those in more detail and how to modify them on Lightning pages in later units. In this unit, we focus on customizing the page structure, components, record detail fields, and related lists.
 
 ---
 
-### 4. `[REQ-5.5.G3.1]`–`[REQ-5.5.G3.RET]` Activate for the Sales Profile — `[GUI]` + `[CLI]`
+## Create a Custom Lightning Record Page
 
-**Browser first, then terminal.**
+Maria wants to create an Energy Audit record page just for her sales team so they can have the necessary field and related list information at their fingertips when they view the Energy Audit records.
 
-1. Setup → Home tab → Quick Find **App Builder** → **Lightning App Builder** → **Edit** next to **Energy Audit Record Page for Sales**.
-2. **Activation** → **App, Record Type, and Profile** tab → **Assign to Apps, Record Types, and Profiles**.
-3. Step through the wizard: assign to the **Energy Consultations** app, **Desktop and phone** form factor, **Master** record type, and both **Custom: Sales Profile** and **System Administrator** (System Administrator only so the assignment is visible while logged in as admin — Maria's real users only need Sales Profile).
-4. Review assignments → **Save**.
+When the Energy Audit custom object was created, a system default Energy Audit record page was created too. Right now, everyone in the org who views an Energy Audit record sees the information from that default layout. Maria is going to create a customized record page just for the sales people.
+
+Let’s follow along.
+
+1. From the App Launcher, find and select **Energy Consultations**, then click the **Energy Audits** tab.
+2. Open the **All** list view.
+3. Select **Burlington evaluation**.
+4. From the Setup menu, select **Edit Page**.
+   - The page opens in the Lightning App Builder.
+5. In the page properties, change the Label to **Energy Audit Record Page for Sales**.
+6. Change the API Name to **Energy_Audit_Record_Page_for_Sales**.
+7. Click the **Details** tab on the canvas, then click the **Record Detail** component (where the fields are).
+   - There are all the fields for the Energy Audit object. But they’re all in one non-customizable block. With the click of one button, we can change that.
+8. In the properties pane, click **Upgrade Now** to start the Dynamic Forms migration wizard.
+   - Upgrade to Dynamic Forms message with Upgrade Now button
+   - With Dynamic Forms, you can migrate the fields and sections from your existing record pages into individual components. Then you can configure them just like the rest of the components on the page—adding more, removing some, or moving them around–giving your users only the fields and sections that they need.
+9. Step through the wizard, select **Energy Audit Layout**, then click **Finish**.
+   - The right-hand column of the Details section is almost empty, and the fields could be in a better order. Let’s fix that.
+10. Click the **Audit Notes** field and drag it to the right column, above **Owner**.
+11. Drag the **Type of Installation** field above **Audit Notes**.
+12. If it's not already there, move **Account** below **Energy Audit Name**.
+13. Click **Save**, then **Not Yet**.
+    - Activating the page makes it available to your users. This page isn’t quite ready for users, however. Maria wants to add a related list.
+
+**No CLI equivalent — do this in the browser.**
 
 ```bash
-# 1. Pull the resulting App/Record-Type/Profile assignment into source
-sf project retrieve start \
-  -m "CustomApplication:Energy_Consultations" \
-  -o trailhead-playground \
-  --json
+# Retrieves the wizard-generated Dynamic Forms FlexiPage and deploys it as a reproducible metadata payload
+mkdir -p badges/05_lightning_experience_customization/logs # creates logs directory for output tracking
 
-# 2. Redeploy that exact file, capturing raw output directly to the audit log —
-#    the reproducible, auditable command going forward
-UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
-mkdir -p "$UNIT_DIR"
+# Step 1: Retrieve builder-generated FlexiPage metadata into local source
+CMD="sf project retrieve start -m FlexiPage:Energy_Audit_Record_Page_for_Sales -o trailhead-playground --json" # sf retrieve command for flexipage
+{ jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } | tee badges/05_lightning_experience_customization/logs/UNIT_5_GUIDED_FLEXIPAGE_RETRIEVE_AUDIT.json # executes retrieve and writes log output
 
-sf project deploy start \
-  -m "CustomApplication:Energy_Consultations" \
-  -o trailhead-playground \
-  --json | tee "$UNIT_DIR/UNIT_5_GUIDED_ACTIVATION_AUDIT.json"
+# Step 2: Deploy captured FlexiPage metadata payload back to org
+CMD="sf project deploy start -m FlexiPage:Energy_Audit_Record_Page_for_Sales -o trailhead-playground --json" # sf deploy command for flexipage
+{ jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } | tee badges/05_lightning_experience_customization/logs/UNIT_5_GUIDED_FLEXIPAGE_DEPLOY_AUDIT.json # executes deploy and writes log output
+```
+
+```bash
+# Verifies Energy Audit record flexipage metadata deployment via Salesforce Tooling API query
+CMD="sf data query --use-tooling-api -q \"SELECT Id, DeveloperName, MasterLabel, SobjectType FROM FlexiPage WHERE DeveloperName = 'Energy_Audit_Record_Page_for_Sales'\" -o trailhead-playground --json" # tooling api query for flexipage
+{ jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } | tee badges/05_lightning_experience_customization/logs/UNIT_5_GUIDED_FLEXIPAGE_VERIFY_AUDIT.json # executes query and writes log output
 ```
 
 ---
 
-## Part 2: Hands-On Challenge (`Contact`)
+## Customize Related Lists
 
-Give Contact records a trimmed field set and swap Notes & Attachments for Files.
+Because Energy Audit is a custom object, it doesn’t have any related lists…yet. Let’s add one. We can do that in the page layout editor.
 
-### 1. `[REQ-5.5.C1.1]`–`[REQ-5.5.C1.3]` Build the Contact Page — `[CLI]` (deviation from `[GUI]`)
-
-**Deviation note:** The doc's own classification rule (`docs/reference/CLI_GUI_BOUNDARIES.md`) tags Dynamic Forms conversion `[GUI]` because there's normally no retrieved baseline to pattern-match against. Here there's a partial exception: `G1` already produced a **real, deployed, verified** Dynamic-Forms page (`Energy_Audit_Record_Page_for_Sales.flexipage-meta.xml`) with the exact component/facet/region structure this org's API version actually accepts. Rather than authoring blind, this page is hand-authored by adapting that proven structure to Contact's field set. Residual risk this doesn't eliminate: Trailhead's automated check may specifically verify the Dynamic Forms wizard was used, which a hand-authored file can't guarantee even though the deploy itself should succeed.
-
-**Step 1 — retrieve the real field list first (no guessing):**
+1. Click **Back** in the App Builder header.
+2. From the Setup menu, select **Setup**.
+   - Setup opens in a new browser tab.
+3. Click **Object Manager**, then find and click **Energy Audit** in the list of objects.
+4. Click **Page Layouts**, then **Energy Audit Layout**.
+5. Scroll down to the **Related Lists** section.
+6. In the palette at the top of the page, click **Related Lists**, and drag the **Files** element down to the Related Lists section.
+   - With the Files related list, Ursa Major Solar sales reps can add files to a record and see a list of files associated with the record.
+7. Click **Quick Save**, then click **Yes**.
 
 ```bash
-# Pulls the org's actual Contact Layout — needed both to know the real field
-# list/order for the Dynamic Forms page below, and as C2's own prerequisite baseline
-sf project retrieve start \
-  -m "Layout:Contact-Contact Layout" \
-  -o trailhead-playground \
-  --json
+# Retrieves Energy Audit Layout XML, applies RelatedFileList entry, and deploys updated layout metadata
+mkdir -p badges/05_lightning_experience_customization/logs # creates logs directory for output tracking
+
+# Step 1: Retrieve org-default layout baseline
+CMD="sf project retrieve start -m Layout:Energy_Audit__c-Energy Audit Layout -o trailhead-playground --json" # sf retrieve command for object layout
+{ jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } | tee badges/05_lightning_experience_customization/logs/UNIT_5_GUIDED_LAYOUT_RETRIEVE_AUDIT.json # executes retrieve and writes log output
+
+# Step 2: Deploy patched layout metadata with RelatedFileList
+CMD="sf project deploy start -m Layout:Energy_Audit__c-Energy Audit Layout -o trailhead-playground --json" # sf deploy command for object layout
+{ jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } | tee badges/05_lightning_experience_customization/logs/UNIT_5_GUIDED_LAYOUT_DEPLOY_AUDIT.json # executes deploy and writes log output
 ```
 
-Paste the retrieved `Contact-Contact Layout.layout-meta.xml` content (or just its field list) back — the Dynamic Forms `FlexiPage` XML below will be drafted from the org's real field list once that's in hand, not assumed from memory.
-
-### 2. `[REQ-5.5.C1.RET]` Author, Deploy, Then Retrieve as a Redeployable Payload — `[CLI]`
-
-**Terminal only.** Modeled field-for-field on the already-deployed `Energy_Audit_Record_Page_for_Sales.flexipage-meta.xml` structure — Contact Information section (Owner, Name, Account, Title, Department, Birthdate, Reports To, Lead Source on the left; Phone, Mobile, Email, Assistant Name, Assistant Phone on the right — **Fax/Home Phone/Other Phone deliberately omitted**), plus System Information (Created By, Last Modified By, read-only). Address Information / Additional Information / Description sections from the source layout are intentionally left out — not part of the stated requirement, and Energy Audit's proven structure has no verified pattern for a one-column section to copy.
-
 ```bash
-# 1. Author the FlexiPage XML directly
-mkdir -p force-app/main/default/flexipages
-
-cat << 'EOF' > "force-app/main/default/flexipages/Contact_Record_Page_for_Sales.flexipage-meta.xml"
-<?xml version="1.0" encoding="UTF-8"?>
-<FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
-    <flexiPageRegions>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>collapsed</name>
-                    <value>false</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>enableActionsConfiguration</name>
-                    <value>false</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>enableActionsInNative</name>
-                    <value>false</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>hideChatterActions</name>
-                    <value>false</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>hideSlackAction</name>
-                    <value>false</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>numVisibleActions</name>
-                    <value>3</value>
-                </componentInstanceProperties>
-                <componentName>force:highlightsPanel</componentName>
-                <identifier>force_highlightsPanel</identifier>
-            </componentInstance>
-        </itemInstances>
-        <mode>Replace</mode>
-        <name>header</name>
-        <type>Region</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.OwnerId</fieldItem>
-                <identifier>RecordOwnerIdField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>required</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.Name</fieldItem>
-                <identifier>RecordNameField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.AccountId</fieldItem>
-                <identifier>RecordAccountIdField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.Title</fieldItem>
-                <identifier>RecordTitleField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.Department</fieldItem>
-                <identifier>RecordDepartmentField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.Birthdate</fieldItem>
-                <identifier>RecordBirthdateField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.ReportsToId</fieldItem>
-                <identifier>RecordReportsToIdField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.LeadSource</fieldItem>
-                <identifier>RecordLeadSourceField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <name>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000001</name>
-        <type>Facet</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.Phone</fieldItem>
-                <identifier>RecordPhoneField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.MobilePhone</fieldItem>
-                <identifier>RecordMobilePhoneField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.Email</fieldItem>
-                <identifier>RecordEmailField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.AssistantName</fieldItem>
-                <identifier>RecordAssistantNameField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.AssistantPhone</fieldItem>
-                <identifier>RecordAssistantPhoneField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <name>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000002</name>
-        <type>Facet</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>body</name>
-                    <value>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000001</value>
-                </componentInstanceProperties>
-                <componentName>flexipage:column</componentName>
-                <identifier>flexipage_column</identifier>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>body</name>
-                    <value>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000002</value>
-                </componentInstanceProperties>
-                <componentName>flexipage:column</componentName>
-                <identifier>flexipage_column2</identifier>
-            </componentInstance>
-        </itemInstances>
-        <name>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000003</name>
-        <type>Facet</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>columns</name>
-                    <value>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000003</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>horizontalAlignment</name>
-                    <value>false</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>label</name>
-                    <value>@@@SFDCInformationSFDC@@@</value>
-                </componentInstanceProperties>
-                <componentName>flexipage:fieldSection</componentName>
-                <identifier>flexipage_fieldSection</identifier>
-            </componentInstance>
-        </itemInstances>
-        <name>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000004</name>
-        <type>Facet</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>readonly</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.CreatedById</fieldItem>
-                <identifier>RecordCreatedByIdField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <name>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000005</name>
-        <type>Facet</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>readonly</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.LastModifiedById</fieldItem>
-                <identifier>RecordLastModifiedByIdField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <name>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000006</name>
-        <type>Facet</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>body</name>
-                    <value>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000005</value>
-                </componentInstanceProperties>
-                <componentName>flexipage:column</componentName>
-                <identifier>flexipage_column3</identifier>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>body</name>
-                    <value>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000006</value>
-                </componentInstanceProperties>
-                <componentName>flexipage:column</componentName>
-                <identifier>flexipage_column4</identifier>
-            </componentInstance>
-        </itemInstances>
-        <name>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000007</name>
-        <type>Facet</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>columns</name>
-                    <value>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000007</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>horizontalAlignment</name>
-                    <value>false</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>label</name>
-                    <value>@@@SFDCSystem_InformationSFDC@@@</value>
-                </componentInstanceProperties>
-                <componentName>flexipage:fieldSection</componentName>
-                <identifier>flexipage_fieldSection2</identifier>
-            </componentInstance>
-        </itemInstances>
-        <name>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000008</name>
-        <type>Facet</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>relatedListComponentOverride</name>
-                    <value>NONE</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>rowsToDisplay</name>
-                    <value>10</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>showActionBar</name>
-                    <value>true</value>
-                </componentInstanceProperties>
-                <componentName>force:relatedListContainer</componentName>
-                <identifier>force_relatedListContainer</identifier>
-            </componentInstance>
-        </itemInstances>
-        <mode>Replace</mode>
-        <name>relatedTabContent</name>
-        <type>Facet</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
-        <itemInstances>
-            <componentInstance>
-                <componentName>force:detailPanel</componentName>
-                <identifier>force_detailPanel</identifier>
-            </componentInstance>
-        </itemInstances>
-        <mode>Replace</mode>
-        <name>detailTabContent</name>
-        <type>Facet</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>body</name>
-                    <value>relatedTabContent</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>title</name>
-                    <value>Standard.Tab.relatedLists</value>
-                </componentInstanceProperties>
-                <componentName>flexipage:tab</componentName>
-                <identifier>relatedListsTab</identifier>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>active</name>
-                    <value>true</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>body</name>
-                    <value>detailTabContent</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>title</name>
-                    <value>Standard.Tab.detail</value>
-                </componentInstanceProperties>
-                <componentName>flexipage:tab</componentName>
-                <identifier>detailTab</identifier>
-            </componentInstance>
-        </itemInstances>
-        <mode>Replace</mode>
-        <name>maintabs</name>
-        <type>Facet</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>accordionSections</name>
-                    <value>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000009</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>allowMultipleSectionsOpen</name>
-                    <value>false</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>defaultSectionName</name>
-                    <value>accordionSection1</value>
-                </componentInstanceProperties>
-                <componentName>flexipage:accordion</componentName>
-                <identifier>flexipage_accordion</identifier>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>label</name>
-                    <value>Tabs</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>tabs</name>
-                    <value>maintabs</value>
-                </componentInstanceProperties>
-                <componentName>flexipage:tabset</componentName>
-                <identifier>flexipage_tabset</identifier>
-            </componentInstance>
-        </itemInstances>
-        <mode>Replace</mode>
-        <name>main</name>
-        <type>Region</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>body</name>
-                    <value>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000004</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>label</name>
-                    <value>Standard.Tab.fields</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>name</name>
-                    <value>accordionSection1</value>
-                </componentInstanceProperties>
-                <componentName>flexipage:accordionSection</componentName>
-                <identifier>flexipage_accordionSection</identifier>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>body</name>
-                    <value>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000008</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>label</name>
-                    <value>Standard.Tab.additionalFields</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>name</name>
-                    <value>accordionSection2</value>
-                </componentInstanceProperties>
-                <componentName>flexipage:accordionSection</componentName>
-                <identifier>flexipage_accordionSection2</identifier>
-            </componentInstance>
-        </itemInstances>
-        <name>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000009</name>
-        <type>Facet</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
-        <itemInstances>
-            <componentInstance>
-                <componentName>forceChatter:recordFeedContainer</componentName>
-                <identifier>forceChatter_recordFeedContainer</identifier>
-            </componentInstance>
-        </itemInstances>
-        <mode>Replace</mode>
-        <name>feedTabContent</name>
-        <type>Facet</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>body</name>
-                    <value>feedTabContent</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>title</name>
-                    <value>Standard.Tab.collaborate</value>
-                </componentInstanceProperties>
-                <componentName>flexipage:tab</componentName>
-                <identifier>collaborateTab</identifier>
-            </componentInstance>
-        </itemInstances>
-        <mode>Replace</mode>
-        <name>sidebartabs</name>
-        <type>Facet</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>label</name>
-                    <value>Tabs</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>tabs</name>
-                    <value>sidebartabs</value>
-                </componentInstanceProperties>
-                <componentName>flexipage:tabset</componentName>
-                <identifier>flexipage_tabset2</identifier>
-            </componentInstance>
-        </itemInstances>
-        <mode>Replace</mode>
-        <name>sidebar</name>
-        <type>Region</type>
-    </flexiPageRegions>
-    <masterLabel>Contact Record Page for Sales</masterLabel>
-    <parentFlexiPage>flexipage__default_rec_L</parentFlexiPage>
-    <sobjectType>Contact</sobjectType>
-    <template>
-        <name>flexipage:recordHomeTemplateDesktop</name>
-    </template>
-    <type>RecordPage</type>
-</FlexiPage>
-EOF
-
-# 2. Deploy the hand-authored FlexiPage, capturing raw output directly to the audit log
-UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
-mkdir -p "$UNIT_DIR"
-
-sf project deploy start \
-  -m "FlexiPage:Contact_Record_Page_for_Sales" \
-  -o trailhead-playground \
-  --json | tee "$UNIT_DIR/UNIT_5_CHALLENGE_FLEXIPAGE_DEPLOY_AUDIT.json"
-
-# 3. Retrieve it back to confirm the deployed state matches source exactly —
-#    same audit purpose as every other retrieve/deploy pair in this doc
-sf project retrieve start \
-  -m "FlexiPage:Contact_Record_Page_for_Sales" \
-  -o trailhead-playground \
-  --json
+# Verifies Energy Audit layout metadata existence in target org via Tooling API query
+CMD="sf data query --use-tooling-api -q \"SELECT Id, Name, TableEnumOrId FROM Layout WHERE TableEnumOrId = 'Energy_Audit__c'\" -o trailhead-playground --json" # tooling api layout verification query
+{ jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } | tee badges/05_lightning_experience_customization/logs/UNIT_5_GUIDED_LAYOUT_VERIFY_AUDIT.json # executes query and writes log output
 ```
 
 ---
 
-### 3. `[REQ-5.5.C2.RETRIEVE]`–`[REQ-5.5.C2.DEP]` Swap the Related List — `[CLI]`
+## Activate the Page
 
-**No browser needed — and no retrieve needed either.** This reuses the exact same `Contact-Contact Layout.layout-meta.xml` already pulled down in `C1` — nothing has touched that file since, so it's already current. Edit it directly:
+Maria’s done with customizing the page for now, but no one can see it. It’s time to activate the Lightning page and make it live for her Sales users.
 
-- Remove the existing Notes & Attachments `relatedLists` entry — confirmed against the retrieved file, it's:
-  ```xml
-  <relatedLists>
-      <relatedList>RelatedNoteList</relatedList>
-  </relatedLists>
-  ```
-  (not the commonly-assumed `CombinedAttachments` — this org's actual layout uses `RelatedNoteList`.)
-- Add — **correction:** both `AttachedContentDocuments` and `RelatedContentDocumentList` failed deployment, same as `G2`. Confirmed correct value (discovered via `G2`'s one-time GUI check): **`RelatedFileList`**.
+1. From Setup, click the **Home** tab.
+2. Enter `App Builder` in the Quick Find box, then select **Lightning App Builder**.
+3. Click **Edit** next to the **Energy Audit Record Page for Sales** page.
+4. Click **Activation**.
 
-```xml
-<relatedLists>
-    <relatedList>RelatedFileList</relatedList>
-</relatedLists>
+The Activation: Energy Audit Record Page for Sales has three options: Org Default, App Default, and App, Record Type, and Profile.
+
+There are four options for activation.
+
+1. Make the page the org default for the object.
+2. Make the page the default object record page for specific Lightning apps.
+3. Assign the page to a combination of Lightning apps, record types, and profiles.
+4. Assign the page to a form factor, such as a desktop or phone.
+
+Maria wants Ursa Major Solar’s salespeople to see this new record page. She’s going to assign it to her sales team’s user profile so that when they view Energy Audit records, they’ll see the revised view of the fields and the new related list. She’s also going to make sure it’s assigned to both the desktop and phone form factors, so her users can view it when working on their desktops and when on the road from their mobile devices. Let’s get started.
+
+1. Click the **App, Record Type, and Profile** tab.
+2. Click **Assign to Apps, Record Types, and Profiles**.
+3. Step through the wizard and assign the page to the **Energy Consultations** app, the **Desktop and phone** form factor, the **Master** record type, and both the **Custom: Sales Profile** and the **System Administrator** profile.
+   - Normally, Maria would select only Custom: Sales Profile, but since you’re logged in as a System Administrator, we select that too so that you can see how the new page layout looks.
+4. Review the page assignments.
+   - The New Page column is populated with the name of the page we’re activating: Energy Audit Record Page for Sales.
+5. Click **Save**.
+
+**No CLI equivalent — do this in the browser.**
+
+```bash
+# Retrieves CustomApplication Energy Consultations metadata after activation wizard completion and redeploys it
+mkdir -p badges/05_lightning_experience_customization/logs # creates logs directory for output tracking
+
+# Step 1: Retrieve CustomApplication metadata after activation wizard completion
+CMD="sf project retrieve start -m CustomApplication:Energy_Consultations -o trailhead-playground --json" # sf retrieve command for custom application
+{ jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } | tee badges/05_lightning_experience_customization/logs/UNIT_5_GUIDED_ACTIVATION_RETRIEVE_AUDIT.json # executes retrieve and writes log output
+
+# Step 2: Deploy CustomApplication metadata back to org
+CMD="sf project deploy start -m CustomApplication:Energy_Consultations -o trailhead-playground --json" # sf deploy command for custom application
+{ jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } | tee badges/05_lightning_experience_customization/logs/UNIT_5_GUIDED_ACTIVATION_DEPLOY_AUDIT.json # executes deploy and writes log output
 ```
 
 ```bash
-# 2. Deploy the patched layout, capturing raw output directly to the audit log
-UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
-mkdir -p "$UNIT_DIR"
-
-sf project deploy start \
-  -m "Layout:Contact-Contact Layout" \
-  -o trailhead-playground \
-  --json | tee "$UNIT_DIR/UNIT_5_CHALLENGE_LAYOUT_DEPLOY_AUDIT.json"
+# Verifies CustomApplication metadata exist in org via Tooling API query
+CMD="sf data query --use-tooling-api -q \"SELECT Id, DeveloperName FROM CustomApplication WHERE DeveloperName = 'Energy_Consultations'\" -o trailhead-playground --json" # tooling api custom application query
+{ jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } | tee badges/05_lightning_experience_customization/logs/UNIT_5_GUIDED_ACTIVATION_VERIFY_AUDIT.json # executes query and writes log output
 ```
 
 ---
 
-### 4. `[REQ-5.5.C3.1]`–`[REQ-5.5.C3.RET]` Activate as Org Default — `[GUI]` + `[CLI]`
+## View the Customized Page
 
-**Browser first, then terminal.**
+Maria’s customized record page is now live. Let’s go check it out.
 
-1. **Save** the Contact page.
-2. **Activation** → **Org Default** → assign both **Desktop** and **Phone** form factors → **Save**.
+1. Click **Back** in the App Builder header.
+2. From the App Launcher, find and select **Energy Audits**, then open an audit record.
+   - You might have to refresh the page to see the changes.
+3. Look at the **Details** tab. It’s more condensed and efficient now.
 
-```bash
-# 1. Pull the final page/assignment into source
-sf project retrieve start \
-  -m "FlexiPage:Contact_Record_Page_for_Sales" \
-  -o trailhead-playground \
-  --json
+**Before**  
+Details tab with original organization of fields
 
-# 2. Redeploy that exact file, capturing raw output directly to the audit log —
-#    the reproducible, auditable command going forward
-UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
-mkdir -p "$UNIT_DIR"
+**After**  
+Details tab with new organization of fields
 
-sf project deploy start \
-  -m "FlexiPage:Contact_Record_Page_for_Sales" \
-  -o trailhead-playground \
-  --json | tee "$UNIT_DIR/UNIT_5_CHALLENGE_ACTIVATION_AUDIT.json"
-```
+4. Click the **Related** tab.
+
+Now you can see the Files related list there, just waiting for someone to upload something.
+
+Great job! Now that you’re more familiar with Lightning page customization, you can start creating pages that give your users just what they need. By arranging components and fields in logical sections, you can make it even easier for your users to store and manage the data that’s important to your business.
 
 ---
 
-## Resources & Reference Documentation
+## Resources
 
 - [Salesforce Help: Create and Configure Lightning Experience Record Pages](https://help.salesforce.com/s/articleView?id=sf.lightning_page_create.htm&type=5)
 - [Salesforce Help: Activate Lightning Experience Record Pages](https://help.salesforce.com/s/articleView?id=sf.lightning_page_activate.htm&type=5)
-- [Metadata API Reference: FlexiPage](https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_flexipage.htm)
-- [Metadata API Reference: Layout](https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_layouts.htm)
-- [docs/reference/TROUBLESHOOTING.md](../../../../reference/TROUBLESHOOTING.md) — quick-lookup entries for the Files related-list value and Org-Default activation limitation hit below
+- [Salesforce Help: Lightning App Builder Considerations](https://help.salesforce.com/s/articleView?id=sf.flexipage_overview.htm&type=5)
+
+---
+
+## Hands-On Challenge
+
+### Get Ready
+
+You’ll be completing this unit in your own hands-on org. Click Launch to get started, or click the name of your org to choose a different one.
+
+### Your Challenge
+
+#### Customize a contact record page
+
+Give users a customized set of fields on their contact record pages.
+
+- Select **Edit Page** from a contact record
+- Upgrade the page to use Dynamic Forms
+- Use the **Contact Layout** as the source for the fields
+- Remove these fields from the page:
+  - Fax
+  - Other Phone
+  - Home Phone
+- Remove the **Notes & Attachments** related list from the Contact Layout page layout and replace it with the **Files** related list.
+- Save and activate the page as the org default, and make it available to both desktop and phone users
+
+```bash
+# Authors FlexiPage XML for Contact_Record_Page_for_Sales with Dynamic Forms layout and deploys to target org
+mkdir -p force-app/main/default/flexipages # creates flexipages metadata directory
+mkdir -p badges/05_lightning_experience_customization/logs # creates logging directory
+
+cat << 'EOF' > force-app/main/default/flexipages/Contact_Record_Page_for_Sales.flexipage-meta.xml # starts heredoc for Contact flexipage
+<?xml version="1.0" encoding="UTF-8"?> <!-- XML declaration header -->
+<FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata"> <!-- FlexiPage root element -->
+    <flexiPageRegions> <!-- Header region definition -->
+        <itemInstances> <!-- Component instance wrapper -->
+            <componentInstance> <!-- Highlights panel component instance -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>collapsed</name> <!-- Property name: collapsed -->
+                    <value>false</value> <!-- Property value: false -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>enableActionsConfiguration</name> <!-- Property name: enableActionsConfiguration -->
+                    <value>false</value> <!-- Property value: false -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>enableActionsInNative</name> <!-- Property name: enableActionsInNative -->
+                    <value>false</value> <!-- Property value: false -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>hideChatterActions</name> <!-- Property name: hideChatterActions -->
+                    <value>false</value> <!-- Property value: false -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>hideSlackAction</name> <!-- Property name: hideSlackAction -->
+                    <value>false</value> <!-- Property value: false -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>numVisibleActions</name> <!-- Property name: numVisibleActions -->
+                    <value>3</value> <!-- Property value: 3 -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentName>force:highlightsPanel</componentName> <!-- Standard highlights panel component -->
+                <identifier>force_highlightsPanel</identifier> <!-- Unique component identifier -->
+            </componentInstance> <!-- End highlights panel component -->
+        </itemInstances> <!-- End component instance wrapper -->
+        <mode>Replace</mode> <!-- Region mode: Replace -->
+        <name>header</name> <!-- Region name: header -->
+        <type>Region</type> <!-- Region type: Region -->
+    </flexiPageRegions> <!-- End header region -->
+    <flexiPageRegions> <!-- First column field facet -->
+        <itemInstances> <!-- Owner field instance -->
+            <fieldInstance> <!-- Field instance tag -->
+                <fieldInstanceProperties> <!-- Property wrapper -->
+                    <name>uiBehavior</name> <!-- UI behavior property -->
+                    <value>none</value> <!-- None UI behavior -->
+                </fieldInstanceProperties> <!-- End property wrapper -->
+                <fieldItem>Record.OwnerId</fieldItem> <!-- Contact Owner field item -->
+                <identifier>RecordOwnerIdField</identifier> <!-- Field identifier -->
+            </fieldInstance> <!-- End Owner field -->
+        </itemInstances> <!-- End Owner item -->
+        <itemInstances> <!-- Name field instance -->
+            <fieldInstance> <!-- Field instance tag -->
+                <fieldInstanceProperties> <!-- Property wrapper -->
+                    <name>uiBehavior</name> <!-- UI behavior property -->
+                    <value>required</value> <!-- Required UI behavior for Name -->
+                </fieldInstanceProperties> <!-- End property wrapper -->
+                <fieldItem>Record.Name</fieldItem> <!-- Contact Name field item -->
+                <identifier>RecordNameField</identifier> <!-- Field identifier -->
+            </fieldInstance> <!-- End Name field -->
+        </itemInstances> <!-- End Name item -->
+        <itemInstances> <!-- Account field instance -->
+            <fieldInstance> <!-- Field instance tag -->
+                <fieldInstanceProperties> <!-- Property wrapper -->
+                    <name>uiBehavior</name> <!-- UI behavior property -->
+                    <value>none</value> <!-- None UI behavior -->
+                </fieldInstanceProperties> <!-- End property wrapper -->
+                <fieldItem>Record.AccountId</fieldItem> <!-- Contact Account field item -->
+                <identifier>RecordAccountIdField</identifier> <!-- Field identifier -->
+            </fieldInstance> <!-- End Account field -->
+        </itemInstances> <!-- End Account item -->
+        <itemInstances> <!-- Title field instance -->
+            <fieldInstance> <!-- Field instance tag -->
+                <fieldInstanceProperties> <!-- Property wrapper -->
+                    <name>uiBehavior</name> <!-- UI behavior property -->
+                    <value>none</value> <!-- None UI behavior -->
+                </fieldInstanceProperties> <!-- End property wrapper -->
+                <fieldItem>Record.Title</fieldItem> <!-- Contact Title field item -->
+                <identifier>RecordTitleField</identifier> <!-- Field identifier -->
+            </fieldInstance> <!-- End Title field -->
+        </itemInstances> <!-- End Title item -->
+        <itemInstances> <!-- Department field instance -->
+            <fieldInstance> <!-- Field instance tag -->
+                <fieldInstanceProperties> <!-- Property wrapper -->
+                    <name>uiBehavior</name> <!-- UI behavior property -->
+                    <value>none</value> <!-- None UI behavior -->
+                </fieldInstanceProperties> <!-- End property wrapper -->
+                <fieldItem>Record.Department</fieldItem> <!-- Contact Department field item -->
+                <identifier>RecordDepartmentField</identifier> <!-- Field identifier -->
+            </fieldInstance> <!-- End Department field -->
+        </itemInstances> <!-- End Department item -->
+        <itemInstances> <!-- Birthdate field instance -->
+            <fieldInstance> <!-- Field instance tag -->
+                <fieldInstanceProperties> <!-- Property wrapper -->
+                    <name>uiBehavior</name> <!-- UI behavior property -->
+                    <value>none</value> <!-- None UI behavior -->
+                </fieldInstanceProperties> <!-- End property wrapper -->
+                <fieldItem>Record.Birthdate</fieldItem> <!-- Contact Birthdate field item -->
+                <identifier>RecordBirthdateField</identifier> <!-- Field identifier -->
+            </fieldInstance> <!-- End Birthdate field -->
+        </itemInstances> <!-- End Birthdate item -->
+        <itemInstances> <!-- ReportsTo field instance -->
+            <fieldInstance> <!-- Field instance tag -->
+                <fieldInstanceProperties> <!-- Property wrapper -->
+                    <name>uiBehavior</name> <!-- UI behavior property -->
+                    <value>none</value> <!-- None UI behavior -->
+                </fieldInstanceProperties> <!-- End property wrapper -->
+                <fieldItem>Record.ReportsToId</fieldItem> <!-- Contact Reports To field item -->
+                <identifier>RecordReportsToIdField</identifier> <!-- Field identifier -->
+            </fieldInstance> <!-- End ReportsTo field -->
+        </itemInstances> <!-- End ReportsTo item -->
+        <itemInstances> <!-- LeadSource field instance -->
+            <fieldInstance> <!-- Field instance tag -->
+                <fieldInstanceProperties> <!-- Property wrapper -->
+                    <name>uiBehavior</name> <!-- UI behavior property -->
+                    <value>none</value> <!-- None UI behavior -->
+                </fieldInstanceProperties> <!-- End property wrapper -->
+                <fieldItem>Record.LeadSource</fieldItem> <!-- Contact Lead Source field item -->
+                <identifier>RecordLeadSourceField</identifier> <!-- Field identifier -->
+            </fieldInstance> <!-- End LeadSource field -->
+        </itemInstances> <!-- End LeadSource item -->
+        <name>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000001</name> <!-- First column facet name -->
+        <type>Facet</type> <!-- Facet region type -->
+    </flexiPageRegions> <!-- End first column field facet -->
+    <flexiPageRegions> <!-- Second column field facet -->
+        <itemInstances> <!-- Phone field instance -->
+            <fieldInstance> <!-- Field instance tag -->
+                <fieldInstanceProperties> <!-- Property wrapper -->
+                    <name>uiBehavior</name> <!-- UI behavior property -->
+                    <value>none</value> <!-- None UI behavior -->
+                </fieldInstanceProperties> <!-- End property wrapper -->
+                <fieldItem>Record.Phone</fieldItem> <!-- Contact Phone field item -->
+                <identifier>RecordPhoneField</identifier> <!-- Field identifier -->
+            </fieldInstance> <!-- End Phone field -->
+        </itemInstances> <!-- End Phone item -->
+        <itemInstances> <!-- Mobile Phone field instance -->
+            <fieldInstance> <!-- Field instance tag -->
+                <fieldInstanceProperties> <!-- Property wrapper -->
+                    <name>uiBehavior</name> <!-- UI behavior property -->
+                    <value>none</value> <!-- None UI behavior -->
+                </fieldInstanceProperties> <!-- End property wrapper -->
+                <fieldItem>Record.MobilePhone</fieldItem> <!-- Contact Mobile Phone field item -->
+                <identifier>RecordMobilePhoneField</identifier> <!-- Field identifier -->
+            </fieldInstance> <!-- End Mobile Phone field -->
+        </itemInstances> <!-- End Mobile Phone item -->
+        <itemInstances> <!-- Email field instance -->
+            <fieldInstance> <!-- Field instance tag -->
+                <fieldInstanceProperties> <!-- Property wrapper -->
+                    <name>uiBehavior</name> <!-- UI behavior property -->
+                    <value>none</value> <!-- None UI behavior -->
+                </fieldInstanceProperties> <!-- End property wrapper -->
+                <fieldItem>Record.Email</fieldItem> <!-- Contact Email field item -->
+                <identifier>RecordEmailField</identifier> <!-- Field identifier -->
+            </fieldInstance> <!-- End Email field -->
+        </itemInstances> <!-- End Email item -->
+        <itemInstances> <!-- Assistant Name field instance -->
+            <fieldInstance> <!-- Field instance tag -->
+                <fieldInstanceProperties> <!-- Property wrapper -->
+                    <name>uiBehavior</name> <!-- UI behavior property -->
+                    <value>none</value> <!-- None UI behavior -->
+                </fieldInstanceProperties> <!-- End property wrapper -->
+                <fieldItem>Record.AssistantName</fieldItem> <!-- Contact Assistant Name field item -->
+                <identifier>RecordAssistantNameField</identifier> <!-- Field identifier -->
+            </fieldInstance> <!-- End Assistant Name field -->
+        </itemInstances> <!-- End Assistant Name item -->
+        <itemInstances> <!-- Assistant Phone field instance -->
+            <fieldInstance> <!-- Field instance tag -->
+                <fieldInstanceProperties> <!-- Property wrapper -->
+                    <name>uiBehavior</name> <!-- UI behavior property -->
+                    <value>none</value> <!-- None UI behavior -->
+                </fieldInstanceProperties> <!-- End property wrapper -->
+                <fieldItem>Record.AssistantPhone</fieldItem> <!-- Contact Assistant Phone field item -->
+                <identifier>RecordAssistantPhoneField</identifier> <!-- Field identifier -->
+            </fieldInstance> <!-- End Assistant Phone field -->
+        </itemInstances> <!-- End Assistant Phone item -->
+        <name>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000002</name> <!-- Second column facet name -->
+        <type>Facet</type> <!-- Facet region type -->
+    </flexiPageRegions> <!-- End second column field facet -->
+    <flexiPageRegions> <!-- Field section columns facet -->
+        <itemInstances> <!-- First column container -->
+            <componentInstance> <!-- Column component instance -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>body</name> <!-- Body property -->
+                    <value>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000001</value> <!-- References first column facet -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentName>flexipage:column</componentName> <!-- Flexipage column component -->
+                <identifier>flexipage_column</identifier> <!-- Column identifier -->
+            </componentInstance> <!-- End column component -->
+        </itemInstances> <!-- End first column container -->
+        <itemInstances> <!-- Second column container -->
+            <componentInstance> <!-- Column component instance -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>body</name> <!-- Body property -->
+                    <value>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000002</value> <!-- References second column facet -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentName>flexipage:column</componentName> <!-- Flexipage column component -->
+                <identifier>flexipage_column2</identifier> <!-- Column identifier 2 -->
+            </componentInstance> <!-- End column component -->
+        </itemInstances> <!-- End second column container -->
+        <name>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000003</name> <!-- Columns facet name -->
+        <type>Facet</type> <!-- Facet region type -->
+    </flexiPageRegions> <!-- End field section columns facet -->
+    <flexiPageRegions> <!-- Information section facet -->
+        <itemInstances> <!-- Information field section component -->
+            <componentInstance> <!-- Section component instance -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>columns</name> <!-- Columns property -->
+                    <value>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000003</value> <!-- References columns facet -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>horizontalAlignment</name> <!-- Alignment property -->
+                    <value>false</value> <!-- Horizontal alignment false -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>label</name> <!-- Section label property -->
+                    <value>@@@SFDCInformationSFDC@@@</value> <!-- Standard Information label identifier -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentName>flexipage:fieldSection</componentName> <!-- Flexipage field section component -->
+                <identifier>flexipage_fieldSection</identifier> <!-- Field section identifier -->
+            </componentInstance> <!-- End section component -->
+        </itemInstances> <!-- End field section wrapper -->
+        <name>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000004</name> <!-- Information section facet name -->
+        <type>Facet</type> <!-- Facet region type -->
+    </flexiPageRegions> <!-- End Information section facet -->
+    <flexiPageRegions> <!-- System Information left column facet -->
+        <itemInstances> <!-- CreatedBy field instance -->
+            <fieldInstance> <!-- Field instance tag -->
+                <fieldInstanceProperties> <!-- Property wrapper -->
+                    <name>uiBehavior</name> <!-- UI behavior property -->
+                    <value>readonly</value> <!-- Read-only UI behavior -->
+                </fieldInstanceProperties> <!-- End property wrapper -->
+                <fieldItem>Record.CreatedById</fieldItem> <!-- Created By lookup field item -->
+                <identifier>RecordCreatedByIdField</identifier> <!-- Field identifier -->
+            </fieldInstance> <!-- End CreatedBy field -->
+        </itemInstances> <!-- End CreatedBy item -->
+        <name>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000005</name> <!-- System Info left column facet -->
+        <type>Facet</type> <!-- Facet region type -->
+    </flexiPageRegions> <!-- End System Info left column facet -->
+    <flexiPageRegions> <!-- System Information right column facet -->
+        <itemInstances> <!-- LastModifiedBy field instance -->
+            <fieldInstance> <!-- Field instance tag -->
+                <fieldInstanceProperties> <!-- Property wrapper -->
+                    <name>uiBehavior</name> <!-- UI behavior property -->
+                    <value>readonly</value> <!-- Read-only UI behavior -->
+                </fieldInstanceProperties> <!-- End property wrapper -->
+                <fieldItem>Record.LastModifiedById</fieldItem> <!-- Last Modified By lookup field item -->
+                <identifier>RecordLastModifiedByIdField</identifier> <!-- Field identifier -->
+            </fieldInstance> <!-- End LastModifiedBy field -->
+        </itemInstances> <!-- End LastModifiedBy item -->
+        <name>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000006</name> <!-- System Info right column facet -->
+        <type>Facet</type> <!-- Facet region type -->
+    </flexiPageRegions> <!-- End System Info right column facet -->
+    <flexiPageRegions> <!-- System Information section columns facet -->
+        <itemInstances> <!-- System Info left column container -->
+            <componentInstance> <!-- Column component instance -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>body</name> <!-- Body property -->
+                    <value>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000005</value> <!-- References system info left facet -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentName>flexipage:column</componentName> <!-- Flexipage column component -->
+                <identifier>flexipage_column3</identifier> <!-- Column identifier 3 -->
+            </componentInstance> <!-- End column component -->
+        </itemInstances> <!-- End column container -->
+        <itemInstances> <!-- System Info right column container -->
+            <componentInstance> <!-- Column component instance -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>body</name> <!-- Body property -->
+                    <value>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000006</value> <!-- References system info right facet -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentName>flexipage:column</componentName> <!-- Flexipage column component -->
+                <identifier>flexipage_column4</identifier> <!-- Column identifier 4 -->
+            </componentInstance> <!-- End column component -->
+        </itemInstances> <!-- End column container -->
+        <name>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000007</name> <!-- System Info columns facet name -->
+        <type>Facet</type> <!-- Facet region type -->
+    </flexiPageRegions> <!-- End System Information section columns facet -->
+    <flexiPageRegions> <!-- System Information section facet -->
+        <itemInstances> <!-- System Information field section component -->
+            <componentInstance> <!-- Section component instance -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>columns</name> <!-- Columns property -->
+                    <value>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000007</value> <!-- References system info columns facet -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>horizontalAlignment</name> <!-- Alignment property -->
+                    <value>false</value> <!-- Horizontal alignment false -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>label</name> <!-- Section label property -->
+                    <value>@@@SFDCSystem_InformationSFDC@@@</value> <!-- Standard System Information label identifier -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentName>flexipage:fieldSection</componentName> <!-- Flexipage field section component -->
+                <identifier>flexipage_fieldSection2</identifier> <!-- Field section identifier 2 -->
+            </componentInstance> <!-- End section component -->
+        </itemInstances> <!-- End field section wrapper -->
+        <name>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000008</name> <!-- System Info section facet name -->
+        <type>Facet</type> <!-- Facet region type -->
+    </flexiPageRegions> <!-- End System Information section facet -->
+    <flexiPageRegions> <!-- Related lists tab content facet -->
+        <itemInstances> <!-- Related list container component -->
+            <componentInstance> <!-- Component instance -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>relatedListComponentOverride</name> <!-- Component override property -->
+                    <value>NONE</value> <!-- Standard related list override setting -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>rowsToDisplay</name> <!-- Rows count property -->
+                    <value>10</value> <!-- Display 10 rows per related list -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>showActionBar</name> <!-- Show action bar property -->
+                    <value>true</value> <!-- Display action bar on related lists -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentName>force:relatedListContainer</componentName> <!-- Standard related list container -->
+                <identifier>force_relatedListContainer</identifier> <!-- Related list container identifier -->
+            </componentInstance> <!-- End related list component -->
+        </itemInstances> <!-- End related list item -->
+        <mode>Replace</mode> <!-- Replace mode -->
+        <name>relatedTabContent</name> <!-- Related tab content name -->
+        <type>Facet</type> <!-- Facet region type -->
+    </flexiPageRegions> <!-- End Related lists tab content facet -->
+    <flexiPageRegions> <!-- Detail tab content facet -->
+        <itemInstances> <!-- Record detail panel component -->
+            <componentInstance> <!-- Component instance -->
+                <componentName>force:detailPanel</componentName> <!-- Standard detail panel component -->
+                <identifier>force_detailPanel</identifier> <!-- Detail panel identifier -->
+            </componentInstance> <!-- End detail component -->
+        </itemInstances> <!-- End detail item -->
+        <mode>Replace</mode> <!-- Replace mode -->
+        <name>detailTabContent</name> <!-- Detail tab content name -->
+        <type>Facet</type> <!-- Facet region type -->
+    </flexiPageRegions> <!-- End Detail tab content facet -->
+    <flexiPageRegions> <!-- Main tabs facet -->
+        <itemInstances> <!-- Related lists tab component -->
+            <componentInstance> <!-- Component instance -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>body</name> <!-- Body property -->
+                    <value>relatedTabContent</value> <!-- References related tab content facet -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>title</name> <!-- Tab title property -->
+                    <value>Standard.Tab.relatedLists</value> <!-- Standard related lists tab title -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentName>flexipage:tab</componentName> <!-- Flexipage tab component -->
+                <identifier>relatedListsTab</identifier> <!-- Related lists tab identifier -->
+            </componentInstance> <!-- End tab component -->
+        </itemInstances> <!-- End related tab item -->
+        <itemInstances> <!-- Detail tab component -->
+            <componentInstance> <!-- Component instance -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>active</name> <!-- Active property -->
+                    <value>true</value> <!-- Sets detail tab as active by default -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>body</name> <!-- Body property -->
+                    <value>detailTabContent</value> <!-- References detail tab content facet -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>title</name> <!-- Tab title property -->
+                    <value>Standard.Tab.detail</value> <!-- Standard detail tab title -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentName>flexipage:tab</componentName> <!-- Flexipage tab component -->
+                <identifier>detailTab</identifier> <!-- Detail tab identifier -->
+            </componentInstance> <!-- End tab component -->
+        </itemInstances> <!-- End detail tab item -->
+        <mode>Replace</mode> <!-- Replace mode -->
+        <name>maintabs</name> <!-- Main tabs name -->
+        <type>Facet</type> <!-- Facet region type -->
+    </flexiPageRegions> <!-- End Main tabs facet -->
+    <flexiPageRegions> <!-- Main region -->
+        <itemInstances> <!-- Accordion component container -->
+            <componentInstance> <!-- Component instance -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>accordionSections</name> <!-- Accordion sections property -->
+                    <value>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000009</value> <!-- References accordion sections facet -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>allowMultipleSectionsOpen</name> <!-- Multiple sections property -->
+                    <value>false</value> <!-- Disallow multiple open sections -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>defaultSectionName</name> <!-- Default section property -->
+                    <value>accordionSection1</value> <!-- Default open section accordionSection1 -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentName>flexipage:accordion</componentName> <!-- Flexipage accordion component -->
+                <identifier>flexipage_accordion</identifier> <!-- Accordion identifier -->
+            </componentInstance> <!-- End accordion component -->
+        </itemInstances> <!-- End accordion container item -->
+        <itemInstances> <!-- Main tabset component container -->
+            <componentInstance> <!-- Component instance -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>label</name> <!-- Tabset label property -->
+                    <value>Tabs</value> <!-- Tabset label Tabs -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>tabs</name> <!-- Tabs property -->
+                    <value>maintabs</value> <!-- References maintabs facet -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentName>flexipage:tabset</componentName> <!-- Flexipage tabset component -->
+                <identifier>flexipage_tabset</identifier> <!-- Tabset identifier -->
+            </componentInstance> <!-- End tabset component -->
+        </itemInstances> <!-- End tabset item -->
+        <mode>Replace</mode> <!-- Replace mode -->
+        <name>main</name> <!-- Region name: main -->
+        <type>Region</type> <!-- Region type: Region -->
+    </flexiPageRegions> <!-- End Main region -->
+    <flexiPageRegions> <!-- Accordion sections facet -->
+        <itemInstances> <!-- Information accordion section -->
+            <componentInstance> <!-- Component instance -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>body</name> <!-- Body property -->
+                    <value>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000004</value> <!-- References Information section facet -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>label</name> <!-- Section label property -->
+                    <value>Standard.Tab.fields</value> <!-- Fields tab label -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>name</name> <!-- Section name property -->
+                    <value>accordionSection1</value> <!-- Section identifier accordionSection1 -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentName>flexipage:accordionSection</componentName> <!-- Accordion section component -->
+                <identifier>flexipage_accordionSection</identifier> <!-- Section identifier -->
+            </componentInstance> <!-- End section component -->
+        </itemInstances> <!-- End Information section item -->
+        <itemInstances> <!-- System Info accordion section -->
+            <componentInstance> <!-- Component instance -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>body</name> <!-- Body property -->
+                    <value>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000008</value> <!-- References System Info section facet -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>label</name> <!-- Section label property -->
+                    <value>Standard.Tab.additionalFields</value> <!-- Additional fields tab label -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>name</name> <!-- Section name property -->
+                    <value>accordionSection2</value> <!-- Section identifier accordionSection2 -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentName>flexipage:accordionSection</componentName> <!-- Accordion section component -->
+                <identifier>flexipage_accordionSection2</identifier> <!-- Section identifier 2 -->
+            </componentInstance> <!-- End section component -->
+        </itemInstances> <!-- End System Info section item -->
+        <name>Facet-c1a1b2c3-1111-4a1a-8a1a-000000000009</name> <!-- Accordion sections facet name -->
+        <type>Facet</type> <!-- Facet region type -->
+    </flexiPageRegions> <!-- End Accordion sections facet -->
+    <flexiPageRegions> <!-- Chatter feed tab content facet -->
+        <itemInstances> <!-- Record feed component -->
+            <componentInstance> <!-- Component instance -->
+                <componentName>forceChatter:recordFeedContainer</componentName> <!-- Standard Chatter feed container component -->
+                <identifier>forceChatter_recordFeedContainer</identifier> <!-- Chatter feed identifier -->
+            </componentInstance> <!-- End feed component -->
+        </itemInstances> <!-- End feed item -->
+        <mode>Replace</mode> <!-- Replace mode -->
+        <name>feedTabContent</name> <!-- Feed tab content name -->
+        <type>Facet</type> <!-- Facet region type -->
+    </flexiPageRegions> <!-- End Chatter feed tab content facet -->
+    <flexiPageRegions> <!-- Sidebar tabs facet -->
+        <itemInstances> <!-- Collaborate tab component -->
+            <componentInstance> <!-- Component instance -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>body</name> <!-- Body property -->
+                    <value>feedTabContent</value> <!-- References feed tab content facet -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>title</name> <!-- Tab title property -->
+                    <value>Standard.Tab.collaborate</value> <!-- Standard collaborate tab title -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentName>flexipage:tab</componentName> <!-- Flexipage tab component -->
+                <identifier>collaborateTab</identifier> <!-- Collaborate tab identifier -->
+            </componentInstance> <!-- End tab component -->
+        </itemInstances> <!-- End collaborate tab item -->
+        <mode>Replace</mode> <!-- Replace mode -->
+        <name>sidebartabs</name> <!-- Sidebar tabs name -->
+        <type>Facet</type> <!-- Facet region type -->
+    </flexiPageRegions> <!-- End Sidebar tabs facet -->
+    <flexiPageRegions> <!-- Sidebar region -->
+        <itemInstances> <!-- Sidebar tabset component container -->
+            <componentInstance> <!-- Component instance -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>label</name> <!-- Tabset label property -->
+                    <value>Tabs</value> <!-- Tabset label Tabs -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentInstanceProperties> <!-- Property wrapper -->
+                    <name>tabs</name> <!-- Tabs property -->
+                    <value>sidebartabs</value> <!-- References sidebartabs facet -->
+                </componentInstanceProperties> <!-- End property wrapper -->
+                <componentName>flexipage:tabset</componentName> <!-- Flexipage tabset component -->
+                <identifier>flexipage_tabset2</identifier> <!-- Sidebar tabset identifier -->
+            </componentInstance> <!-- End tabset component -->
+        </itemInstances> <!-- End sidebar tabset item -->
+        <mode>Replace</mode> <!-- Replace mode -->
+        <name>sidebar</name> <!-- Region name: sidebar -->
+        <type>Region</type> <!-- Region type: Region -->
+    </flexiPageRegions> <!-- End Sidebar region -->
+    <masterLabel>Contact Record Page for Sales</masterLabel> <!-- Master label for FlexiPage -->
+    <parentFlexiPage>flexipage__default_rec_L</parentFlexiPage> <!-- Parent standard default FlexiPage template -->
+    <sobjectType>Contact</sobjectType> <!-- SObject type: Contact -->
+    <template> <!-- Template definition -->
+        <name>flexipage:recordHomeTemplateDesktop</name> <!-- Standard desktop record home template -->
+    </template> <!-- End template definition -->
+    <type>RecordPage</type> <!-- FlexiPage type: RecordPage -->
+</FlexiPage> <!-- End FlexiPage document -->
+EOF # ends heredoc for Contact FlexiPage
+
+# Step 2: Deploy Contact Record Page for Sales metadata to target org
+CMD="sf project deploy start -m FlexiPage:Contact_Record_Page_for_Sales -o trailhead-playground --json" # sf deploy command
+{ jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } | tee badges/05_lightning_experience_customization/logs/UNIT_5_CHALLENGE_FLEXIPAGE_DEPLOY_AUDIT.json # executes deploy and writes log output
+
+# Step 3: Retrieve Contact Record Page for Sales metadata back to local source
+CMD="sf project retrieve start -m FlexiPage:Contact_Record_Page_for_Sales -o trailhead-playground --json" # sf retrieve command
+{ jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } | tee badges/05_lightning_experience_customization/logs/UNIT_5_CHALLENGE_FLEXIPAGE_RETRIEVE_AUDIT.json # executes retrieve and writes log output
+```
+
+```bash
+# Verifies Contact record flexipage metadata deployment via Salesforce Tooling API query
+CMD="sf data query --use-tooling-api -q \"SELECT Id, DeveloperName, MasterLabel, SobjectType FROM FlexiPage WHERE DeveloperName = 'Contact_Record_Page_for_Sales'\" -o trailhead-playground --json" # tooling api flexipage query
+{ jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } | tee badges/05_lightning_experience_customization/logs/UNIT_5_CHALLENGE_FLEXIPAGE_VERIFY_AUDIT.json # executes query and writes log output
+```
+
+```bash
+# Deploys updated Contact Layout metadata with Notes & Attachments removed and Files related list added
+mkdir -p badges/05_lightning_experience_customization/logs # creates logging directory for output tracking
+
+# Step 1: Deploy patched Contact Layout metadata
+CMD="sf project deploy start -m Layout:Contact-Contact Layout -o trailhead-playground --json" # sf deploy command for contact layout
+{ jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } | tee badges/05_lightning_experience_customization/logs/UNIT_5_CHALLENGE_LAYOUT_DEPLOY_AUDIT.json # executes deploy and writes log output
+```
+
+```bash
+# Verifies Contact layout metadata exist in target org via Tooling API query
+CMD="sf data query --use-tooling-api -q \"SELECT Id, Name, TableEnumOrId FROM Layout WHERE TableEnumOrId = 'Contact' AND Name = 'Contact Layout'\" -o trailhead-playground --json" # tooling api layout query
+{ jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } | tee badges/05_lightning_experience_customization/logs/UNIT_5_CHALLENGE_LAYOUT_VERIFY_AUDIT.json # executes query and writes log output
+```
+
+```bash
+# Retrieves Contact_Record_Page_for_Sales metadata post org-default activation and redeploys as audit payload
+mkdir -p badges/05_lightning_experience_customization/logs # creates logging directory for output tracking
+
+# Step 1: Retrieve activated FlexiPage metadata from org
+CMD="sf project retrieve start -m FlexiPage:Contact_Record_Page_for_Sales -o trailhead-playground --json" # sf retrieve command for activated flexipage
+{ jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } | tee badges/05_lightning_experience_customization/logs/UNIT_5_CHALLENGE_ACTIVATION_RETRIEVE_AUDIT.json # executes retrieve and writes log output
+
+# Step 2: Deploy activated FlexiPage metadata back to org
+CMD="sf project deploy start -m FlexiPage:Contact_Record_Page_for_Sales -o trailhead-playground --json" # sf deploy command for activated flexipage
+{ jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } | tee badges/05_lightning_experience_customization/logs/UNIT_5_CHALLENGE_ACTIVATION_DEPLOY_AUDIT.json # executes deploy and writes log output
+```
+
+```bash
+# Verifies activation of Contact_Record_Page_for_Sales FlexiPage via Tooling API query
+CMD="sf data query --use-tooling-api -q \"SELECT Id, DeveloperName, SobjectType FROM FlexiPage WHERE DeveloperName = 'Contact_Record_Page_for_Sales'\" -o trailhead-playground --json" # tooling api query for flexipage activation
+{ jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } | tee badges/05_lightning_experience_customization/logs/UNIT_5_CHALLENGE_ACTIVATION_VERIFY_AUDIT.json # executes query and writes log output
+```
 
 ---
 
@@ -803,27 +812,35 @@ sf project deploy start \
 1. **FlexiPage / Dynamic Forms Hand-Authoring Infeasibility:**
    - **Finding:** Unlike `CompactLayout` or `CustomObject`, `FlexiPage` XML generated by the Dynamic Forms migration wizard and the Activation wizard includes builder-assigned region UUIDs and nested facet structures that Salesforce's own docs steer you away from hand-authoring.
    - **Resolution:** Built via GUI per the Trailhead click-path, then closed out with a retrieve → deploy round trip — the redeployed file, not a hand-written-from-scratch XML block, is the reproducible payload for these requirements.
+
 2. **Missing Local Baseline for Page Layouts:**
    - **Finding:** `Energy_Audit__c`'s default page layout was auto-created by Salesforce when the object was deployed (Unit 1) but was never retrieved into local source, so its full field/section content wasn't known locally.
    - **Resolution:** Retrieve the current layout first, patch only the `relatedLists` block, then redeploy — avoids blindly reconstructing (and potentially corrupting) a layout whose existing content wasn't fully known.
+
 3. **Field Order Regression Caught by Auditing the Retrieved Output:**
    - **Finding:** After the `G1` Dynamic Forms build, the retrieved FlexiPage showed `Account__c` listed _before_ `Record.Name` — backwards from the requirement ("Account sits below Energy Audit Name"). Easy to miss without actually reading the retrieved XML.
    - **Resolution:** Since a real, wizard-generated baseline already existed, the two `<itemInstances>` blocks were swapped directly via a targeted hand-edit — safe because it reordered existing sibling elements without introducing any new builder-assigned identifiers.
+
 4. **Files Related List: Two Wrong Values Before the Real One:**
    - **Finding:** `AttachedContentDocuments` and `RelatedContentDocumentList` both failed deployment with `Cannot find related list:...`. Neither is documented in Salesforce's Metadata API reference, and no existing layout in the org (Account's included) had a working example to copy from.
-   - **Resolution:** The real value — **`RelatedFileList`** — was only discoverable by adding Files via the classic Page Layout GUI editor once, saving, then retrieving to see what Salesforce itself assigned. Full diagnostic writeup in `docs/reference/TROUBLESHOOTING.md`.
+   - **Resolution:** The real value — **`RelatedFileList`** — was only discoverable by adding Files via the classic Page Layout GUI editor once, saving, then retrieving to see what Salesforce itself assigned.
+
 5. **Org-Default Activation Cannot Be Deployed via CLI at All — Confirmed, Not Assumed:**
    - **Finding:** Verified across three separate documentation checks (the `FlexiPage` Metadata API reference, the general Metadata API docs, and the Tooling API object list) that "Assign as Org Default" record page activation isn't represented in any deployable metadata type. This is a genuine, permanent Salesforce platform limitation, not a gap that better tooling knowledge would close.
-   - **Resolution:** This one action — Activation → Org Default → Save — must always happen via browser click. Contrast with `G3`'s **App, Record Type, and Profile** assignment (not Org Default), which _is_ captured, via `profileActionOverrides` inside the owning `CustomApplication`'s own metadata — confirmed by inspecting `Energy_Consultations.app-meta.xml` directly after activation. Full diagnostic writeup in `docs/reference/TROUBLESHOOTING.md`.
+   - **Resolution:** This one action — Activation → Org Default → Save — must always happen via browser click. Contrast with `G3`'s **App, Record Type, and Profile** assignment (not Org Default), which _is_ captured, via `profileActionOverrides` inside the owning `CustomApplication`'s own metadata — confirmed by inspecting `Energy_Consultations.app-meta.xml` directly after activation.
+
 6. **Unfilled Doc Placeholders Produce Confusing Failures:**
    - **Finding:** `<confirm actual API name>` was left in `C3`'s code block even after the real name (`Contact_Record_Page_for_Sales`) was already known elsewhere in the doc, causing `Entity of type 'FlexiPage' named '<confirm actual API name>' cannot be found`.
    - **Resolution:** Once a placeholder's real value is confirmed anywhere in a doc, immediately propagate it to every occurrence — stale template text left sitting in an otherwise-real, copy-paste-ready code block reads as a working command until it isn't.
+
 7. **Audit Logs Must Be Written By the Command Itself, Not Reconstructed Afterward:**
    - **Finding:** Both Unit 4 and this unit lost their audit trail for a stretch — `--json` output was being pasted into chat/terminal without ever being redirected to a file, and by the time it's noticed, the exact raw output isn't reliably recoverable.
    - **Resolution:** Every deploy command in this doc now pipes its own output directly to the log file via `tee`, matching Unit 3's established pattern — the log is a direct capture of what the CLI actually returned, never a secondhand transcription.
+
 8. **Terminal Paste Corruption on Multi-Line Commands:**
    - **Finding:** Multi-line `\`-continued commands repeatedly broke when pasted through the terminal — a wrapped `git push --force-with-lease`, a SOQL query, and a `sf project deploy start` call all hit this, the last one appending a stray `~` that broke the `--json` flag entirely.
    - **Resolution:** Prefer single-line commands for anything likely to be copy-pasted through a terminal prone to bracketed-paste-mode artifacts. Multi-line heredocs (`cat << 'EOF' ... EOF`) were never affected, since they paste as one logical block.
+
 9. **Re-Retrieving Metadata Can Silently Overwrite an Undeployed Local Fix:**
    - **Finding:** After manually correcting `Contact-Contact Layout.layout-meta.xml`'s related-list value locally, re-running its retrieve command (as part of a "rerun everything from scratch" pass) would have pulled the org's still-broken state and erased the fix — the deploy that would've made the fix live had errored out first, so the org was never actually caught up.
    - **Resolution:** When rerunning a sequence from scratch, skip any retrieve that pulls _from_ the org if a correct, not-yet-deployed local edit already exists for that file — only the deploy should be repeated in that case.
