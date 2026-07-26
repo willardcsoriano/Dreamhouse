@@ -27,7 +27,9 @@ After completing this unit, you'll be able to:
 - Create or modify a lookup relationship.
 - Create or modify a master-detail relationship.
 
-> **Accessibility:** This unit requires some additional instructions for screen reader users. To access a detailed screen reader version of this unit, click this link: Open Trailhead screen reader instructions.
+> **Note:** Accessibility
+>
+> This unit requires some additional instructions for screen reader users. To access a detailed screen reader version of this unit, click this link: Open Trailhead screen reader instructions.
 
 ## What Are Object Relationships?
 
@@ -47,7 +49,7 @@ Before you do that, you should learn about the different kinds of relationships 
 
 ## The Wide World of Object Relationships
 
-> Note: Where possible, we changed noninclusive terms to align with our company value of Equality. We maintained certain terms to avoid any effect on customer implementations.
+> **Note:** Where possible, we changed noninclusive terms to align with our company value of Equality. We maintained certain terms to avoid any effect on customer implementations.
 
 There are two main types of object relationships: lookup and master-detail.
 
@@ -81,7 +83,7 @@ When you start adding relationships between objects, remember that you're increa
 
 You're ready to jump back in with D'Angelo to build some relationships for the DreamHouse app. Say DreamHouse wanted a way to track users who mark particular properties as favorites on their website. This feature can help DreamHouse's real estate brokers reach out to potential home buyers.
 
-> Note: Even if you're completing this module as part of the Admin Beginner trail, be sure you use the new Trailhead Playground you created in the previous unit.
+> **Note:** Even if you're completing this module as part of the Admin Beginner trail, be sure you use the new Trailhead Playground you created in the previous unit.
 
 To start, create a custom object called Favorite and add a field to the object.
 
@@ -95,6 +97,7 @@ To start, create a custom object called Favorite and add a field to the object.
 8. Click **Next**, **Next**, and **Save**.
 
 ```bash
+# Deploys custom Favorite__c object metadata and CustomTab definition with Admin tab visibility grant
 # Favorite__c custom object — Text name field, ControlledByParent sharing (required for the Master-Detail detail side)
 cat << 'EOF' > force-app/main/default/objects/Favorite__c/Favorite__c.object-meta.xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -129,8 +132,10 @@ cat << 'EOF' > force-app/main/default/tabs/Favorite__c.tab-meta.xml
 EOF
 
 # Grant tab visibility for the new Favorite tab
-sed -i '/<\/Profile>/i \    <tabVisibilities>\n        <tab>Favorite__c</tab>\n        <visibility>DefaultOn</visibility>\n    </tabVisibilities>' force-app/main/default/profiles/Admin.profile-meta.xml
+sed -i '/<\/Profile>/i \    <tabVisibilities>\n        <tab>Favorite__c</tab>\n        <visibility>DefaultOn</visibility>\n    </tabVisibilities>' force-app/main/default/profiles/Admin.profile-meta.xml # grants DefaultOn tab visibility to Admin profile
 ```
+
+**Deploy and verification deferred — folded into the _Create a Master-Detail Relationship_ step below, because Favorite__c requires its relationship fields before deploying and verifying atomically.**
 
 ## Create a Lookup Relationship
 
@@ -146,6 +151,7 @@ Next, create two custom relationship fields on the Favorite object. First, creat
 8. Click **Next**, **Next**, and **Save**.
 
 ```bash
+# Deploys non-required Contact__c Lookup field on Favorite__c with explicit Admin profile FLS grant
 # Contact__c Lookup field on Favorite__c — links to Contact, SetNull on delete; relationshipName deploys as Favorites1 (Salesforce auto-suffixed it, plain "Favorites" was already taken)
 cat << 'EOF' > force-app/main/default/objects/Favorite__c/fields/Contact__c.field-meta.xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -163,8 +169,10 @@ cat << 'EOF' > force-app/main/default/objects/Favorite__c/fields/Contact__c.fiel
 EOF
 
 # Provision Field-Level Security (FLS) so the field isn't invisible by default — required because Contact__c isn't a required field (Rule above)
-sed -i '/<\/Profile>/i \    <fieldPermissions>\n        <editable>true</editable>\n        <field>Favorite__c.Contact__c</field>\n        <readable>true</readable>\n    </fieldPermissions>' force-app/main/default/profiles/Admin.profile-meta.xml
+sed -i '/<\/Profile>/i \    <fieldPermissions>\n        <editable>true</editable>\n        <field>Favorite__c.Contact__c</field>\n        <readable>true</readable>\n    </fieldPermissions>' force-app/main/default/profiles/Admin.profile-meta.xml # adds fieldPermissions block to Admin profile
 ```
+
+**Deploy and verification deferred — folded into the _Create a Master-Detail Relationship_ step below, because Favorite__c's object schema, tab, lookup field, and master-detail field are deployed and verified atomically in one pass.**
 
 ## Create a Master-Detail Relationship
 
@@ -179,6 +187,7 @@ Now, create a second relationship field. You want a master-detail relationship w
 7. Click **Next**, **Next**, and **Save**.
 
 ```bash
+# Deploys Property__c Master-Detail field on Favorite__c and executes combined deploy and Tooling API verification
 # Property__c Master-Detail field on Favorite__c — links to Property__c, no fieldPermissions block (Master-Detail inherits security from the parent)
 cat << 'EOF' > force-app/main/default/objects/Favorite__c/fields/Property__c.field-meta.xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -202,22 +211,22 @@ EOF
 Deploy everything for Favorite in one atomic push, then verify:
 
 ```bash
-mkdir -p docs/trails/developer_beginner/badges/04_data_modeling/logs
+mkdir -p docs/trails/developer_beginner/badges/04_data_modeling/logs # creates directory for guided deploy and verification logs
 
 # Deploy Favorite__c object, tab, fields, and profile FLS/tab-visibility grants atomically
-CMD="sf project deploy start -d force-app/main/default/objects/Favorite__c -d force-app/main/default/tabs -d force-app/main/default/profiles -o trailhead-playground --json"
+CMD="sf project deploy start -d force-app/main/default/objects/Favorite__c -d force-app/main/default/tabs -d force-app/main/default/profiles -o trailhead-playground --json" # constructs deploy command for Favorite__c components
 { jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } \
-  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_2_GUIDED_DEPLOY_AUDIT.json
+  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_2_GUIDED_DEPLOY_AUDIT.json # runs deployment and saves JSON audit log
 
 # Verify Favorite__c field data types deployed correctly via Tooling API
-CMD="sf data query -o trailhead-playground --use-tooling-api -q \"SELECT QualifiedApiName, DataType FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = 'Favorite__c'\" --json"
+CMD="sf data query -o trailhead-playground --use-tooling-api -q \"SELECT QualifiedApiName, DataType FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = 'Favorite__c'\" --json" # constructs query to inspect Favorite__c fields
 { jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } \
-  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_2_GUIDED_VERIFICATION_AUDIT.json
+  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_2_GUIDED_VERIFICATION_AUDIT.json # runs schema verification query
 
 # Verify the sed-based FLS grant on Contact__c and the tab-visibility grant actually landed on the Admin profile
-CMD="sf data query -o trailhead-playground --use-tooling-api -q \"SELECT Field, PermissionsRead, PermissionsEdit FROM FieldPermissions WHERE SobjectType='Favorite__c'\" --json"
+CMD="sf data query -o trailhead-playground --use-tooling-api -q \"SELECT Field, PermissionsRead, PermissionsEdit FROM FieldPermissions WHERE SobjectType='Favorite__c'\" --json" # constructs query to verify FLS grants on Favorite__c
 { jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } \
-  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_2_GUIDED_VERIFICATION_AUDIT_FIELDPERMISSIONS.json
+  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_2_GUIDED_VERIFICATION_AUDIT_FIELDPERMISSIONS.json # runs FLS verification query
 ```
 
 Now, if you look at a Property record, you'll see Favorites listed in the Related tab.
@@ -242,7 +251,7 @@ No CLI equivalent — creating a demo Favorite record through the UI is the poin
 - Salesforce Help: Object Relationships Overview
 - Salesforce Help: Considerations for Object Relationships
 
-> Note: Where possible, we changed noninclusive terms to align with our company value of Equality. This is a work in progress, so if you find a term to evaluate for inclusive language, click Provide feedback for this badge in the right sidebar to submit it.
+> **Note:** Where possible, we changed noninclusive terms to align with our company value of Equality. This is a work in progress, so if you find a term to evaluate for inclusive language, click Provide feedback for this badge in the right sidebar to submit it.
 
 ---
 
@@ -276,6 +285,7 @@ Even if you're completing this module as part of the Admin Beginner trail, be su
    - Field Name: `Contact`
 
 ```bash
+# Deploys Property__c Master-Detail and Contact__c Lookup fields on Offer__c with Admin profile FLS grant and Tooling API verification
 # Property__c Master-Detail field on Offer__c — links to Property__c, Offers relationship name, no fieldPermissions block
 cat << 'EOF' > force-app/main/default/objects/Offer__c/fields/Property__c.field-meta.xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -309,26 +319,26 @@ cat << 'EOF' > force-app/main/default/objects/Offer__c/fields/Contact__c.field-m
 EOF
 
 # Provision Field-Level Security (FLS) so the field isn't invisible by default — required because Contact__c isn't a required field
-sed -i '/<\/Profile>/i \    <fieldPermissions>\n        <editable>true</editable>\n        <field>Offer__c.Contact__c</field>\n        <readable>true</readable>\n    </fieldPermissions>' force-app/main/default/profiles/Admin.profile-meta.xml
+sed -i '/<\/Profile>/i \    <fieldPermissions>\n        <editable>true</editable>\n        <field>Offer__c.Contact__c</field>\n        <readable>true</readable>\n    </fieldPermissions>' force-app/main/default/profiles/Admin.profile-meta.xml # injects FLS permission into Admin profile
 ```
 
 ```bash
-mkdir -p docs/trails/developer_beginner/badges/04_data_modeling/logs
+mkdir -p docs/trails/developer_beginner/badges/04_data_modeling/logs # creates logs folder for challenge execution audit logs
 
 # Deploy Offer__c relationship fields and profile FLS grant atomically
-CMD="sf project deploy start -d force-app/main/default/objects/Offer__c -d force-app/main/default/profiles -o trailhead-playground --json"
+CMD="sf project deploy start -d force-app/main/default/objects/Offer__c -d force-app/main/default/profiles -o trailhead-playground --json" # constructs deploy command for Offer__c relationships
 { jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } \
-  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_2_CHALLENGE_DEPLOY_AUDIT.json
+  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_2_CHALLENGE_DEPLOY_AUDIT.json # executes deploy and records audit log
 
 # Verify Offer__c field data types deployed correctly via Tooling API
-CMD="sf data query -o trailhead-playground --use-tooling-api -q \"SELECT QualifiedApiName, DataType FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = 'Offer__c'\" --json"
+CMD="sf data query -o trailhead-playground --use-tooling-api -q \"SELECT QualifiedApiName, DataType FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = 'Offer__c'\" --json" # constructs schema verification SOQL query
 { jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } \
-  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_2_CHALLENGE_VERIFICATION_AUDIT_SCHEMA.json
+  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_2_CHALLENGE_VERIFICATION_AUDIT_SCHEMA.json # executes schema query
 
 # Verify Admin profile FieldPermissions on Offer__c.Contact__c; Master-Detail Property__c has no row by design
-CMD="sf data query -o trailhead-playground --use-tooling-api -q \"SELECT Field, PermissionsRead, PermissionsEdit FROM FieldPermissions WHERE SobjectType='Offer__c'\" --json"
+CMD="sf data query -o trailhead-playground --use-tooling-api -q \"SELECT Field, PermissionsRead, PermissionsEdit FROM FieldPermissions WHERE SobjectType='Offer__c'\" --json" # constructs FLS verification SOQL query
 { jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } \
-  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_2_CHALLENGE_VERIFICATION_AUDIT_FIELDPERMISSIONS.json
+  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_2_CHALLENGE_VERIFICATION_AUDIT_FIELDPERMISSIONS.json # executes FLS query
 ```
 
 ## Technical Post-Mortem & Engineering Learnings

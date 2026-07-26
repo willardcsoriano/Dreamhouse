@@ -23,7 +23,9 @@ After completing this unit, you'll be able to:
 - Use Schema Builder to add a custom object to your schema.
 - Use Schema Builder to add a custom field to your schema.
 
-> **Accessibility:** This unit requires some additional instructions for screen reader users. To access a detailed screen reader version of this unit, click this link: Open Trailhead screen reader instructions.
+> **Note:** Accessibility
+>
+> This unit requires some additional instructions for screen reader users. To access a detailed screen reader version of this unit, click this link: Open Trailhead screen reader instructions.
 
 ## See Your Data Model in Action
 
@@ -107,8 +109,9 @@ DreamHouse brokers often visit properties with their clients. They want to see o
 The challenge asks you to build this through Schema Builder's canvas, but a required `TextArea` field has a small, stable, fully-documented Metadata API shape — it passes all three CLI-payload checks, so it's worth hand-authoring here rather than treated as GUI-only:
 
 ```bash
-mkdir -p force-app/main/default/objects/Property__c/fields
-mkdir -p docs/trails/developer_beginner/badges/04_data_modeling/logs
+# Deploys required Street_Address__c TextArea field to Property__c and runs Tooling API verification
+mkdir -p force-app/main/default/objects/Property__c/fields # scaffolds directory structure for Property__c fields
+mkdir -p docs/trails/developer_beginner/badges/04_data_modeling/logs # creates logs directory for audit outputs
 
 # Street_Address__c Text Area field — required, so it auto-grants universal FLS and skips fieldPermissions entirely
 cat << 'EOF' > force-app/main/default/objects/Property__c/fields/Street_Address__c.field-meta.xml
@@ -122,14 +125,14 @@ cat << 'EOF' > force-app/main/default/objects/Property__c/fields/Street_Address_
 EOF
 
 # Deploy Property__c schema to the Trailhead Playground
-CMD="sf project deploy start -d force-app/main/default/objects/Property__c -o trailhead-playground --json"
+CMD="sf project deploy start -d force-app/main/default/objects/Property__c -o trailhead-playground --json" # constructs deploy command for Property__c
 { jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } \
-  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_3_CHALLENGE_DEPLOY_AUDIT.json
+  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_3_CHALLENGE_DEPLOY_AUDIT.json # executes deploy and records audit log
 
 # Verify Street_Address__c's data type and required-ness via the Tooling API
-CMD="sf data query -o trailhead-playground --use-tooling-api -q \"SELECT QualifiedApiName, DataType, IsRequired FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = 'Property__c' AND QualifiedApiName = 'Street_Address__c'\" --json"
+CMD="sf data query -o trailhead-playground --use-tooling-api -q \"SELECT QualifiedApiName, DataType, IsRequired FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = 'Property__c' AND QualifiedApiName = 'Street_Address__c'\" --json" # constructs Tooling API query to verify Street_Address__c
 { jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } \
-  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_3_CHALLENGE_VERIFICATION_AUDIT.json
+  | tee docs/trails/developer_beginner/badges/04_data_modeling/logs/UNIT_3_CHALLENGE_VERIFICATION_AUDIT.json # executes verification query and records audit log
 ```
 
 ## Technical Post-Mortem & Engineering Learnings
