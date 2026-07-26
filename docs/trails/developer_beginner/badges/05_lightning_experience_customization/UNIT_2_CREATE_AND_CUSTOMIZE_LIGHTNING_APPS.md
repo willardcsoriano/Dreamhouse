@@ -1,4 +1,4 @@
-# Trailhead Unit: Create and Customize Lightning Apps (Agentforce 360 Platform Apps)
+# Trailhead Unit: Create and Customize Agentforce 360 Platform Apps (formerly Lightning Apps)
 
 **Trail:** Developer Beginner  
 **Badge 05:** Lightning Experience Customization  
@@ -7,162 +7,165 @@
 
 ---
 
-## Introduction & Learning Objectives
+## Table of Contents
 
-An app is a collection of items that work together to serve a particular function. In Lightning Experience, Lightning apps give users access to sets of objects, tabs, and other items all in one convenient bundle accessible from the top navigation bar and App Launcher.
+- [Learning Objectives](#learning-objectives)
+- [What Is a Lightning App?](#what-is-a-lightning-app)
+  - [Lightning Navigation](#lightning-navigation)
+- [Meet the Lightning Experience App Manager](#meet-the-lightning-experience-app-manager)
+- [What’s the Visible in Lightning Column About?](#whats-the-visible-in-lightning-column-about)
+- [Create a Lightning App](#create-a-lightning-app)
+  - [Expected Tooling API Output (`--json`):](#expected-tooling-api-output---json)
+- [Tips for Creating Apps in Lightning Experience](#tips-for-creating-apps-in-lightning-experience)
+- [Resources](#resources)
+- [Hands-On Challenge](#hands-on-challenge)
+  - [Retake Quiz](#retake-quiz)
+    - [1. What's a key benefit (or benefits) of Lightning apps for your users?](#1-whats-a-key-benefit-or-benefits-of-lightning-apps-for-your-users)
+    - [2. What can you include in a Lightning app?](#2-what-can-you-include-in-a-lightning-app)
+    - [3. What's a good way to optimize an app for your users?](#3-whats-a-good-way-to-optimize-an-app-for-your-users)
+- [Technical Post-Mortem & Engineering Learnings](#technical-post-mortem-engineering-learnings)
+  - [Key Engineering Hiccups & Solutions Encountered](#key-engineering-hiccups-solutions-encountered)
+
+## Learning Objectives
 
 After completing this unit, you’ll be able to:
 
-- Describe the benefits of Lightning apps and custom navigation.
-- Create and configure a Lightning app with custom branding and ordered navigation items.
-- List two best practices for planning and organizing Lightning apps across different user groups in your org.
+- Describe the benefits of Lightning apps.
+- Create a Lightning app with custom branding.
+- List two best practices for planning Lightning apps for your org.
+
+> **Note:**  
+> **Accessibility**  
+> This unit requires some additional instructions for screen reader users. To access a detailed screen reader version of this unit, click the link below:  
+> Open Trailhead screen reader instructions.
 
 ---
 
-## Conceptual Architecture: What Is a Lightning App?
+## What Is a Lightning App?
 
-Each Lightning app features a **Navigation Bar** at the top of the page that acts as a container for items and functionality. While the navigation bar container is always present, the items within it change dynamically based on the active app.
+An app is a collection of items that work together to serve a particular function. In Lightning Experience, Lightning apps give your users access to sets of objects, tabs, and other items all in one convenient bundle in the navigation bar.
 
-### Key Capabilities of the Navigation Bar
+Lightning apps let you brand your apps with a custom color and logo. You can even include a utility bar and Lightning page tabs in your Lightning app. Members of your org can work more efficiently by easily switching between apps. What’s most important to sales reps? Accounts, events, and organizations. How about sales managers? Reports and dashboards make the top of the list.
 
-1. **App Identity & Branding:** Displays the custom app name, logo, and primary brand color on the far left of the navigation bar (`headerColor`).
-2. **App Launcher Access:** Users can discover and switch between connected apps, Lightning apps, and Classic apps with a single click on the 9-dot **App Launcher** icon (`App Launcher`).
-3. **Item Navigation & Action Menus:** Provides instant access to standard objects (Home, Chatter, Groups), custom objects (`Energy_Audit__c`), Visualforce tabs, Lightning component tabs, and web tabs. Users can create records and access recent lists directly from item dropdown menus.
-4. **Utility Bar Integration:** If enabled, the utility bar provides persistent footer access to common productivity tools across all app pages (e.g., integrated voice, notes, flow runners).
+Let’s jump into the details.
+
+Each Lightning app has a navigation bar at the top of the page, letting your users:
+
+- Find what they need using item names for easy recognition
+- Complete actions and access recent records and lists with a single click
+- Personalize the navigation bar to suit the unique way they work
+
+Think of the navigation bar as a container for a set of items and functionality. It’s always there, but the items within it change based on the app you’re using.
+
+### Lightning Navigation
+
+- The app name (1) displays on the left side of the navigation bar and custom colors and branding make each app unique and easy to identify.
+- Your users can access other items and apps by clicking the App Launcher icon (2).
+- Your users can create records and access recent records and lists directly from the navigation bar (3) for items like Opportunities.
+
+So what things can you put in a Lightning app?
+
+- Most standard objects, including Home, the main Chatter feed, Groups, and People
+- Your org’s custom objects
+- Visualforce tabs
+- Lightning component tabs
+- Canvas apps via Visualforce tabs
+- Web tabs
+
+You can even include Lightning page tabs and utilities like Lightning Voice. If your org uses utility features, you can enable a utility bar in your app that allows instant access to productivity tools, like integrated voice, in the Lightning Experience footer.
+
+You can also build your own on-demand apps by grouping items into new custom apps.
+
+To switch between apps, users can use the App Launcher icon. This makes it easy for users to switch contexts and still have access to the items, objects, and pages they need most.
 
 ---
 
 ## Meet the Lightning Experience App Manager
 
-The **App Manager** in Setup (`Setup | App Manager`) is the centralized console for managing all connected and Salesforce apps within the org.
+The App Manager in Setup is your go-to place for managing apps for Lightning Experience. It shows all your connected apps and Salesforce apps.
 
-### Visible in Lightning Column Explained
+Use the App Manager in Lightning Experience to:
 
-- **Lightning Apps (`UiType: Lightning`):** Designed natively for Lightning Experience with custom branding, utility bars, and enhanced navigation. Always checked in the _Visible in Lightning_ column.
-- **Classic Apps Marked Visible:** Classic apps (`UiType: SalesforceClassic`) that have a checkmark in the _Visible in Lightning_ column are accessible and usable via the App Launcher in Lightning Experience, but they do not support advanced features like utility bars or custom branding colors.
-- **Classic-Only Apps:** Classic apps without a checkmark are restricted to the legacy Salesforce Classic UI and are hidden from the Lightning App Launcher.
+- View all your Salesforce apps.
+- Create Lightning apps or connected apps.
+- See which apps are visible in Lightning Experience.
+- Easily manage apps.
 
----
-
-## Best Practices for Planning Lightning Apps
-
-When designing custom apps for different business units across your org, follow these core planning principles:
-
-1. **Conduct User Priority Assessments:** Engage directly with end users through Chatter feedback groups, polls, and discovery sessions to identify high-priority objects for each job role (e.g., Sales Reps prioritize Accounts and Opportunities, while Sales Managers prioritize Reports and Dashboards).
-2. **Create and Prune a Master Object List:** Assemble a comprehensive list of all required objects org-wide, then tailor and prune the navigation items for each specific user profile:
-   - Keep shared essentials (`Home`, `Tasks`, `Chatter`) across all apps.
-   - Position high-priority items at the top/front of the navigation bar.
-   - Remove low-priority items entirely (users can still access secondary items on-demand via the App Launcher).
+> **Note:** Click a column header to sort the list based on that column.
 
 ---
 
-## Guided Activities (Consolidated Requirements & Solutions)
+## What’s the Visible in Lightning Column About?
 
-### `[REQ-5.2.G1]` Create a Custom Lightning App (`Energy_Consultations`)
+You can see in the App Manager that there are two types of apps: Classic and Lightning. A checkmark in the Visible in Lightning Experience column means that the app is accessible in Lightning Experience via the App Launcher and is fully functional.
 
-As Ursa Major Solar's administrator, Maria Jimenez needs an app that consolidates customer energy assessments and audit tools into a single navigation bundle for her energy consultants.
-
-#### Requirement Specifications
-
-- **Target Application Developer Name:** `Energy_Consultations`
-- **Application Label:** `Energy Consultations`
-- **Description:** `Track energy audits and product recommendations.`
-- **Brand Primary Hex Color:** `#FA8B05` (Warm Orange)
-- **Org Theme Options:** Override / use org theme (`shouldOverrideOrgTheme: false`)
-- **Navigation Items (Exact Order):**
-  1. `standard-home` (Home tab)
-  2. `standard-Chatter` (Chatter feed)
-  3. `standard-CollaborationGroup` (Groups)
-  4. `Energy_Audit__c` (Custom Energy Audit object tab created in Unit 1)
-  5. `standard-Account` (Accounts)
-  6. `standard-Contact` (Contacts)
-  7. `standard-Product2` (Products)
-  8. `standard-Task` (Tasks)
-- **Assigned Profile Visibility:** `System Administrator` (`Admin`)
+Classic apps that don’t have a check mark in the Visible in Lightning column are enabled only for our Salesforce Classic UI. Because you’re working in Lightning Experience, you won’t find those Classic-only apps in the App Launcher. Classic apps marked as visible in Lightning Experience are fully usable in Lightning Experience, but they don’t take advantage of the app enhancements that Lightning Experience offers.
 
 ---
 
-### Step 1: Generate `CustomApplication` Metadata XML
+## Create a Lightning App
 
-Instead of manually clicking through the Lightning App Wizard in Setup, we generate the exact declarative `CustomApplication` schema metadata on our local feature branch:
+Creating and editing a Lightning app is easy. As Ursa Major Solar’s admin, Maria needs an app that puts everything about customer energy assessments at her consultants’ fingertips. Let’s dive right in and try it out. In a few simple steps, you can give an app a name, set its primary color, upload a logo, specify which items appear in the app’s navigation bar, and assign the app to user profiles.
+
+1. From the Home tab in Setup, enter `App` in the Quick Find box, then select **App Manager**.
+2. Click **New Lightning App**. Walk through the Lightning App Wizard, creating an app with these parameters.
+   - App Name: `Energy Consultations`
+   - Description: `Track energy audits and product recommendations.`
+   - Image: Your choice! Use a JPG, PNG, BMP, or GIF image that’s smaller than 5 MB. For best results, upload an image that’s 128 by 128 pixels. Images larger than the maximum display of 128 by 128 pixels are automatically resized.
+   - Primary Hex Color Value: `#FA8B05`
+   - Org Theme Options: Select the checkbox.
+   - App Options and Utility Items: Leave as is.
+   - Navigation Items: Add these items in this order: `Home`, `Chatter`, `Groups`, `Energy Audits`, `Accounts`, `Contacts`, `Products`, `Tasks`
+   - If there are multiple Home tabs in the Available Items list, choose the one with the red icon.
+   - Assigned to user profile: `System Administrator`. Maria would assign it to her consultants’ user profile, but for our purposes, it’s easier to test if we set it to System Administrator.
+3. Click **Save and Finish** to exit the wizard.
+4. From the App Launcher icon, find and select **Energy Consultations**.
+5. Check out the new app! It’s got all the custom branding you gave it: a custom icon in the upper left and the custom color you assigned to it. Because Home is first in the navigation bar, it becomes the first page your users see when they open the app.
 
 ```bash
-mkdir -p force-app/main/default/applications
+# Deploys the Energy_Consultations CustomApplication metadata, custom tab, and profile application visibility atomically to trailhead-playground org
+mkdir -p force-app/main/default/applications # Creates destination directory for CustomApplication metadata files
 
-cat << 'EOF' > force-app/main/default/applications/Energy_Consultations.app-meta.xml
-<?xml version="1.0" encoding="UTF-8"?>
-<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
-    <brand>
-        <headerColor>#FA8B05</headerColor>
-        <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
-    </brand>
-    <description>Track energy audits and product recommendations.</description>
-    <formFactors>Small</formFactors>
-    <formFactors>Large</formFactors>
-    <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
-    <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
-    <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
-    <label>Energy Consultations</label>
-    <navType>Standard</navType>
-    <tabs>standard-home</tabs>
-    <tabs>standard-Feed</tabs>
-    <tabs>standard-CollaborationGroup</tabs>
-    <tabs>Energy_Audit__c</tabs>
-    <tabs>standard-Account</tabs>
-    <tabs>standard-Contact</tabs>
-    <tabs>standard-Product2</tabs>
-    <tabs>standard-Task</tabs>
-    <uiType>Lightning</uiType>
-</CustomApplication>
-EOF
+cat << 'EOF' > force-app/main/default/applications/Energy_Consultations.app-meta.xml # Generates application metadata XML file
+<?xml version="1.0" encoding="UTF-8"?> <!-- XML declaration specifies UTF-8 encoding -->
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata"> <!-- Metadata API root element for custom applications -->
+    <brand> <!-- Container for custom app branding configurations -->
+        <headerColor>#FA8B05</headerColor> <!-- Primary brand hex color value (Warm Orange) -->
+        <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme> <!-- Flag indicating whether to override org theme -->
+    </brand> <!-- End of branding container -->
+    <description>Track energy audits and product recommendations.</description> <!-- Descriptive summary of app purpose -->
+    <formFactors>Small</formFactors> <!-- Enables app accessibility on mobile form factor -->
+    <formFactors>Large</formFactors> <!-- Enables app accessibility on desktop form factor -->
+    <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled> <!-- Allows temporary tabs during user navigation -->
+    <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled> <!-- Allows end users to personalize navigation bar -->
+    <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled> <!-- Retains tab navigation persistence across sessions -->
+    <label>Energy Consultations</label> <!-- User-facing application label in App Launcher -->
+    <navType>Standard</navType> <!-- Specifies standard navigation mode instead of console mode -->
+    <tabs>standard-home</tabs> <!-- Navigation item 1: Standard Home tab -->
+    <tabs>standard-Feed</tabs> <!-- Navigation item 2: Standard Chatter Feed tab (standard-Feed in Metadata API) -->
+    <tabs>standard-CollaborationGroup</tabs> <!-- Navigation item 3: Standard Groups tab -->
+    <tabs>Energy_Audit__c</tabs> <!-- Navigation item 4: Custom Energy Audit object tab -->
+    <tabs>standard-Account</tabs> <!-- Navigation item 5: Standard Accounts object tab -->
+    <tabs>standard-Contact</tabs> <!-- Navigation item 6: Standard Contacts object tab -->
+    <tabs>standard-Product2</tabs> <!-- Navigation item 7: Standard Products object tab -->
+    <tabs>standard-Task</tabs> <!-- Navigation item 8: Standard Tasks object tab -->
+    <uiType>Lightning</uiType> <!-- Configures application natively for Lightning Experience -->
+</CustomApplication> <!-- End of CustomApplication definition -->
+EOF <!-- End of heredoc content -->
+
+sed -i '/<\/Profile>/i \    <applicationVisibilities>\n        <application>Energy_Consultations</application>\n        <default>false</default>\n        <visible>true</visible>\n    </applicationVisibilities>' force-app/main/default/profiles/Admin.profile-meta.xml # Appends application visibility grant to System Administrator profile
+
+CMD="sf project deploy start -d force-app/main/default/applications/Energy_Consultations.app-meta.xml -d force-app/main/default/tabs -d force-app/main/default/profiles/Admin.profile-meta.xml -o trailhead-playground --json" # Assigns deployment command to CMD variable for structured log recording
+{ jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } | tee badges/05_lightning_experience_customization/logs/UNIT_2_GUIDED_DEPLOY_APP.json # Executes deployment and logs JSON command output
 ```
-
----
-
-### Step 2: Provision Profile Application Visibility (`Admin`)
-
-In accordance with **Rule 1.2 (Atomic Schema & Security Deployments)**, applications deployed without explicit profile visibility remain hidden from the App Launcher. We use non-interactive stream editing (`sed`) to append application visibility directly into `Admin.profile-meta.xml`:
 
 ```bash
-sed -i '/<\/Profile>/i \    <applicationVisibilities>\n        <application>Energy_Consultations</application>\n        <default>false</default>\n        <visible>true</visible>\n    </applicationVisibilities>' force-app/main/default/profiles/Admin.profile-meta.xml
+# Queries Tooling API for CustomApplication metadata to verify Energy_Consultations app attributes landed in the target org
+CMD="sf data query -o trailhead-playground --use-tooling-api -q \"SELECT DeveloperName, Label, Description, UiType, NavType FROM CustomApplication WHERE DeveloperName = 'Energy_Consultations'\" --json" # Assigns SOQL query command targeting Tooling API CustomApplication entity to CMD variable
+{ jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } | tee badges/05_lightning_experience_customization/logs/UNIT_2_VERIFICATION_AUDIT.json # Executes Tooling API verification query and logs output to JSON file
 ```
 
----
-
-### Step 3: Atomic Deployment to Salesforce Cloud
-
-Deploy the application definitions, custom tabs, and profile permissions atomically using the SFDX CLI `--json` protocol:
-
-```bash
-UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
-mkdir -p "$UNIT_DIR"
-
-sf project deploy start \
-  -d force-app/main/default/applications/Energy_Consultations.app-meta.xml \
-  -d force-app/main/default/tabs \
-  -d force-app/main/default/profiles/Admin.profile-meta.xml \
-  -o trailhead-playground \
-  --json | tee "$UNIT_DIR/UNIT_2_GUIDED_DEPLOY_APP.json"
-```
-
----
-
-## Verification Query & Challenge Check
-
-Verify the `CustomApplication` schema definition across the org via the **Tooling API** (`--use-tooling-api`) before testing in the App Launcher:
-
-```bash
-UNIT_DIR="docs/trails/developer_beginner/badges/05_lightning_experience_customization/logs"
-mkdir -p "$UNIT_DIR"
-
-sf data query \
-  -o trailhead-playground \
-  --use-tooling-api \
-  -q "SELECT DeveloperName, Label, Description, UiType, NavType FROM CustomApplication WHERE DeveloperName = 'Energy_Consultations'" \
-  --json | tee "$UNIT_DIR/UNIT_2_VERIFICATION_AUDIT.json"
-```
-
-### Expected Tooling API Output (`--json`):
+#### Expected Tooling API Output (`--json`):
 
 ```json
 {
@@ -183,11 +186,27 @@ sf data query \
 }
 ```
 
-Once verified, open the App Launcher in your Trailhead Playground (`App Launcher | Energy Consultations`) to verify the `#FA8B05` branding and ordered navigation items!
+Nice work! Now you’re ready to create your own custom Lightning apps.
+
+> **Note:** Did you know that app images for Lightning apps can be animated GIFs? Oh yes, they can. You're welcome.
 
 ---
 
-## Resources & Reference Documentation
+## Tips for Creating Apps in Lightning Experience
+
+It’s time for the fun part: deciding how to set up Lightning apps for your users. Here are some tips for planning Lightning apps for your org.
+
+Talk to your users. Ask them what their priorities are. Customizing tabs in apps gives you a unique opportunity to engage with your users. Each group of users has its own priorities. Find out which objects and items represent their highest priorities.
+
+- Ask users to post feedback to a Chatter group.
+- Publish polls.
+- Schedule lunch sessions. Everyone likes a free lunch, and nearly everybody is happy to express their opinion.
+
+Create a master list of objects that everyone in your org wants. Then trim down the list for each group—sales reps, sales managers, execs, and so on. The menus for every user group share some common objects, like Home, Tasks, and Feed. Keep the high-priority items for each group at the top. Put low-priority items at the bottom, or remove them altogether. Users can always go to the App Launcher to get the items they use less often.
+
+---
+
+## Resources
 
 - [Salesforce Help: Salesforce App Considerations](https://help.salesforce.com/s/articleView?id=sf.apps_lex_considerations.htm&type=5)
 - [Salesforce Help: Personalized Navigation Considerations](https://help.salesforce.com/s/articleView?id=sf.user_user_nav_considerations.htm&type=5)
@@ -195,7 +214,36 @@ Once verified, open the App Launcher in your Trailhead Playground (`App Launcher
 
 ---
 
-## Technical Post-Mortem & Hiccups Resolution
+## Hands-On Challenge
+
+### Retake Quiz
+
+This round is just for practice—you won’t earn more points or change your completion date. Now test your knowledge!
+
+#### 1. What's a key benefit (or benefits) of Lightning apps for your users?
+
+- [ ] A. Users can create records and access recent records and lists directly from the navigation bar.
+- [ ] B. It's easy to switch contexts with the App Launcher.
+- [ ] C. Lightning apps give users access to the items, objects, and pages they need most.
+- [x] D. All of the above
+
+#### 2. What can you include in a Lightning app?
+
+- [ ] A. Unique scents that get released when a user clicks a button
+- [ ] B. Custom sound effects and flashing text
+- [x] C. Web tabs, standard and custom objects, and utility features like Lightning Voice
+- [ ] D. All of the above
+
+#### 3. What's a good way to optimize an app for your users?
+
+- [ ] A. Brand the app with an animated GIF and neon colors to get their attention.
+- [x] B. Put the highest priority objects and tabs first in the navigation menu.
+- [ ] C. Have a developer code in a sad trombone sound effect that plays for every error message.
+- [ ] D. Add every object in the org to the navigation menu.
+
+---
+
+## Technical Post-Mortem & Engineering Learnings
 
 - **Trail:** Developer Beginner
 - **Badge 05:** Lightning Experience Customization

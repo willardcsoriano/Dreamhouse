@@ -23,7 +23,8 @@ This badge covers customizing the Lightning Experience user interface for DreamH
   - [3. [Unit 3: Create and Customize List Views](UNIT_3_CREATE_AND_CUSTOMIZE_LIST_VIEWS.md)](#3-unit-3-create-and-customize-list-viewsunit_3_create_and_customize_list_viewsmd)
   - [4. [Unit 4: Customize Record Highlights with Compact Layouts](UNIT_4_CUSTOMIZE_RECORD_HIGHLIGHTS_WITH_COMPACT_LAYOUTS.md)](#4-unit-4-customize-record-highlights-with-compact-layoutsunit_4_customize_record_highlights_with_compact_layoutsmd)
   - [5. [Unit 5: Customize Record Page Components and Fields](UNIT_5_CUSTOMIZE_RECORD_PAGE_COMPONENTS_AND_FIELDS.md)](#5-unit-5-customize-record-page-components-and-fieldsunit_5_customize_record_page_components_and_fieldsmd)
-  - [6. [Unit 6: Create Custom Buttons and Links](UNIT_6_CREATE_AND_CUSTOMIZE_BUTTONS_AND_LINKS.md)](#6-unit-6-create-custom-buttons-and-linksunit_6_create_and_customize_buttons_and_linksmd)
+  - [6. [Unit 6: Create Custom Buttons and Links](UNIT_6_CREATE_CUSTOM_BUTTONS_AND_LINKS.md)](#6-unit-6-create-custom-buttons-and-linksunit_6_create_custom_buttons_and_linksmd)
+  - [7. [Unit 7: Empower Your Users with Quick Actions](UNIT_7_EMPOWER_YOUR_USERS_WITH_QUICK_ACTIONS.md)](#7-unit-7-empower-your-users-with-quick-actionsunit_7_empower_your_users_with_quick_actionsmd)
 - [Execution Protocol](#execution-protocol)
 
 ## Badge Units Index
@@ -39,7 +40,7 @@ This badge covers customizing the Lightning Experience user interface for DreamH
 
 ### 2. [Unit 2: Create and Customize Agentforce 360 Platform Apps (formerly Lightning Apps)](UNIT_2_CREATE_AND_CUSTOMIZE_LIGHTNING_APPS.md)
 
-- **File Link (Absolute):** [UNIT_2_CREATE_AND_CUSTOMIZE_LIGHTNING_APPS.md](file:///home/willard/projects/Dreamhouse/docs/trails/developer_beginner/badges/05_lightning_experience_customization/UNIT_2_CREATE_AND_CUSTOMIZE_LIGHTNING_APPS.md)
+- **File Link (Absolute):** [UNIT_2_CREATE_AND_CUSTOMIZE_LIGHTNING_APPS.md](file:///home/willard/repos/Dreamhouse/docs/trails/developer_beginner/badges/05_lightning_experience_customization/UNIT_2_CREATE_AND_CUSTOMIZE_LIGHTNING_APPS.md)
 - **Focus:** Custom Application `Energy Consultations` (`Energy_Consultations.app-meta.xml`), custom branding (`#FA8B05`), navigation items order (`Home`, `Chatter`, `Groups`, `Energy_Audit__c`, `Account`, `Contact`, `Product2`, `Task`), and profile application visibility (`Admin`).
 - **Tooling Paradigm:** 100% Hands-on SFDX CLI (`sf project deploy start` & `sf data query --use-tooling-api`).
 - **Status:** **DOCUMENTED (Ready for Execution)**
@@ -73,12 +74,21 @@ This badge covers customizing the Lightning Experience user interface for DreamH
 
 ---
 
-### 6. [Unit 6: Create Custom Buttons and Links](UNIT_6_CREATE_AND_CUSTOMIZE_BUTTONS_AND_LINKS.md)
+### 6. [Unit 6: Create Custom Buttons and Links](UNIT_6_CREATE_CUSTOM_BUTTONS_AND_LINKS.md)
 
-- **File Link (Absolute):** [UNIT_6_CREATE_AND_CUSTOMIZE_BUTTONS_AND_LINKS.md](file:///home/willard/repos/Dreamhouse/docs/trails/developer_beginner/badges/05_lightning_experience_customization/UNIT_6_CREATE_AND_CUSTOMIZE_BUTTONS_AND_LINKS.md)
+- **File Link (Absolute):** [UNIT_6_CREATE_CUSTOM_BUTTONS_AND_LINKS.md](file:///home/willard/repos/Dreamhouse/docs/trails/developer_beginner/badges/05_lightning_experience_customization/UNIT_6_CREATE_CUSTOM_BUTTONS_AND_LINKS.md)
 - **Focus:** Custom Buttons and Links (`Audit Guidelines` list button on `Energy_Audit__c`, `Google This Account` detail page link on `Account`, `Map Location` detail page button on `Account`, `Google Info` detail page button on `Contact`).
-- **Tooling Paradigm:** Declarative Salesforce UI & SFDX metadata deployment.
-- **Status:** **DOCUMENTED (In Progress)**
+- **Tooling Paradigm:** 100% Hands-on SFDX CLI (`sf project deploy start` & `sf data query --use-tooling-api`).
+- **Status:** **COMPLETED & VERIFIED**
+
+---
+
+### 7. [Unit 7: Empower Your Users with Quick Actions](UNIT_7_EMPOWER_YOUR_USERS_WITH_QUICK_ACTIONS.md)
+
+- **File Link (Absolute):** [UNIT_7_EMPOWER_YOUR_USERS_WITH_QUICK_ACTIONS.md](file:///home/willard/repos/Dreamhouse/docs/trails/developer_beginner/badges/05_lightning_experience_customization/UNIT_7_EMPOWER_YOUR_USERS_WITH_QUICK_ACTIONS.md)
+- **Focus:** Object-Specific Actions (`New_Energy_Audit` on `Account`), Global Actions (`New_Campaign` on Global Publisher Layout), page layout action assignments.
+- **Tooling Paradigm:** 100% Hands-on SFDX CLI (`sf project deploy start` & `sf data query --use-tooling-api`).
+- **Status:** **DOCUMENTED (Ready for Execution)**
 
 ---
 
