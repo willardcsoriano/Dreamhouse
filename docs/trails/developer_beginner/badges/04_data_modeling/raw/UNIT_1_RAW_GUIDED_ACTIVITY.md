@@ -150,3 +150,33 @@ Be thoughtful about names. Once you start creating a bunch of objects, it can be
 Help out your users. Even with careful naming, your users might not always be clear about the purpose of a particular object or field. Include descriptions for your custom objects and fields. For specialized or complicated customizations, use help text to give more details.
 
 Require fields when necessary. Sometimes, you’ll want to force your users to fill out a field when they’re creating a record on a certain object. Every property needs a price, right? Make important fields required to avoid incomplete data.
+Resources
+
+    Salesforce Help: Customize Your Salesforce Org
+    Salesforce Help: Store Information That’s Unique to Your Organization
+    Trailblazer Community: Customer Success Community
+
+Hands-on Challenge
++500 points
+Get Ready
+
+You’ll be completing this unit in your own hands-on org. Click Launch to get started, or click the name of your org to choose a different one.
+Your Challenge
+Build a custom Offer object
+When a homebuyer makes an offer to buy a property, the brokers at DreamHouse Realty need to track the details in Salesforce. Create a custom object they can use to record the offer amount and target close date for the sale. Use auto numbering to generate the name of each offer record.
+
+    Create a custom object
+        Label: Offer
+        Object Name: Offer
+        Record Name: Offer Name
+        Data Type: Auto Number
+        Display Format: OF-{0000}
+        Starting Number: 1
+    Create a custom currency field on the Offer object
+        Data Type: Currency
+        Field Label: Offer Amount
+        Field Name: Offer_Amount
+    Create a custom date field on the Offer object
+        Data Type: Date
+        Field Label: Target Close Date
+        Field Name: Target_Close_Date

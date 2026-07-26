@@ -65,3 +65,17 @@ Resources
 
     Salesforce Help: Design Your Own Data Model With Schema Builder
     Salesforce Help: Schema Builder Custom Object Definition
+
+Hands-on Challenge
++500 points
+Get Ready
+
+You’ll be completing this unit in your own hands-on org. Click Launch to get started, or click the name of your org to choose a different one.
+Your Challenge
+Use Schema Builder to create a custom field for the Property object
+DreamHouse brokers often visit properties with their clients. They want to see on the property record where the property is located. Use Schema Builder to add a street address field to the Property object.
+
+    Data Type: Text Area
+    Field Label: Street Address
+    Field Name: Street_Address
+    Always require a value in this field in order to save a record: Selected
