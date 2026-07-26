@@ -7,6 +7,20 @@
 
 ---
 
+## Table of Contents
+
+- [Learning Objectives](#learning-objectives)
+- [Custom Buttons and Links](#custom-buttons-and-links)
+- [What Can Custom Buttons and Links Do?](#what-can-custom-buttons-and-links-do)
+- [Create a Custom List Button](#create-a-custom-list-button)
+- [Create a Custom Detail Page Link](#create-a-custom-detail-page-link)
+- [Create a Custom Detail Page Button](#create-a-custom-detail-page-button)
+- [Resources](#resources)
+- [Hands-On Challenge](#hands-on-challenge)
+- [Technical Post-Mortem & Engineering Learnings](#technical-post-mortem-engineering-learnings)
+  - [Technical Learnings & Observations](#technical-learnings-observations)
+  - [Hiccup → Resolution: GUI Record Visibility & List View Filtering](#hiccup-resolution-gui-record-visibility-list-view-filtering)
+
 ## Learning Objectives
 
 After completing this unit, you'll be able to:
@@ -20,7 +34,7 @@ After completing this unit, you'll be able to:
 >
 > This unit requires some additional instructions for screen reader users. To access a detailed screen reader version of this unit, click the link below:
 >
-> [Open Trailhead screen reader instructions.](https://trailhead.salesforce.com/content/learn/modules/lex_customization/lex_customization_buttons_links?trail_id=force_com_dev_beginner)
+> Open Trailhead screen reader instructions.
 
 ---
 
@@ -354,3 +368,10 @@ CMD="sf data query -o trailhead-playground --use-tooling-api -q \"SELECT Id, Mas
 3. **Logging & Verification Standards:**
    - Command logging uses structured JSON wrapper syntax (`CMD="..."` and `{ jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } | tee ...`) to record both command string and CLI JSON result.
    - Tooling API queries verify `WebLink` existence, label, display type, and URL endpoints directly from org metadata.
+
+### Hiccup → Resolution: GUI Record Visibility & List View Filtering
+
+- **Hiccup:** The `GenePoint` Account record and its related `GenePoint 5-year review` Energy Audit record appeared missing when accessing the Accounts tab in the Salesforce Lightning GUI (default `Recently Viewed` list view filter, `filterName=__Recent`).
+- **Root Cause:** Records created or queried programmatically via the Salesforce CLI (`sf data create` / `sf data query`) exist in the org database but don't automatically register in the browser-specific **Recently Viewed** list view until accessed directly through the GUI. `GenePoint` is an **Account** record; `GenePoint 5-year review` is a child **Energy Audit** (`Energy_Audit__c`) record linked to it via a lookup relationship (`Account__c`).
+- **Verification:** `sf data query -q "SELECT Id, Name, Type, Phone, Industry FROM Account WHERE Name LIKE '%GenePoint%'"` returned 1 record (`Id: 001dL00002LjoYOQAZ`), confirming the record existed in the org database the whole time — this was a list-view filter issue, not a deploy or data problem.
+- **Resolution:** In the Accounts tab, switch the list view filter from **Recently Viewed** to **All Accounts**, open the **GenePoint** account record, select the **Related** tab, and scroll to the **Energy Audits** related list to find **GenePoint 5-year review**.

@@ -7,6 +7,25 @@
 
 ---
 
+## Table of Contents
+
+- [Learning Objectives](#learning-objectives)
+- [What Is a Lightning App?](#what-is-a-lightning-app)
+  - [Lightning Navigation](#lightning-navigation)
+- [Meet the Lightning Experience App Manager](#meet-the-lightning-experience-app-manager)
+- [What’s the Visible in Lightning Column About?](#whats-the-visible-in-lightning-column-about)
+- [Create a Lightning App](#create-a-lightning-app)
+  - [Expected Tooling API Output (`--json`):](#expected-tooling-api-output---json)
+- [Tips for Creating Apps in Lightning Experience](#tips-for-creating-apps-in-lightning-experience)
+- [Resources](#resources)
+- [Hands-On Challenge](#hands-on-challenge)
+  - [Retake Quiz](#retake-quiz)
+    - [1. What's a key benefit (or benefits) of Lightning apps for your users?](#1-whats-a-key-benefit-or-benefits-of-lightning-apps-for-your-users)
+    - [2. What can you include in a Lightning app?](#2-what-can-you-include-in-a-lightning-app)
+    - [3. What's a good way to optimize an app for your users?](#3-whats-a-good-way-to-optimize-an-app-for-your-users)
+- [Technical Post-Mortem & Engineering Learnings](#technical-post-mortem-engineering-learnings)
+  - [Key Engineering Hiccups & Solutions Encountered](#key-engineering-hiccups-solutions-encountered)
+
 ## Learning Objectives
 
 After completing this unit, you’ll be able to:
@@ -18,7 +37,7 @@ After completing this unit, you’ll be able to:
 > **Note:**  
 > **Accessibility**  
 > This unit requires some additional instructions for screen reader users. To access a detailed screen reader version of this unit, click the link below:  
-> [Open Trailhead screen reader instructions.](https://trailhead.salesforce.com)
+> Open Trailhead screen reader instructions.
 
 ---
 

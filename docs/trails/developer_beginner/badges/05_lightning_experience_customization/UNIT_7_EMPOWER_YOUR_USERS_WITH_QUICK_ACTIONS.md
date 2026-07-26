@@ -7,6 +7,29 @@
 
 ---
 
+## Table of Contents
+
+- [Learning Objectives](#learning-objectives)
+- [Quick Actions](#quick-actions)
+  - [Object-specific Actions](#object-specific-actions)
+  - [Global Actions](#global-actions)
+- [Create an Object-Specific Action](#create-an-object-specific-action)
+  - [Action Layout Editor](#action-layout-editor)
+- [Add an Object-Specific Action to a Page Layout](#add-an-object-specific-action-to-a-page-layout)
+  - [Adding an Action](#adding-an-action)
+  - [Action List](#action-list)
+  - [Actions](#actions)
+- [Create a Global Action](#create-a-global-action)
+  - [Create a New Campaign action](#create-a-new-campaign-action)
+  - [New Campaign action layout](#new-campaign-action-layout)
+- [Add a Global Action to the Global Actions Menu](#add-a-global-action-to-the-global-actions-menu)
+  - [Global actions menu](#global-actions-menu)
+- [Resources](#resources)
+- [Quiz](#quiz)
+  - [1. How do custom actions help your users?](#1-how-do-custom-actions-help-your-users)
+  - [2. What’s the main difference between object-specific actions and global actions?](#2-whats-the-main-difference-between-object-specific-actions-and-global-actions)
+- [Technical Post-Mortem & Engineering Learnings](#technical-post-mortem-engineering-learnings)
+
 ## Learning Objectives
 
 After completing this unit, you’ll be able to:
@@ -20,7 +43,7 @@ After completing this unit, you’ll be able to:
 >
 > This unit requires some additional instructions for screen reader users. To access a detailed screen reader version of this unit, click the link below:
 >
-> [Open Trailhead screen reader instructions.](https://trailhead.salesforce.com/content/learn/modules/lex_customization/lex_customization_actions?trail_id=force_com_dev_beginner#)
+> Open Trailhead screen reader instructions.
 
 ---
 

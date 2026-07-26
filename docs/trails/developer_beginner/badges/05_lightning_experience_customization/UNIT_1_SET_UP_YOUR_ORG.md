@@ -20,7 +20,8 @@
 - [Hands-on Challenge (+500 points)](#hands-on-challenge-500-points)
   - [Get Ready](#get-ready)
   - [Your Challenge: Create a Custom Object and Custom Fields](#your-challenge-create-a-custom-object-and-custom-fields)
-- [Technical Post-Mortem & Engineering Learnings](#technical-post-mortem--engineering-learnings)
+- [Technical Post-Mortem & Engineering Learnings](#technical-post-mortem-engineering-learnings)
+  - [Key Engineering Hiccups & Solutions Encountered During Unit 1](#key-engineering-hiccups-solutions-encountered-during-unit-1)
 
 ---
 
@@ -322,6 +323,10 @@ sed -i '/<\/CustomObject>/i \    <enableFeeds>true</enableFeeds>' force-app/main
 
 CMD="sf project deploy start -d force-app/main/default/objects/Energy_Audit__c -o trailhead-playground --json" # Deploys updated feed tracking configuration
 { jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } | tee -a badges/05_lightning_experience_customization/logs/UNIT_1_GUIDED_DEPLOY_AUDIT.json # Logs deploy command and appends output to log
+
+# Verifies Chatter feed tracking actually landed at the object level — a clean deploy exit status alone doesn't confirm enableFeeds took effect in the org
+CMD="sf data query -o trailhead-playground --use-tooling-api --json -q \"SELECT QualifiedApiName, IsFeedEnabled FROM EntityDefinition WHERE QualifiedApiName = 'Energy_Audit__c'\"" # Queries EntityDefinition.IsFeedEnabled, the Tooling API's representation of <enableFeeds>
+{ jq -n --arg cmd "$CMD" '{command: $cmd}'; eval "$CMD"; } | tee badges/05_lightning_experience_customization/logs/UNIT_1_GUIDED_VERIFICATION_AUDIT_FEED_TRACKING.json # Logs verification command and its output to its own audit file
 ```
 
 ---

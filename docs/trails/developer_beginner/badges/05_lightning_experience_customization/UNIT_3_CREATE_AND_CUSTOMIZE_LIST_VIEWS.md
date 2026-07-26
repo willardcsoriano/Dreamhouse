@@ -7,6 +7,20 @@
 
 ---
 
+## Table of Contents
+
+- [Learning Objectives](#learning-objectives)
+- [Create a List View](#create-a-list-view)
+- [Customize a List View](#customize-a-list-view)
+- [Create a List View Chart](#create-a-list-view-chart)
+- [Resources](#resources)
+- [Hands-On Challenge](#hands-on-challenge)
+  - [Get Ready](#get-ready)
+  - [Your Challenge](#your-challenge)
+    - [Create a Custom List View](#create-a-custom-list-view)
+- [Technical Post-Mortem & Engineering Learnings](#technical-post-mortem-engineering-learnings)
+  - [Technical Learnings & Architecture](#technical-learnings-architecture)
+
 ## Learning Objectives
 
 After completing this unit, you'll be able to:
@@ -20,7 +34,7 @@ After completing this unit, you'll be able to:
 >
 > This unit requires some additional instructions for screen reader users. To access a detailed screen reader version of this unit, click the link below:
 >
-> [Open Trailhead screen reader instructions.](https://trailhead.salesforce.com/content/learn/modules/lex_customization/lex_customization_list?trail_id=force_com_dev_beginner#)
+> Open Trailhead screen reader instructions.
 
 ---
 
