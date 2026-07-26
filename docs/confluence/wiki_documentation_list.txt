@@ -1,0 +1,67 @@
+================================================================================
+CONFLUENCE WIKI DOCUMENTATION BACKLOG & PLANNING
+================================================================================
+
+This document lists the essential Standard Operating Procedures (SOPs), guides,
+and references that need to be authored in our corporate Confluence Wiki.
+
+--------------------------------------------------------------------------------
+1. CORE DOCUMENTATION (REQUESTED)
+--------------------------------------------------------------------------------
+
+[ ] Version Control Workflow SOP
+    - Git branching strategy (e.g., Feature Branching / GitFlow).
+    - Naming conventions for branches (e.g., feat/issue-description).
+    - Commit message formatting (Conventional Commits standard).
+    - Pull Request requirements: review checklist, branch cleanup, and squash policies.
+
+[ ] Complete Salesforce and Atlassian CLI Reference
+    - Salesforce CLI (sf) command quick-reference (org login, source push/pull, test run).
+    - Atlassian CLI (atlas / jira) commands for ticket updates, transitions, and status checks.
+    - Setup & authentication guides for local CLI environments.
+    - Script automation templates using CLI tools.
+
+[ ] Corporate AI Hygiene Policy for All Employees
+    - Guidelines on sharing company IP, proprietary code, or client data with LLMs.
+    - Safe usage of AI coding assistants (like Antigravity / Claude) in daily development.
+    - Validation process for AI-generated code to prevent security vulnerabilities or bugs.
+    - Licensing and legal considerations regarding AI-generated code.
+
+--------------------------------------------------------------------------------
+2. RECOMMENDED ENGINEERING SOPS (PROPOSED ADDITIONS)
+--------------------------------------------------------------------------------
+
+[ ] Salesforce Scratch Org & Sandbox Lifecycle Management SOP
+    - Standardized process for spinning up, configuring, and deleting scratch orgs.
+    - Sandbox refresh schedule and environment promotion strategy (Dev -> QA -> UAT -> Prod).
+    - Tracking local changes using source tracking (`sf project deploy start` / `sf project retrieve start`).
+
+[ ] Local Developer Environment Setup & Onboarding Guide
+    - Step-by-step onboarding checklist for new engineers.
+    - Installing prerequisites (Node.js, Python, Salesforce CLI, IDE Extensions, Prettier, ESLint).
+    - Setting up Git hooks (Husky, Lint-Staged) to ensure linting and formatting on commit.
+
+[ ] Pull Request (PR) & Code Review Guidelines
+    - Code review standards (performance, scalability, readability).
+    - QA validation steps required before marking a PR as ready for review.
+    - Checklist for reviewing Apex code (bulkification, limit management, trigger frameworks).
+
+[ ] CI/CD Pipeline & Deployment SOP
+    - Overview of the automated build and deployment pipelines (e.g., GitHub Actions, GitLab CI).
+    - Package validation vs. deployment steps.
+    - How to handle manual pre-deployment and post-deployment steps in Salesforce orgs.
+    - Executing and tracking destructive changes (deleting metadata safely).
+
+[ ] Test Data Management & Seeding SOP
+    - Standardized scripts/commands for importing mock data into newly created scratch orgs (e.g., `sf data import tree`).
+    - Guidelines on masking production data if used for sandbox testing.
+    - Maintaining mock data JSON/CSV files in the repository.
+
+[ ] Secrets, Credentials, & Security SOP
+    - Rules on handling sensitive API keys, OAuth tokens, client secrets, and passwords.
+    - Approved methods for managing environment variables (e.g., using secure credential stores, sfdx auth files).
+    - Guidelines on running vulnerability scanners and static code analysis (e.g., PMD, Salesforce Scanner).
+
+[ ] Atlassian Jira-GitHub/GitLab Integration SOP
+    - How to use smart commits to reference Jira tickets directly from commit messages (e.g., "PROJ-123 #comment Resolved login issue").
+    - Automatic ticket transition rules (e.g., moving a ticket to 'In Review' when a PR is opened).

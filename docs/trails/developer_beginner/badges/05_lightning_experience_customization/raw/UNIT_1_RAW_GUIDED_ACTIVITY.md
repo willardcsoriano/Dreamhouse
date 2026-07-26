@@ -215,9 +215,12 @@ Resources
     Salesforce Help: Custom Field Limits
     Salesforce Help: Feed Tracking
 
-Hands-on Challenge
-+500 points
-Get Ready
+=======
+
+> > > > > > > origin/master
+> > > > > > > Hands-on Challenge
+> > > > > > > +500 points
+> > > > > > > Get Ready
 
 You’ll be completing this unit in your own hands-on org. Click Launch to get started, or click the name of your org to choose a different one.
 Your Challenge
